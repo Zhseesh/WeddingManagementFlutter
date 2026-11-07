@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../features/wedding_profile/presentation/onboarding_screen.dart';
-import '../features/wedding_profile/presentation/setup_profile_screen.dart';
-import '../features/wedding_profile/presentation/splash_screen.dart';
-import '../features/dashboard/presentation/dashboard_screen.dart';
-import '../features/preparation/presentation/preparation_screen.dart';
-import '../features/finance/presentation/finance_screen.dart';
-import '../features/reports/presentation/reports_screen.dart';
-import '../features/profile/presentation/profile_screen.dart';
+import 'package:weddingmanagementf/features/wedding_profile/presentation/onboarding_screen.dart';
+import 'package:weddingmanagementf/features/wedding_profile/presentation/setup_profile_screen.dart';
+import 'package:weddingmanagementf/features/wedding_profile/presentation/splash_screen.dart';
+import 'package:weddingmanagementf/features/dashboard/presentation/dashboard_screen.dart';
+import 'package:weddingmanagementf/features/preparation/presentation/preparation_screen.dart';
+import 'package:weddingmanagementf/features/finance/presentation/finance_screen.dart';
+import 'package:weddingmanagementf/features/reports/presentation/reports_screen.dart';
+import 'package:weddingmanagementf/features/profile/presentation/profile_screen.dart';
+import 'package:weddingmanagementf/features/transactions/presentation/transaction_form_screen.dart';
+import 'package:weddingmanagementf/features/transactions/presentation/transaction_detail_screen.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -15,63 +17,66 @@ final appRouter = GoRouter(
   navigatorKey: _rootNavigatorKey,
   initialLocation: '/splash',
   routes: [
-    GoRoute(
-      path: '/splash',
-      builder: (context, state) => const SplashScreen(),
-    ),
-    GoRoute(
-      path: '/onboarding',
-      builder: (context, state) => const OnboardingScreen(),
-    ),
+    GoRoute(path: '/splash', builder: (c, s) => const SplashScreen()),
+    GoRoute(path: '/onboarding', builder: (c, s) => const OnboardingScreen()),
     GoRoute(
       path: '/setup-profile',
-      builder: (context, state) => const SetupProfileScreen(),
+      builder: (c, s) => const SetupProfileScreen(),
     ),
     StatefulShellRoute.indexedStack(
-      builder: (context, state, navigationShell) {
-        return MainShell(navigationShell: navigationShell);
-      },
+      builder: (c, s, navigationShell) =>
+          MainShell(navigationShell: navigationShell),
       branches: [
-        StatefulShellBranch(
-          routes: [
-            GoRoute(
-              path: '/dashboard',
-              builder: (context, state) => const DashboardScreen(),
-            ),
-          ],
-        ),
-        StatefulShellBranch(
-          routes: [
-            GoRoute(
-              path: '/preparation',
-              builder: (context, state) => const PreparationScreen(),
-            ),
-          ],
-        ),
-        StatefulShellBranch(
-          routes: [
-            GoRoute(
-              path: '/finance',
-              builder: (context, state) => const FinanceScreen(),
-            ),
-          ],
-        ),
-        StatefulShellBranch(
-          routes: [
-            GoRoute(
-              path: '/reports',
-              builder: (context, state) => const ReportsScreen(),
-            ),
-          ],
-        ),
-        StatefulShellBranch(
-          routes: [
-            GoRoute(
-              path: '/profile',
-              builder: (context, state) => const ProfileScreen(),
-            ),
-          ],
-        ),
+        StatefulShellBranch(routes: [
+          GoRoute(
+            path: '/dashboard',
+            builder: (c, s) => const DashboardScreen(),
+          ),
+        ]),
+        StatefulShellBranch(routes: [
+          GoRoute(
+            path: '/preparation',
+            builder: (c, s) => const PreparationScreen(),
+          ),
+        ]),
+        StatefulShellBranch(routes: [
+          GoRoute(
+            path: '/finance',
+            builder: (c, s) => const FinanceScreen(),
+            routes: [
+              GoRoute(
+                path: 'transaction/new',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (c, s) => const TransactionFormScreen(),
+              ),
+              GoRoute(
+                path: 'transaction/:id',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (c, s) {
+                  final id = int.tryParse(s.pathParameters['id'] ?? '');
+                  if (id == null) {
+                    return const Scaffold(
+                      body: Center(child: Text('Transaksi tidak valid')),
+                    );
+                  }
+                  return TransactionDetailScreen(transactionId: id);
+                },
+              ),
+            ],
+          ),
+        ]),
+        StatefulShellBranch(routes: [
+          GoRoute(
+            path: '/reports',
+            builder: (c, s) => const ReportsScreen(),
+          ),
+        ]),
+        StatefulShellBranch(routes: [
+          GoRoute(
+            path: '/profile',
+            builder: (c, s) => const ProfileScreen(),
+          ),
+        ]),
       ],
     ),
   ],
@@ -79,7 +84,6 @@ final appRouter = GoRouter(
 
 class MainShell extends StatelessWidget {
   final StatefulNavigationShell navigationShell;
-
   const MainShell({super.key, required this.navigationShell});
 
   @override
