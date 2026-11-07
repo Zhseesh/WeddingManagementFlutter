@@ -7,32 +7,30 @@ class PreparationScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    // FIX: list dibuat const agar semua _PrepItem otomatis const
     const items = <_PrepItem>[
       _PrepItem(
         title: 'Vendor',
         description: 'Kelola vendor, pembayaran, dan DP',
         icon: Icons.store,
         route: '/preparation/vendors',
-        active: true,
       ),
       _PrepItem(
         title: 'Lamaran',
         description: 'Kebutuhan lamaran',
         icon: Icons.favorite_border,
-        route: null,
+        route: '/preparation/engagement',
       ),
       _PrepItem(
         title: 'Seserahan',
         description: 'Daftar seserahan',
         icon: Icons.card_giftcard,
-        route: null,
+        route: '/preparation/dowry',
       ),
       _PrepItem(
         title: 'Checklist',
         description: 'Tugas persiapan',
         icon: Icons.checklist,
-        route: null,
+        route: '/preparation/checklists',
       ),
       _PrepItem(
         title: 'Pengingat',
@@ -61,7 +59,7 @@ class PreparationScreen extends StatelessWidget {
               )),
           const SizedBox(height: 16),
           Text(
-            'Modul lain akan segera tersedia.',
+            'Modul Pengingat akan segera tersedia.',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: scheme.onSurfaceVariant,
                 ),
@@ -77,13 +75,11 @@ class _PrepItem {
   final String description;
   final IconData icon;
   final String? route;
-  final bool active;
   const _PrepItem({
     required this.title,
     required this.description,
     required this.icon,
     required this.route,
-    this.active = false,
   });
 }
 

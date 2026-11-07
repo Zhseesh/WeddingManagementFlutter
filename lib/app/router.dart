@@ -17,6 +17,15 @@ import 'package:weddingmanagementf/features/vendors/data/vendor_model.dart';
 import 'package:weddingmanagementf/features/vendors/presentation/vendor_list_screen.dart';
 import 'package:weddingmanagementf/features/vendors/presentation/vendor_form_screen.dart';
 import 'package:weddingmanagementf/features/vendors/presentation/vendor_detail_screen.dart';
+import 'package:weddingmanagementf/features/checklist/data/checklist_model.dart';
+import 'package:weddingmanagementf/features/checklist/presentation/checklist_list_screen.dart';
+import 'package:weddingmanagementf/features/checklist/presentation/checklist_form_screen.dart';
+import 'package:weddingmanagementf/features/engagement/data/engagement_model.dart';
+import 'package:weddingmanagementf/features/engagement/presentation/engagement_list_screen.dart';
+import 'package:weddingmanagementf/features/engagement/presentation/engagement_form_screen.dart';
+import 'package:weddingmanagementf/features/dowry/data/dowry_model.dart';
+import 'package:weddingmanagementf/features/dowry/presentation/dowry_list_screen.dart';
+import 'package:weddingmanagementf/features/dowry/presentation/dowry_form_screen.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -45,6 +54,7 @@ final appRouter = GoRouter(
             path: '/preparation',
             builder: (c, s) => const PreparationScreen(),
             routes: [
+              // Vendors
               GoRoute(
                 path: 'vendors',
                 parentNavigatorKey: _rootNavigatorKey,
@@ -74,6 +84,63 @@ final appRouter = GoRouter(
                     );
                   }
                   return VendorDetailScreen(vendorId: id);
+                },
+              ),
+              // Checklists
+              GoRoute(
+                path: 'checklists',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (c, s) => const ChecklistListScreen(),
+              ),
+              GoRoute(
+                path: 'checklist/new',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (c, s) => const ChecklistFormScreen(),
+              ),
+              GoRoute(
+                path: 'checklist/edit',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (c, s) {
+                  final initial = s.extra as ChecklistModel?;
+                  return ChecklistFormScreen(initial: initial);
+                },
+              ),
+              // Engagement
+              GoRoute(
+                path: 'engagement',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (c, s) => const EngagementListScreen(),
+              ),
+              GoRoute(
+                path: 'engagement/new',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (c, s) => const EngagementFormScreen(),
+              ),
+              GoRoute(
+                path: 'engagement/edit',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (c, s) {
+                  final initial = s.extra as EngagementModel?;
+                  return EngagementFormScreen(initial: initial);
+                },
+              ),
+              // Dowry
+              GoRoute(
+                path: 'dowry',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (c, s) => const DowryListScreen(),
+              ),
+              GoRoute(
+                path: 'dowry/new',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (c, s) => const DowryFormScreen(),
+              ),
+              GoRoute(
+                path: 'dowry/edit',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (c, s) {
+                  final initial = s.extra as DowryModel?;
+                  return DowryFormScreen(initial: initial);
                 },
               ),
             ],
@@ -125,7 +192,8 @@ final appRouter = GoRouter(
                 parentNavigatorKey: _rootNavigatorKey,
                 builder: (c, s) {
                   final iid = int.tryParse(s.pathParameters['id'] ?? '');
-                  final sid = int.tryParse(s.pathParameters['scheduleId'] ?? '');
+                  final sid =
+                      int.tryParse(s.pathParameters['scheduleId'] ?? '');
                   if (iid == null || sid == null) {
                     return const Scaffold(
                       body: Center(child: Text('Data tidak valid')),
