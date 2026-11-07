@@ -27,12 +27,11 @@ class WeddingProfile {
     return {
       'partner_one': partnerOne,
       'partner_two': partnerTwo,
-      'wedding_date': weddingDate != null
-          ? weddingDate!.toIso8601String().substring(0, 10)
-          : null,
-      'engagement_date': engagementDate != null
-          ? engagementDate!.toIso8601String().substring(0, 10)
-          : null,
+      // Null-aware chain: jika weddingDate null, seluruh ekspresi null.
+      // Jika tidak null, panggil toIso8601String() lalu substring.
+      'wedding_date': weddingDate?.toIso8601String().substring(0, 10),
+      'engagement_date':
+          engagementDate?.toIso8601String().substring(0, 10),
       'wedding_location': weddingLocation,
       'notes': notes,
       'is_active': isActive ? 1 : 0,
