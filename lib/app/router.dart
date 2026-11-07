@@ -10,6 +10,10 @@ import 'package:weddingmanagementf/features/reports/presentation/reports_screen.
 import 'package:weddingmanagementf/features/profile/presentation/profile_screen.dart';
 import 'package:weddingmanagementf/features/transactions/presentation/transaction_form_screen.dart';
 import 'package:weddingmanagementf/features/transactions/presentation/transaction_detail_screen.dart';
+import 'package:weddingmanagementf/features/vendors/data/vendor_model.dart';
+import 'package:weddingmanagementf/features/vendors/presentation/vendor_list_screen.dart';
+import 'package:weddingmanagementf/features/vendors/presentation/vendor_form_screen.dart';
+import 'package:weddingmanagementf/features/vendors/presentation/vendor_detail_screen.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -37,6 +41,39 @@ final appRouter = GoRouter(
           GoRoute(
             path: '/preparation',
             builder: (c, s) => const PreparationScreen(),
+            routes: [
+              GoRoute(
+                path: 'vendors',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (c, s) => const VendorListScreen(),
+              ),
+              GoRoute(
+                path: 'vendor/new',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (c, s) => const VendorFormScreen(),
+              ),
+              GoRoute(
+                path: 'vendor/edit',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (c, s) {
+                  final initial = s.extra as VendorModel?;
+                  return VendorFormScreen(initial: initial);
+                },
+              ),
+              GoRoute(
+                path: 'vendor/:id',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (c, s) {
+                  final id = int.tryParse(s.pathParameters['id'] ?? '');
+                  if (id == null) {
+                    return const Scaffold(
+                      body: Center(child: Text('Vendor tidak valid')),
+                    );
+                  }
+                  return VendorDetailScreen(vendorId: id);
+                },
+              ),
+            ],
           ),
         ]),
         StatefulShellBranch(routes: [
