@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:weddingmanagementf/core/utils/currency_formatter.dart';
 import 'package:weddingmanagementf/features/budget/presentation/budget_screen.dart';
+import 'package:weddingmanagementf/features/installments/presentation/installment_list_screen.dart';
 import 'package:weddingmanagementf/features/transactions/data/transaction_model.dart';
 import 'package:weddingmanagementf/features/transactions/presentation/providers/transaction_providers.dart';
 
@@ -21,14 +22,34 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen>
   @override
   void initState() {
     super.initState();
-    _tab = TabController(length: 2, vsync: this);
-    _tab.addListener(() => setState(() {}));
+    _tab = TabController(length: 3, vsync: this);
+    _tab.addListener(() {
+      if (mounted) setState(() {});
+    });
   }
 
   @override
   void dispose() {
     _tab.dispose();
     super.dispose();
+  }
+
+  Widget? _buildFab(BuildContext context) {
+    if (_tab.index == 0) {
+      return FloatingActionButton.extended(
+        onPressed: () => context.push('/finance/transaction/new'),
+        icon: const Icon(Icons.add),
+        label: const Text('Transaksi'),
+      );
+    }
+    if (_tab.index == 2) {
+      return FloatingActionButton.extended(
+        onPressed: () => context.push('/finance/installment/new'),
+        icon: const Icon(Icons.add),
+        label: const Text('Cicilan'),
+      );
+    }
+    return null;
   }
 
   @override
@@ -41,6 +62,7 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen>
           tabs: const [
             Tab(text: 'Transaksi'),
             Tab(text: 'Anggaran'),
+            Tab(text: 'Cicilan'),
           ],
         ),
       ),
@@ -49,15 +71,10 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen>
         children: const [
           _TransactionTab(),
           BudgetScreen(),
+          InstallmentListScreen(),
         ],
       ),
-      floatingActionButton: _tab.index == 0
-          ? FloatingActionButton.extended(
-              onPressed: () => context.push('/finance/transaction/new'),
-              icon: const Icon(Icons.add),
-              label: const Text('Transaksi'),
-            )
-          : null,
+      floatingActionButton: _buildFab(context),
     );
   }
 }

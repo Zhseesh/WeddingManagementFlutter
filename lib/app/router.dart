@@ -6,6 +6,9 @@ import 'package:weddingmanagementf/features/wedding_profile/presentation/splash_
 import 'package:weddingmanagementf/features/dashboard/presentation/dashboard_screen.dart';
 import 'package:weddingmanagementf/features/preparation/presentation/preparation_screen.dart';
 import 'package:weddingmanagementf/features/finance/presentation/finance_screen.dart';
+import 'package:weddingmanagementf/features/installments/presentation/installment_detail_screen.dart';
+import 'package:weddingmanagementf/features/installments/presentation/installment_form_screen.dart';
+import 'package:weddingmanagementf/features/installments/presentation/installment_payment_form_screen.dart';
 import 'package:weddingmanagementf/features/reports/presentation/reports_screen.dart';
 import 'package:weddingmanagementf/features/profile/presentation/profile_screen.dart';
 import 'package:weddingmanagementf/features/transactions/presentation/transaction_form_screen.dart';
@@ -97,6 +100,41 @@ final appRouter = GoRouter(
                     );
                   }
                   return TransactionDetailScreen(transactionId: id);
+                },
+              ),
+              GoRoute(
+                path: 'installment/new',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (c, s) => const InstallmentFormScreen(),
+              ),
+              GoRoute(
+                path: 'installment/:id',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (c, s) {
+                  final id = int.tryParse(s.pathParameters['id'] ?? '');
+                  if (id == null) {
+                    return const Scaffold(
+                      body: Center(child: Text('Cicilan tidak valid')),
+                    );
+                  }
+                  return InstallmentDetailScreen(installmentId: id);
+                },
+              ),
+              GoRoute(
+                path: 'installment/:id/pay/:scheduleId',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (c, s) {
+                  final iid = int.tryParse(s.pathParameters['id'] ?? '');
+                  final sid = int.tryParse(s.pathParameters['scheduleId'] ?? '');
+                  if (iid == null || sid == null) {
+                    return const Scaffold(
+                      body: Center(child: Text('Data tidak valid')),
+                    );
+                  }
+                  return InstallmentPaymentFormScreen(
+                    installmentId: iid,
+                    scheduleId: sid,
+                  );
                 },
               ),
             ],
