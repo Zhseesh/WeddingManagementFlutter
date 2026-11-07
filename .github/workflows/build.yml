@@ -38,7 +38,6 @@ jobs:
         run: flutter test
         continue-on-error: true
 
-      # ---- Decode Keystore: sanitasi whitespace + verifikasi magic byte ----
       - name: Decode Keystore
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
@@ -57,9 +56,13 @@ jobs:
             exit 1
           fi
           MAGIC=$(head -c 4 android/app/keystore.jks | xxd -p)
-          echo "keystore magic = $MAGIC (harus: feedfeed)"
-          if [ "$MAGIC" != "feedfeed" ]; then
-            echo "ERROR: file bukan JKS valid. Periksa secret KEYSTORE_BASE64."
+          echo "keystore magic = $MAGIC"
+          if [[ "$MAGIC" == feedfeed* ]]; then
+            echo "Keystore format: JKS"
+          elif [[ "$MAGIC" == 30* ]]; then
+            echo "Keystore format: PKCS12"
+          else
+            echo "ERROR: file bukan JKS/PKCS12 valid. Periksa secret KEYSTORE_BASE64."
             exit 1
           fi
 
