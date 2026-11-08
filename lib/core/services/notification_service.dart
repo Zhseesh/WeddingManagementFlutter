@@ -17,6 +17,11 @@ class NotificationService {
       FlutterLocalNotificationsPlugin();
   bool _initialized = false;
 
+  Future<void> rescheduleAllPending() async {
+    // Implementasi: baca semua reminder dengan isEnabled=true dan isCompleted=false
+    // yang reminderDate-nya di masa depan, lalu panggil schedule()
+  }
+
   Future<void> init() async {
     if (_initialized) return;
     try {

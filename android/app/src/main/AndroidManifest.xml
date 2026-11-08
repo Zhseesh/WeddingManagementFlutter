@@ -27,22 +27,31 @@
             </intent-filter>
         </activity>
 
-        <!-- Scheduled notification receiver -->
+        <!-- Receiver untuk trigger notifikasi pada waktu yang ditentukan -->
         <receiver
             android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver"
             android:exported="false"/>
 
-        <!-- Boot receiver: exported="true" WAJIB di Android 12+ -->
+        <!--
+          DelayedBootReceiver: tangkap BOOT_COMPLETED, jadwalkan alarm
+          +120 detik via AlarmManager (postDelayed Handler tidak bisa
+          dipakai karena receiver cuma hidup ~10 detik).
+        -->
         <receiver
-            android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver"
+            android:name=".DelayedBootReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
-                <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
-                <action android:name="android.intent.action.QUICKBOOT_POWERON"/>
-                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON"/>
             </intent-filter>
         </receiver>
+
+        <!--
+          RescheduleTriggerReceiver: dipicu oleh DelayedBootReceiver
+          via AlarmManager +120 detik, lalu panggil reschedule plugin.
+        -->
+        <receiver
+            android:name=".RescheduleTriggerReceiver"
+            android:exported="false"/>
 
         <meta-data
             android:name="flutterEmbedding"
