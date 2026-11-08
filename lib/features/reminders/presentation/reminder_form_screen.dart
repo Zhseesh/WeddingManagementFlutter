@@ -32,8 +32,7 @@ class _ReminderFormScreenState extends ConsumerState<ReminderFormScreen> {
     final m = widget.initial;
     _titleCtrl = TextEditingController(text: m?.title ?? '');
     _descCtrl = TextEditingController(text: m?.description ?? '');
-    _date = m?.reminderDate ??
-        DateTime.now().add(const Duration(hours: 1));
+    _date = m?.reminderDate ?? DateTime.now().add(const Duration(hours: 1));
     _isEnabled = m?.isEnabled ?? true;
   }
 
@@ -88,7 +87,6 @@ class _ReminderFormScreenState extends ConsumerState<ReminderFormScreen> {
     }
     setState(() => _submitting = true);
 
-    // Minta izin notifikasi jika reminder di-enable
     if (_isEnabled) {
       await NotificationService.instance.ensurePermission();
     }
@@ -161,31 +159,10 @@ class _ReminderFormScreenState extends ConsumerState<ReminderFormScreen> {
       ),
     );
     if (ok != true) return;
-    await ref
-        .read(reminderRepositoryProvider)
-        .delete(widget.initial!.id!);
+    await ref.read(reminderRepositoryProvider).delete(widget.initial!.id!);
     ref.invalidate(reminderListProvider);
     if (!mounted) return;
     context.pop();
-  }
-
-  Future<void> _testNotificationNow() async {
-    await NotificationService.instance.ensurePermission();
-    await NotificationService.instance.showNow(
-      id: 999999,
-      title: 'Tes Notifikasi',
-      body: 'Kalau kamu baca ini, channel notifikasi hidup.',
-    );
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          'Kalau notifikasi tidak muncul, cek Settings → Apps → '
-          'weddingmanagementf → Notifications.',
-        ),
-        duration: Duration(seconds: 5),
-      ),
-    );
   }
 
   void _showSnack(String msg) {
@@ -199,11 +176,6 @@ class _ReminderFormScreenState extends ConsumerState<ReminderFormScreen> {
         title: Text(_isEdit ? 'Edit Pengingat' : 'Tambah Pengingat'),
         actions: [
           if (_isEdit)
-            IconButton(
-              icon: const Icon(Icons.notification_add),
-              tooltip: 'Tes notifikasi sekarang',
-              onPressed: _testNotificationNow,
-            ),
             IconButton(
               icon: const Icon(Icons.delete_outline),
               tooltip: 'Hapus',
@@ -238,8 +210,7 @@ class _ReminderFormScreenState extends ConsumerState<ReminderFormScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              Text('Waktu',
-                  style: Theme.of(context).textTheme.titleSmall),
+              Text('Waktu', style: Theme.of(context).textTheme.titleSmall),
               const SizedBox(height: 8),
               Card(
                 margin: EdgeInsets.zero,

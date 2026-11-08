@@ -6,7 +6,6 @@ class PreparationScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
     const items = <_PrepItem>[
       _PrepItem(
         title: 'Vendor',
@@ -57,13 +56,6 @@ class PreparationScreen extends StatelessWidget {
                 padding: const EdgeInsets.only(bottom: 8),
                 child: _PrepCard(item: item),
               )),
-          const SizedBox(height: 16),
-          Text(
-            'Semua modul persiapan sudah tersedia. 🎉',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: scheme.onSurfaceVariant,
-                ),
-          ),
         ],
       ),
     );

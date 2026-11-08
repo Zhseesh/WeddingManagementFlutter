@@ -16,10 +16,7 @@ import 'package:weddingmanagementf/features/wedding_profile/presentation/provide
 class ReportsScreen extends ConsumerWidget {
   const ReportsScreen({super.key});
 
-  Future<void> _pickCustomRange(
-    BuildContext context,
-    WidgetRef ref,
-  ) async {
+  Future<void> _pickCustomRange(BuildContext context, WidgetRef ref) async {
     final current = ref.read(reportFilterProvider).period;
     final picked = await showDateRangePicker(
       context: context,
@@ -50,8 +47,7 @@ class ReportsScreen extends ConsumerWidget {
       const SnackBar(content: Text('Menyiapkan PDF...')),
     );
     try {
-      final profile =
-          await ref.read(activeWeddingProfileProvider.future);
+      final profile = await ref.read(activeWeddingProfileProvider.future);
       if (profile == null) return;
       final bytes = await PdfExporter.generate(
         data,
@@ -296,7 +292,6 @@ class _ReportContent extends StatelessWidget {
       physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.fromLTRB(16, 4, 16, 32),
       children: [
-        // Summary Cards
         Row(
           children: [
             Expanded(
@@ -328,7 +323,6 @@ class _ReportContent extends StatelessWidget {
         ),
         const SizedBox(height: 16),
 
-        // Budget vs Actual
         if (data.totalBudget > 0) ...[
           const _SectionTitle(title: 'Anggaran vs Realisasi'),
           Container(
@@ -387,7 +381,6 @@ class _ReportContent extends StatelessWidget {
           const SizedBox(height: 16),
         ],
 
-        // Category Breakdown
         if (data.categories.isNotEmpty) ...[
           const _SectionTitle(title: 'Pengeluaran per Kategori'),
           Container(
@@ -439,7 +432,6 @@ class _ReportContent extends StatelessWidget {
           const SizedBox(height: 16),
         ],
 
-        // Vendors
         if (data.vendors.isNotEmpty) ...[
           const _SectionTitle(title: 'Ringkasan Vendor'),
           ...data.vendors.take(10).map((v) => Container(
@@ -485,7 +477,6 @@ class _ReportContent extends StatelessWidget {
           const SizedBox(height: 16),
         ],
 
-        // Installments
         if (data.installments.isNotEmpty) ...[
           const _SectionTitle(title: 'Ringkasan Cicilan'),
           ...data.installments.take(10).map((i) => Container(
@@ -531,7 +522,6 @@ class _ReportContent extends StatelessWidget {
           const SizedBox(height: 16),
         ],
 
-        // Export buttons
         const _SectionTitle(title: 'Export Laporan'),
         Row(
           children: [
@@ -551,12 +541,6 @@ class _ReportContent extends StatelessWidget {
               ),
             ),
           ],
-        ),
-        const SizedBox(height: 8),
-        Text(
-          'PDF & CSV akan dibagikan via aplikasi lain (WhatsApp, Email, dll).',
-          style: Theme.of(context).textTheme.bodySmall,
-          textAlign: TextAlign.center,
         ),
       ],
     );
