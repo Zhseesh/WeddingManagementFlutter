@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/data/latest.dart' as tzdata;
@@ -45,24 +46,20 @@ class NotificationService {
           enableVibration: true,
         ),
       );
-
       _initialized = true;
     } catch (_) {
-      // Abaikan: notifikasi bukan fitur kritis
+      // Notifikasi bukan fitur kritis
     }
   }
 
-  /// Minta POST_NOTIFICATIONS + SCHEDULE_EXACT_ALARM sekaligus.
   Future<bool> ensurePermission() async {
     if (!_initialized) await init();
     try {
       final android = _plugin.resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin>();
       if (android == null) return false;
-      final notifOk =
-          (await android.requestNotificationsPermission()) ?? false;
-      final exactOk =
-          (await android.requestExactAlarmsPermission()) ?? false;
+      final notifOk = (await android.requestNotificationsPermission()) ?? false;
+      final exactOk = (await android.requestExactAlarmsPermission()) ?? false;
       return notifOk && exactOk;
     } catch (_) {
       return false;
@@ -70,8 +67,8 @@ class NotificationService {
   }
 
   /// Tes instan: tampilkan notifikasi SEKARANG (bukan scheduled).
-  /// Kalau ini muncul tapi `schedule` tidak, berarti masalahnya di scheduling.
-  /// Kalau ini pun tidak muncul, berarti channel/permission bermasalah.
+  /// Kalau method ini berhasil tapi `schedule` tidak, masalahnya di
+  /// penjadwalan (izin exact alarm / OEM background restriction).
   Future<void> showNow({
     required int id,
     required String title,
@@ -105,50 +102,59 @@ class NotificationService {
   }) async {
     if (!_initialized) await init();
     if (when.isBefore(DateTime.now())) return;
+
+    final android = _plugin.resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>();
+    if (android == null) return;
+
+    // Cek apakah exact alarm diizinkan. Ini pengganti
+    // resolveAndroidScheduleMode yang tidak tersedia di versi 17.x.
+    final canScheduleExact =
+        (await android.canScheduleExactNotifications()) ?? false;
+    final mode = canScheduleExact
+        ? AndroidScheduleMode.exactAllowWhileIdle
+        : AndroidScheduleMode.inexactAllowWhileIdle;
+
+    // FIX: NotificationDetails sekarang const
+    const notificationDetails = NotificationDetails(
+      android: AndroidNotificationDetails(
+        _channelId,
+        _channelName,
+        channelDescription: _channelDesc,
+        importance: Importance.max,
+        priority: Priority.max,
+        icon: '@mipmap/ic_launcher',
+      ),
+    );
+
     try {
       await _plugin.zonedSchedule(
         id,
         title,
         body,
         tz.TZDateTime.from(when, tz.local),
-        const NotificationDetails(
-          android: AndroidNotificationDetails(
-            _channelId,
-            _channelName,
-            channelDescription: _channelDesc,
-            importance: Importance.max,
-            priority: Priority.max,
-            icon: '@mipmap/ic_launcher',
-          ),
-        ),
+        notificationDetails,
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,
-        // GANTI ke exact supaya muncul tepat waktu (butuh SCHEDULE_EXACT_ALARM)
-        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        androidScheduleMode: mode,
       );
-    } catch (_) {
-      // Jangan diam total: fallback ke inexact kalau exact ditolak
-      try {
-        await _plugin.zonedSchedule(
-          id,
-          title,
-          body,
-          tz.TZDateTime.from(when, tz.local),
-          const NotificationDetails(
-            android: AndroidNotificationDetails(
-              _channelId,
-              _channelName,
-              channelDescription: _channelDesc,
-              importance: Importance.max,
-              priority: Priority.max,
-              icon: '@mipmap/ic_launcher',
-            ),
-          ),
-          uiLocalNotificationDateInterpretation:
-              UILocalNotificationDateInterpretation.absoluteTime,
-          androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-        );
-      } catch (_) {}
+    } on PlatformException catch (e) {
+      // Fallback jika exact ditolak sistem (meski canScheduleExact=true,
+      // race condition bisa terjadi)
+      if (e.code == 'exact_alarms_not_permitted') {
+        try {
+          await _plugin.zonedSchedule(
+            id,
+            title,
+            body,
+            tz.TZDateTime.from(when, tz.local),
+            notificationDetails,
+            uiLocalNotificationDateInterpretation:
+                UILocalNotificationDateInterpretation.absoluteTime,
+            androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+          );
+        } catch (_) {}
+      }
     }
   }
 
