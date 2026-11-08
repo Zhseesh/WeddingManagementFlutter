@@ -1,5 +1,5 @@
-import '../../../../core/database/database_helper.dart';
-import 'wedding_profile_model.dart';
+import 'package:weddingmanagementf/core/database/database_helper.dart';
+import 'package:weddingmanagementf/features/wedding_profile/data/wedding_profile_model.dart';
 
 class WeddingProfileRepository {
   final DatabaseHelper _dbHelper;
@@ -17,6 +17,8 @@ class WeddingProfileRepository {
     return WeddingProfile.fromMap(result.first);
   }
 
+  /// Buat profile baru + seed budget + seed kategori + seed checklist default.
+  /// Semua dalam SATU database transaction (atomik).
   Future<int> createProfileWithDefaults({
     required WeddingProfile profile,
     required int initialBudget,
@@ -89,5 +91,23 @@ class WeddingProfileRepository {
 
       return profileId;
     });
+  }
+
+  /// Update data profil (nama, tanggal, lokasi, notes).
+  Future<void> updateProfile(WeddingProfile profile) async {
+    if (profile.id == null) {
+      throw ArgumentError('Tidak bisa update profile tanpa id');
+    }
+    final db = await _dbHelper.database;
+    final now = DateTime.now().toIso8601String();
+    final map = profile.toMap()
+      ..remove('created_at')
+      ..remove('updated_at');
+    await db.update(
+      'wedding_profiles',
+      {...map, 'updated_at': now},
+      where: 'id = ?',
+      whereArgs: [profile.id],
+    );
   }
 }

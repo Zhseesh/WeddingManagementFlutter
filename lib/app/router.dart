@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:weddingmanagementf/features/wedding_profile/data/wedding_profile_model.dart';
+import 'package:weddingmanagementf/features/wedding_profile/presentation/edit_profile_screen.dart';
 import 'package:weddingmanagementf/features/wedding_profile/presentation/onboarding_screen.dart';
 import 'package:weddingmanagementf/features/wedding_profile/presentation/setup_profile_screen.dart';
 import 'package:weddingmanagementf/features/wedding_profile/presentation/splash_screen.dart';
@@ -54,7 +56,6 @@ final appRouter = GoRouter(
             path: '/preparation',
             builder: (c, s) => const PreparationScreen(),
             routes: [
-              // Vendors
               GoRoute(
                 path: 'vendors',
                 parentNavigatorKey: _rootNavigatorKey,
@@ -86,7 +87,6 @@ final appRouter = GoRouter(
                   return VendorDetailScreen(vendorId: id);
                 },
               ),
-              // Checklists
               GoRoute(
                 path: 'checklists',
                 parentNavigatorKey: _rootNavigatorKey,
@@ -105,7 +105,6 @@ final appRouter = GoRouter(
                   return ChecklistFormScreen(initial: initial);
                 },
               ),
-              // Engagement
               GoRoute(
                 path: 'engagement',
                 parentNavigatorKey: _rootNavigatorKey,
@@ -124,7 +123,6 @@ final appRouter = GoRouter(
                   return EngagementFormScreen(initial: initial);
                 },
               ),
-              // Dowry
               GoRoute(
                 path: 'dowry',
                 parentNavigatorKey: _rootNavigatorKey,
@@ -218,6 +216,21 @@ final appRouter = GoRouter(
           GoRoute(
             path: '/profile',
             builder: (c, s) => const ProfileScreen(),
+            routes: [
+              GoRoute(
+                path: 'edit',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (c, s) {
+                  final profile = s.extra as WeddingProfile?;
+                  if (profile == null) {
+                    return const Scaffold(
+                      body: Center(child: Text('Profil tidak valid')),
+                    );
+                  }
+                  return EditProfileScreen(profile: profile);
+                },
+              ),
+            ],
           ),
         ]),
       ],
