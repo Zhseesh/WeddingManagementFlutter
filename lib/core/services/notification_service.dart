@@ -24,7 +24,6 @@ class NotificationService {
         final tzName = await FlutterTimezone.getLocalTimezone();
         tz.setLocalLocation(tz.getLocation(tzName));
       } catch (_) {
-        // Fallback WIB
         tz.setLocalLocation(tz.getLocation('Asia/Jakarta'));
       }
 
@@ -41,7 +40,9 @@ class NotificationService {
           _channelId,
           _channelName,
           description: _channelDesc,
-          importance: Importance.high,
+          importance: Importance.max,
+          playSound: true,
+          enableVibration: true,
         ),
       );
 
@@ -51,18 +52,49 @@ class NotificationService {
     }
   }
 
-  /// Request izin POST_NOTIFICATIONS (idempoten, aman dipanggil berkali-kali).
+  /// Minta POST_NOTIFICATIONS + SCHEDULE_EXACT_ALARM sekaligus.
   Future<bool> ensurePermission() async {
     if (!_initialized) await init();
     try {
-      final androidPlugin = _plugin.resolvePlatformSpecificImplementation<
+      final android = _plugin.resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin>();
-      if (androidPlugin == null) return false;
-      final result = await androidPlugin.requestNotificationsPermission();
-      return result ?? false;
+      if (android == null) return false;
+      final notifOk =
+          (await android.requestNotificationsPermission()) ?? false;
+      final exactOk =
+          (await android.requestExactAlarmsPermission()) ?? false;
+      return notifOk && exactOk;
     } catch (_) {
       return false;
     }
+  }
+
+  /// Tes instan: tampilkan notifikasi SEKARANG (bukan scheduled).
+  /// Kalau ini muncul tapi `schedule` tidak, berarti masalahnya di scheduling.
+  /// Kalau ini pun tidak muncul, berarti channel/permission bermasalah.
+  Future<void> showNow({
+    required int id,
+    required String title,
+    required String body,
+  }) async {
+    if (!_initialized) await init();
+    try {
+      await _plugin.show(
+        id,
+        title,
+        body,
+        const NotificationDetails(
+          android: AndroidNotificationDetails(
+            _channelId,
+            _channelName,
+            channelDescription: _channelDesc,
+            importance: Importance.max,
+            priority: Priority.max,
+            icon: '@mipmap/ic_launcher',
+          ),
+        ),
+      );
+    } catch (_) {}
   }
 
   Future<void> schedule({
@@ -84,18 +116,39 @@ class NotificationService {
             _channelId,
             _channelName,
             channelDescription: _channelDesc,
-            importance: Importance.high,
-            priority: Priority.high,
+            importance: Importance.max,
+            priority: Priority.max,
             icon: '@mipmap/ic_launcher',
           ),
         ),
-        // FIX: parameter wajib di flutter_local_notifications 17.x
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,
-        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+        // GANTI ke exact supaya muncul tepat waktu (butuh SCHEDULE_EXACT_ALARM)
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       );
     } catch (_) {
-      // Abaikan: notifikasi bukan fitur kritis
+      // Jangan diam total: fallback ke inexact kalau exact ditolak
+      try {
+        await _plugin.zonedSchedule(
+          id,
+          title,
+          body,
+          tz.TZDateTime.from(when, tz.local),
+          const NotificationDetails(
+            android: AndroidNotificationDetails(
+              _channelId,
+              _channelName,
+              channelDescription: _channelDesc,
+              importance: Importance.max,
+              priority: Priority.max,
+              icon: '@mipmap/ic_launcher',
+            ),
+          ),
+          uiLocalNotificationDateInterpretation:
+              UILocalNotificationDateInterpretation.absoluteTime,
+          androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+        );
+      } catch (_) {}
     }
   }
 

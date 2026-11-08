@@ -1,11 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- Notifikasi (Android 13+) -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
-    <!-- Reschedule notifikasi setelah HP reboot -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
 
     <application
-        android:label="Wedding Management"
+        android:label="weddingmanagementf"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
@@ -27,13 +26,15 @@
             </intent-filter>
         </activity>
 
-        <!-- flutter_local_notifications receivers -->
+        <!-- Scheduled notification receiver -->
         <receiver
             android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver"
             android:exported="false"/>
+
+        <!-- Boot receiver: exported="true" WAJIB di Android 12+ -->
         <receiver
             android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver"
-            android:exported="false">
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>

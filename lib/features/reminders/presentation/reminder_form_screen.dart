@@ -169,6 +169,25 @@ class _ReminderFormScreenState extends ConsumerState<ReminderFormScreen> {
     context.pop();
   }
 
+  Future<void> _testNotificationNow() async {
+    await NotificationService.instance.ensurePermission();
+    await NotificationService.instance.showNow(
+      id: 999999,
+      title: 'Tes Notifikasi',
+      body: 'Kalau kamu baca ini, channel notifikasi hidup.',
+    );
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          'Kalau notifikasi tidak muncul, cek Settings → Apps → '
+          'weddingmanagementf → Notifications.',
+        ),
+        duration: Duration(seconds: 5),
+      ),
+    );
+  }
+
   void _showSnack(String msg) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
   }
@@ -180,6 +199,11 @@ class _ReminderFormScreenState extends ConsumerState<ReminderFormScreen> {
         title: Text(_isEdit ? 'Edit Pengingat' : 'Tambah Pengingat'),
         actions: [
           if (_isEdit)
+            IconButton(
+              icon: const Icon(Icons.notification_add),
+              tooltip: 'Tes notifikasi sekarang',
+              onPressed: _testNotificationNow,
+            ),
             IconButton(
               icon: const Icon(Icons.delete_outline),
               tooltip: 'Hapus',
