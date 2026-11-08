@@ -34,9 +34,9 @@ class PreparationScreen extends StatelessWidget {
       ),
       _PrepItem(
         title: 'Pengingat',
-        description: 'Notifikasi & jadwal',
+        description: 'Notifikasi & jadwal penting',
         icon: Icons.alarm,
-        route: null,
+        route: '/preparation/reminders',
       ),
     ];
 
@@ -59,7 +59,7 @@ class PreparationScreen extends StatelessWidget {
               )),
           const SizedBox(height: 16),
           Text(
-            'Modul Pengingat akan segera tersedia.',
+            'Semua modul persiapan sudah tersedia. 🎉',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: scheme.onSurfaceVariant,
                 ),

@@ -28,6 +28,9 @@ import 'package:weddingmanagementf/features/engagement/presentation/engagement_f
 import 'package:weddingmanagementf/features/dowry/data/dowry_model.dart';
 import 'package:weddingmanagementf/features/dowry/presentation/dowry_list_screen.dart';
 import 'package:weddingmanagementf/features/dowry/presentation/dowry_form_screen.dart';
+import 'package:weddingmanagementf/features/reminders/data/reminder_model.dart';
+import 'package:weddingmanagementf/features/reminders/presentation/reminder_list_screen.dart';
+import 'package:weddingmanagementf/features/reminders/presentation/reminder_form_screen.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -139,6 +142,24 @@ final appRouter = GoRouter(
                 builder: (c, s) {
                   final initial = s.extra as DowryModel?;
                   return DowryFormScreen(initial: initial);
+                },
+              ),
+              GoRoute(
+                path: 'reminders',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (c, s) => const ReminderListScreen(),
+              ),
+              GoRoute(
+                path: 'reminder/new',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (c, s) => const ReminderFormScreen(),
+              ),
+              GoRoute(
+                path: 'reminder/edit',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (c, s) {
+                  final initial = s.extra as ReminderModel?;
+                  return ReminderFormScreen(initial: initial);
                 },
               ),
             ],
