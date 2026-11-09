@@ -80,8 +80,9 @@ class _ChecklistFormSheetState extends ConsumerState<_ChecklistFormSheet> {
               id: widget.initial!.id,
               profileId: widget.initial!.profileId,
               title: _titleCtrl.text.trim(),
-              category:
-                  _categoryCtrl.text.trim().isEmpty ? null : _categoryCtrl.text.trim(),
+              category: _categoryCtrl.text.trim().isEmpty
+                  ? null
+                  : _categoryCtrl.text.trim(),
               description:
                   _descCtrl.text.trim().isEmpty ? null : _descCtrl.text.trim(),
               priority: _priority.dbValue,
@@ -97,8 +98,9 @@ class _ChecklistFormSheetState extends ConsumerState<_ChecklistFormSheet> {
         await ref.read(checklistRepositoryProvider).insert(ChecklistModel(
               profileId: profile!.id!,
               title: _titleCtrl.text.trim(),
-              category:
-                  _categoryCtrl.text.trim().isEmpty ? null : _categoryCtrl.text.trim(),
+              category: _categoryCtrl.text.trim().isEmpty
+                  ? null
+                  : _categoryCtrl.text.trim(),
               description:
                   _descCtrl.text.trim().isEmpty ? null : _descCtrl.text.trim(),
               priority: _priority.dbValue,
@@ -155,23 +157,45 @@ class _ChecklistFormSheetState extends ConsumerState<_ChecklistFormSheet> {
             const Text('Prioritas',
                 style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
             const SizedBox(height: 6),
-            SegmentedButton<ChecklistPriority>(
-              segments: ChecklistPriority.values
-                  .map((p) => ButtonSegment(value: p, label: Text(p.label)))
-                  .toList(),
-              selected: {_priority},
-              onSelectionChanged: (s) => setState(() => _priority = s.first),
+            SizedBox(
+              width: double.infinity,
+              child: SegmentedButton<ChecklistPriority>(
+                segments: ChecklistPriority.values
+                    .map((p) => ButtonSegment(
+                          value: p,
+                          label: Text(
+                            p.label,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(fontSize: 13),
+                          ),
+                        ))
+                    .toList(),
+                selected: {_priority},
+                expandedInsets: EdgeInsets.zero, 
+                onSelectionChanged: (s) => setState(() => _priority = s.first),
+              ),
             ),
             const SizedBox(height: 14),
             const Text('Status',
                 style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
             const SizedBox(height: 6),
-            SegmentedButton<ChecklistStatus>(
-              segments: ChecklistStatus.values
-                  .map((s) => ButtonSegment(value: s, label: Text(s.label)))
-                  .toList(),
-              selected: {_status},
-              onSelectionChanged: (s) => setState(() => _status = s.first),
+            SizedBox(
+              width: double.infinity,
+              child: SegmentedButton<ChecklistStatus>(
+                segments: ChecklistStatus.values
+                    .map((s) => ButtonSegment(
+                          value: s,
+                          label: Text(
+                            s.label,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(fontSize: 13),
+                          ),
+                        ))
+                    .toList(),
+                selected: {_status},
+                expandedInsets: EdgeInsets.zero, 
+                onSelectionChanged: (s) => setState(() => _status = s.first),
+              ),
             ),
             const SizedBox(height: 12),
             ListTile(

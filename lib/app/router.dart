@@ -9,11 +9,8 @@ import 'package:weddingmanagementf/features/dashboard/presentation/dashboard_scr
 import 'package:weddingmanagementf/features/preparation/presentation/preparation_screen.dart';
 import 'package:weddingmanagementf/features/finance/presentation/finance_screen.dart';
 import 'package:weddingmanagementf/features/installments/presentation/installment_detail_screen.dart';
-import 'package:weddingmanagementf/features/installments/presentation/installment_form_screen.dart';
-import 'package:weddingmanagementf/features/installments/presentation/installment_payment_form_screen.dart';
 import 'package:weddingmanagementf/features/reports/presentation/reports_screen.dart';
 import 'package:weddingmanagementf/features/profile/presentation/profile_screen.dart';
-import 'package:weddingmanagementf/features/transactions/presentation/transaction_form_screen.dart';
 import 'package:weddingmanagementf/features/transactions/presentation/transaction_detail_screen.dart';
 import 'package:weddingmanagementf/features/vendors/presentation/vendor_detail_screen.dart';
 
@@ -25,15 +22,12 @@ final appRouter = GoRouter(
   routes: [
     GoRoute(path: '/splash', builder: (c, s) => const SplashScreen()),
     GoRoute(path: '/onboarding', builder: (c, s) => const OnboardingScreen()),
-    GoRoute(
-        path: '/setup-profile', builder: (c, s) => const SetupProfileScreen()),
+    GoRoute(path: '/setup-profile', builder: (c, s) => const SetupProfileScreen()),
     StatefulShellRoute.indexedStack(
-      builder: (c, s, navigationShell) =>
-          MainShell(navigationShell: navigationShell),
+      builder: (c, s, navigationShell) => MainShell(navigationShell: navigationShell),
       branches: [
         StatefulShellBranch(routes: [
-          GoRoute(
-              path: '/dashboard', builder: (c, s) => const DashboardScreen()),
+          GoRoute(path: '/dashboard', builder: (c, s) => const DashboardScreen()),
         ]),
         StatefulShellBranch(routes: [
           GoRoute(
@@ -45,10 +39,7 @@ final appRouter = GoRouter(
                 parentNavigatorKey: _rootNavigatorKey,
                 builder: (c, s) {
                   final id = int.tryParse(s.pathParameters['id'] ?? '');
-                  if (id == null) {
-                    return const Scaffold(
-                        body: Center(child: Text('Vendor tidak valid')));
-                  }
+                  if (id == null) return const Scaffold(body: Center(child: Text('Vendor tidak valid')));
                   return VendorDetailScreen(vendorId: id);
                 },
               ),
@@ -61,59 +52,28 @@ final appRouter = GoRouter(
             builder: (c, s) => const FinanceScreen(),
             routes: [
               GoRoute(
-                path: 'transaction/new',
-                parentNavigatorKey: _rootNavigatorKey,
-                builder: (c, s) => const TransactionFormScreen(),
-              ),
-              GoRoute(
                 path: 'transaction/:id',
                 parentNavigatorKey: _rootNavigatorKey,
                 builder: (c, s) {
                   final id = int.tryParse(s.pathParameters['id'] ?? '');
-                  if (id == null) {
-                    return const Scaffold(
-                        body: Center(child: Text('Transaksi tidak valid')));
-                  }
+                  if (id == null) return const Scaffold(body: Center(child: Text('Transaksi tidak valid')));
                   return TransactionDetailScreen(transactionId: id);
                 },
-              ),
-              GoRoute(
-                path: 'installment/new',
-                parentNavigatorKey: _rootNavigatorKey,
-                builder: (c, s) => const InstallmentFormScreen(),
               ),
               GoRoute(
                 path: 'installment/:id',
                 parentNavigatorKey: _rootNavigatorKey,
                 builder: (c, s) {
                   final id = int.tryParse(s.pathParameters['id'] ?? '');
-                  if (id == null) {
-                    return const Scaffold(
-                        body: Center(child: Text('Cicilan tidak valid')));
-                  }
+                  if (id == null) return const Scaffold(body: Center(child: Text('Cicilan tidak valid')));
                   return InstallmentDetailScreen(installmentId: id);
-                },
-              ),
-              GoRoute(
-                path: 'installment/:id/pay/:scheduleId',
-                parentNavigatorKey: _rootNavigatorKey,
-                builder: (c, s) {
-                  final iid = int.tryParse(s.pathParameters['id'] ?? '');
-                  final sid = int.tryParse(s.pathParameters['scheduleId'] ?? '');
-                  if (iid == null || sid == null) {
-                    return const Scaffold(
-                        body: Center(child: Text('Data tidak valid')));
-                  }
-                  return InstallmentPaymentFormScreen(
-                      installmentId: iid, scheduleId: sid);
                 },
               ),
             ],
           ),
         ]),
         StatefulShellBranch(routes: [
-          GoRoute(
-              path: '/reports', builder: (c, s) => const ReportsScreen()),
+          GoRoute(path: '/reports', builder: (c, s) => const ReportsScreen()),
         ]),
         StatefulShellBranch(routes: [
           GoRoute(
@@ -125,10 +85,7 @@ final appRouter = GoRouter(
                 parentNavigatorKey: _rootNavigatorKey,
                 builder: (c, s) {
                   final p = s.extra as WeddingProfile?;
-                  if (p == null) {
-                    return const Scaffold(
-                        body: Center(child: Text('Profil tidak valid')));
-                  }
+                  if (p == null) return const Scaffold(body: Center(child: Text('Profil tidak valid')));
                   return EditProfileScreen(profile: p);
                 },
               ),
@@ -150,31 +107,13 @@ class MainShell extends StatelessWidget {
       body: navigationShell,
       bottomNavigationBar: NavigationBar(
         selectedIndex: navigationShell.currentIndex,
-        onDestinationSelected: (index) {
-          navigationShell.goBranch(index,
-              initialLocation: index == navigationShell.currentIndex);
-        },
+        onDestinationSelected: (index) => navigationShell.goBranch(index, initialLocation: index == navigationShell.currentIndex),
         destinations: const [
-          NavigationDestination(
-              icon: Icon(Icons.home_outlined),
-              selectedIcon: Icon(Icons.home),
-              label: 'Beranda'),
-          NavigationDestination(
-              icon: Icon(Icons.checklist_outlined),
-              selectedIcon: Icon(Icons.checklist),
-              label: 'Persiapan'),
-          NavigationDestination(
-              icon: Icon(Icons.wallet_outlined),
-              selectedIcon: Icon(Icons.wallet),
-              label: 'Keuangan'),
-          NavigationDestination(
-              icon: Icon(Icons.bar_chart_outlined),
-              selectedIcon: Icon(Icons.bar_chart),
-              label: 'Laporan'),
-          NavigationDestination(
-              icon: Icon(Icons.person_outline),
-              selectedIcon: Icon(Icons.person),
-              label: 'Profil'),
+          NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home), label: 'Beranda'),
+          NavigationDestination(icon: Icon(Icons.checklist_outlined), selectedIcon: Icon(Icons.checklist), label: 'Persiapan'),
+          NavigationDestination(icon: Icon(Icons.wallet_outlined), selectedIcon: Icon(Icons.wallet), label: 'Keuangan'),
+          NavigationDestination(icon: Icon(Icons.bar_chart_outlined), selectedIcon: Icon(Icons.bar_chart), label: 'Laporan'),
+          NavigationDestination(icon: Icon(Icons.person_outline), selectedIcon: Icon(Icons.person), label: 'Profil'),
         ],
       ),
     );
