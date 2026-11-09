@@ -57,6 +57,10 @@ class DashboardScreen extends ConsumerWidget {
   }
 }
 
+// ============================================================
+// Content
+// ============================================================
+
 class _DashboardContent extends StatelessWidget {
   final DashboardData data;
   const _DashboardContent({required this.data});
@@ -74,7 +78,7 @@ class _DashboardContent extends StatelessWidget {
         _SectionHead(
           title: 'Ringkasan Anggaran',
           actionLabel: 'Lihat detail',
-          onAction: () => context.go('/finance'),
+          onAction: () => context.go('/finance?tab=0'), // Ke tab Anggaran
         ),
         const SizedBox(height: 8),
         _CategoryList(categories: data.categories),
@@ -82,7 +86,7 @@ class _DashboardContent extends StatelessWidget {
         _SectionHead(
           title: 'Aktivitas Terbaru',
           actionLabel: 'Semua',
-          onAction: () => context.go('/finance'),
+          onAction: () => context.go('/finance?tab=1'), // Ke tab Transaksi
         ),
         const SizedBox(height: 8),
         _RecentTransactionsList(items: data.recentTransactions),
@@ -94,6 +98,10 @@ class _DashboardContent extends StatelessWidget {
     );
   }
 }
+
+// ============================================================
+// Hero Countdown
+// ============================================================
 
 class _HeroCard extends StatelessWidget {
   final DashboardData data;
@@ -192,6 +200,10 @@ class _HeroCard extends StatelessWidget {
     );
   }
 }
+
+// ============================================================
+// Stats 2x2
+// ============================================================
 
 class _StatsGrid extends StatelessWidget {
   final DashboardData data;
@@ -334,6 +346,10 @@ class _StatCard extends StatelessWidget {
   }
 }
 
+// ============================================================
+// Section head
+// ============================================================
+
 class _SectionHead extends StatelessWidget {
   final String title;
   final String? actionLabel;
@@ -383,6 +399,10 @@ class _SectionHead extends StatelessWidget {
     );
   }
 }
+
+// ============================================================
+// Category list (Ringkasan Anggaran)
+// ============================================================
 
 class _CategoryList extends StatelessWidget {
   final List<DashboardCategory> categories;
@@ -473,6 +493,10 @@ class _CategoryList extends StatelessWidget {
     );
   }
 }
+
+// ============================================================
+// Recent transactions (Aktivitas Terbaru)
+// ============================================================
 
 class _RecentTransactionsList extends StatelessWidget {
   final List<TransactionModel> items;
@@ -602,6 +626,10 @@ class _RecentTile extends StatelessWidget {
   }
 }
 
+// ============================================================
+// Quick actions (Akses Cepat)
+// ============================================================
+
 class _QuickActionsGrid extends StatelessWidget {
   const _QuickActionsGrid();
 
@@ -609,32 +637,32 @@ class _QuickActionsGrid extends StatelessWidget {
     _QuickAction(
       label: 'Vendor',
       icon: Icons.store_outlined,
-      route: '/preparation/vendors',
+      route: '/preparation?tab=0',
     ),
     _QuickAction(
       label: 'Lamaran',
       icon: Icons.favorite_border,
-      route: '/preparation/engagement',
+      route: '/preparation?tab=2',
     ),
     _QuickAction(
       label: 'Seserahan',
       icon: Icons.card_giftcard,
-      route: '/preparation/dowry',
+      route: '/preparation?tab=3',
     ),
     _QuickAction(
       label: 'Transaksi',
       icon: Icons.receipt_long_outlined,
-      route: '/finance/transaction/new',
+      route: '/finance?tab=1',
     ),
     _QuickAction(
       label: 'Cicilan',
       icon: Icons.calendar_month_outlined,
-      route: '/finance',
+      route: '/finance?tab=2',
     ),
     _QuickAction(
       label: 'Checklist',
       icon: Icons.check_circle_outline,
-      route: '/preparation/checklists',
+      route: '/preparation?tab=1',
     ),
   ];
 
@@ -686,7 +714,7 @@ class _QuickActionButton extends StatelessWidget {
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(15),
-        onTap: () => context.push(action.route),
+        onTap: () => context.go(action.route), // Changed push to go
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 4),
           child: Column(
@@ -710,6 +738,10 @@ class _QuickActionButton extends StatelessWidget {
     );
   }
 }
+
+// ============================================================
+// Empty & Error states
+// ============================================================
 
 class _EmptyView extends StatelessWidget {
   const _EmptyView();

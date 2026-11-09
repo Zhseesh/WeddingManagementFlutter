@@ -12,7 +12,8 @@ import 'package:weddingmanagementf/features/transactions/presentation/providers/
 import 'package:weddingmanagementf/features/transactions/presentation/transaction_form_sheet.dart';
 
 class FinanceScreen extends ConsumerStatefulWidget {
-  const FinanceScreen({super.key});
+  final int initialTabIndex;
+  const FinanceScreen({super.key, this.initialTabIndex = 0});
 
   @override
   ConsumerState<FinanceScreen> createState() => _FinanceScreenState();
@@ -25,7 +26,11 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen>
   @override
   void initState() {
     super.initState();
-    _tab = TabController(length: 3, vsync: this);
+    _tab = TabController(
+      length: 3,
+      vsync: this,
+      initialIndex: widget.initialTabIndex.clamp(0, 2),
+    );
     _tab.addListener(() {
       if (mounted) setState(() {});
     });
@@ -113,8 +118,12 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen>
   }
 }
 
+// ============================================================
+// Finance Stats (2x2 Grid seperti Dashboard)
+// ============================================================
+
 class _FinanceStats extends StatelessWidget {
-  final dynamic data; 
+  final dynamic data; // DashboardData
   const _FinanceStats({required this.data});
 
   @override
@@ -255,6 +264,10 @@ class _FinanceStatCard extends StatelessWidget {
     );
   }
 }
+
+// ============================================================
+// Transaction Tab
+// ============================================================
 
 class _TransactionTab extends ConsumerWidget {
   const _TransactionTab();

@@ -56,7 +56,14 @@ final appRouter = GoRouter(
         StatefulShellBranch(routes: [
           GoRoute(
             path: '/finance',
-            builder: (c, s) => const FinanceScreen(),
+            builder: (c, s) {
+              final tabParam = s.uri.queryParameters['tab'];
+              final initialIndex = int.tryParse(tabParam ?? '0') ?? 0;
+              return FinanceScreen(
+                key: ValueKey('finance-$initialIndex'),
+                initialTabIndex: initialIndex,
+              );
+            },
             routes: [
               GoRoute(
                 path: 'transaction/:id',
