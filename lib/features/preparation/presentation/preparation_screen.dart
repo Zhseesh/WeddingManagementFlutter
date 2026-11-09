@@ -13,7 +13,9 @@ import 'package:weddingmanagementf/features/reminders/presentation/reminder_form
 import 'package:weddingmanagementf/features/vendors/presentation/vendor_form_sheet.dart';
 
 class PreparationScreen extends ConsumerStatefulWidget {
-  const PreparationScreen({super.key});
+  final int initialTabIndex;
+  const PreparationScreen({super.key, this.initialTabIndex = 0});
+
   @override
   ConsumerState<PreparationScreen> createState() => _PreparationScreenState();
 }
@@ -25,7 +27,11 @@ class _PreparationScreenState extends ConsumerState<PreparationScreen>
   @override
   void initState() {
     super.initState();
-    _tab = TabController(length: 5, vsync: this);
+    _tab = TabController(
+      length: 5,
+      vsync: this,
+      initialIndex: widget.initialTabIndex.clamp(0, 4),
+    );
     _tab.addListener(() => setState(() {}));
   }
 
@@ -50,13 +56,7 @@ class _PreparationScreenState extends ConsumerState<PreparationScreen>
     }
   }
 
-  static const _fabLabels = [
-    'Vendor',
-    'Checklist',
-    'Lamaran',
-    'Seserahan',
-    'Pengingat',
-  ];
+  static const _fabLabels = ['Vendor', 'Checklist', 'Lamaran', 'Seserahan', 'Pengingat'];
 
   @override
   Widget build(BuildContext context) {
@@ -66,18 +66,8 @@ class _PreparationScreenState extends ConsumerState<PreparationScreen>
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              'Persiapan',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
-            ),
-            Text(
-              'Vendor, kebutuhan, dan pengingat',
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w500,
-                color: AppTheme.muted,
-              ),
-            ),
+            Text('Persiapan', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+            Text('Vendor, kebutuhan, dan pengingat', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w500, color: AppTheme.muted)),
           ],
         ),
         bottom: TabBar(
@@ -88,10 +78,8 @@ class _PreparationScreenState extends ConsumerState<PreparationScreen>
           unselectedLabelColor: AppTheme.muted,
           indicatorColor: AppTheme.primary,
           indicatorSize: TabBarIndicatorSize.label,
-          labelStyle:
-              const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
-          unselectedLabelStyle:
-              const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+          labelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+          unselectedLabelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
           tabs: const [
             Tab(text: 'Vendor'),
             Tab(text: 'Checklist'),

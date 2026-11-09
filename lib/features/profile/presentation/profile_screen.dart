@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:weddingmanagementf/app/theme/app_theme.dart';
 import 'package:weddingmanagementf/features/backup/presentation/providers/backup_providers.dart';
 import 'package:weddingmanagementf/features/budget/presentation/providers/budget_providers.dart';
 import 'package:weddingmanagementf/features/checklist/presentation/providers/checklist_providers.dart';
@@ -14,6 +15,7 @@ import 'package:weddingmanagementf/features/dashboard/presentation/providers/das
 import 'package:weddingmanagementf/features/dowry/presentation/providers/dowry_providers.dart';
 import 'package:weddingmanagementf/features/engagement/presentation/providers/engagement_providers.dart';
 import 'package:weddingmanagementf/features/installments/presentation/providers/installment_providers.dart';
+import 'package:weddingmanagementf/features/reminders/presentation/providers/reminder_providers.dart';
 import 'package:weddingmanagementf/features/reports/presentation/providers/report_providers.dart';
 import 'package:weddingmanagementf/features/transactions/presentation/providers/transaction_providers.dart';
 import 'package:weddingmanagementf/features/vendors/presentation/providers/vendor_providers.dart';
@@ -36,28 +38,22 @@ class ProfileScreen extends ConsumerWidget {
     ref.invalidate(checklistListProvider);
     ref.invalidate(engagementListProvider);
     ref.invalidate(dowryListProvider);
+    ref.invalidate(reminderListProvider);
     ref.invalidate(reportDataProvider);
   }
 
   Future<void> _backup(BuildContext context, WidgetRef ref) async {
     final messenger = ScaffoldMessenger.of(context);
-    messenger.showSnackBar(
-      const SnackBar(content: Text('Menyiapkan backup...')),
-    );
+    messenger.showSnackBar(const SnackBar(content: Text('Menyiapkan backup...')));
     try {
       final json = await ref.read(backupServiceProvider).exportToJson();
       final dir = await getTemporaryDirectory();
       final stamp = DateFormat('yyyyMMdd_HHmmss').format(DateTime.now());
       final file = File('${dir.path}/backup_wedding_$stamp.json');
       await file.writeAsString(json);
-      await Share.shareXFiles(
-        [XFile(file.path)],
-        subject: 'Backup Wedding Planner',
-      );
+      await Share.shareXFiles([XFile(file.path)], subject: 'Backup Wedding Planner');
     } catch (e) {
-      messenger.showSnackBar(
-        SnackBar(content: Text('Gagal backup: $e')),
-      );
+      messenger.showSnackBar(SnackBar(content: Text('Gagal backup: $e')));
     }
   }
 
@@ -73,165 +69,95 @@ class ProfileScreen extends ConsumerWidget {
     final file = result.files.first;
     final raw = file.bytes != null
         ? String.fromCharCodes(file.bytes!)
-        : (file.path != null
-            ? await File(file.path!).readAsString()
-            : null);
+        : (file.path != null ? await File(file.path!).readAsString() : null);
     if (raw == null) {
-      messenger.showSnackBar(
-        const SnackBar(content: Text('Gagal membaca file.')),
-      );
+      messenger.showSnackBar(const SnackBar(content: Text('Gagal membaca file.')));
       return;
     }
 
-    // Validate
     final err = ref.read(backupServiceProvider).validateJson(raw);
     if (err != null) {
-      messenger.showSnackBar(
-        SnackBar(content: Text('File tidak valid: $err')),
-      );
+      messenger.showSnackBar(SnackBar(content: Text('File tidak valid: $err')));
       return;
     }
 
-    // Confirm
     if (!context.mounted) return;
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Restore data?'),
-        content: const Text(
-          'Semua data saat ini akan DIGANTI dengan data dari file backup. '
-          'Aplikasi akan otomatis menyimpan backup data saat ini terlebih dahulu.',
-        ),
+        content: const Text('Semua data saat ini akan DIGANTI dengan data dari file backup. Aplikasi akan otomatis menyimpan backup data saat ini terlebih dahulu.'),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Batal'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('Restore'),
-          ),
+          TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: const Text('Batal')),
+          FilledButton(onPressed: () => Navigator.of(ctx).pop(true), child: const Text('Restore')),
         ],
       ),
     );
     if (ok != true) return;
 
-    // Auto backup current
     try {
-      final preJson =
-          await ref.read(backupServiceProvider).exportToJson();
+      final preJson = await ref.read(backupServiceProvider).exportToJson();
       final docs = await getApplicationDocumentsDirectory();
       final stamp = DateFormat('yyyyMMdd_HHmmss').format(DateTime.now());
       final preFile = File('${docs.path}/pre_restore_$stamp.json');
       await preFile.writeAsString(preJson);
-    } catch (_) {
-      // Abaikan; restore tetap jalan (PRD bilang backup sebelum restore
-      // sebagai upaya terbaik, tidak boleh memblokir restore)
-    }
+    } catch (_) {}
 
-    // Perform restore
     try {
       await ref.read(backupServiceProvider).importFromJson(raw);
       _invalidateAll(ref);
       if (!context.mounted) return;
       messenger.showSnackBar(
-        const SnackBar(
-          content: Text('Restore berhasil. Data dimuat ulang.'),
-          duration: Duration(seconds: 3),
-        ),
+        const SnackBar(content: Text('Restore berhasil. Data dimuat ulang.'), duration: Duration(seconds: 3)),
       );
     } catch (e) {
-      messenger.showSnackBar(
-        SnackBar(content: Text('Restore gagal (data lama aman): $e')),
-      );
+      messenger.showSnackBar(SnackBar(content: Text('Restore gagal (data lama aman): $e')));
     }
+  }
+
+  void _showAbout(BuildContext context) {
+    showAboutDialog(
+      context: context,
+      applicationName: 'Wedding Planner & Finance',
+      applicationVersion: '1.0.0',
+      children: const [
+        Text('Aplikasi offline-first untuk mengelola persiapan pernikahan dan keuangan.'),
+      ],
+    );
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final profileAsync = ref.watch(activeWeddingProfileProvider);
     return Scaffold(
-      appBar: AppBar(title: const Text('Profil')),
+      appBar: AppBar(
+        title: const Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('Profil', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+            Text('Data pernikahan & pengaturan', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w500, color: AppTheme.muted)),
+          ],
+        ),
+      ),
       body: profileAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Error: $e')),
         data: (profile) {
-          if (profile == null) {
-            return const Center(child: Text('Profil belum dibuat.'));
-          }
+          if (profile == null) return const Center(child: Text('Profil belum dibuat.'));
           return ListView(
             padding: const EdgeInsets.all(16),
             children: [
-              _WeddingCard(profile: profile),
-              const SizedBox(height: 20),
-              const _SectionLabel('Data & Backup'),
-              Card(
-                margin: EdgeInsets.zero,
-                child: Column(
-                  children: [
-                    ListTile(
-                      leading: const Icon(Icons.backup),
-                      title: const Text('Backup Data'),
-                      subtitle: const Text(
-                        'Export semua data ke file JSON',
-                      ),
-                      trailing: const Icon(Icons.chevron_right),
-                      onTap: () => _backup(context, ref),
-                    ),
-                    const Divider(height: 1),
-                    ListTile(
-                      leading: const Icon(Icons.restore),
-                      title: const Text('Restore Data'),
-                      subtitle: const Text(
-                        'Pilih file backup JSON untuk dipulihkan',
-                      ),
-                      trailing: const Icon(Icons.chevron_right),
-                      onTap: () => _restore(context, ref),
-                    ),
-                  ],
-                ),
+              _ProfileCard(
+                profile: profile,
+                onEdit: () => context.push('/profile/edit', extra: profile),
               ),
-              const SizedBox(height: 20),
-              const _SectionLabel('Tentang'),
-              Card(
-                margin: EdgeInsets.zero,
-                child: Column(
-                  children: [
-                    const ListTile(
-                      leading: Icon(Icons.info_outline),
-                      title: Text('Versi Aplikasi'),
-                      trailing: Text('1.0.0 (1)'),
-                    ),
-                    const Divider(height: 1),
-                    ListTile(
-                      leading: const Icon(Icons.favorite, color: Colors.pink),
-                      title: const Text('Wedding Planner'),
-                      subtitle: const Text(
-                        'Persiapan & keuangan dalam satu tempat',
-                      ),
-                      onTap: () {
-                        showAboutDialog(
-                          context: context,
-                          applicationName: 'Wedding Planner & Finance',
-                          applicationVersion: '1.0.0',
-                          children: const [
-                            Text(
-                              'Aplikasi offline-first untuk mengelola '
-                              'persiapan pernikahan dan keuangan.',
-                            ),
-                          ],
-                        );
-                      },
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-              Center(
-                child: Text(
-                  'Dibuat dengan ❤️',
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
+              const SizedBox(height: 16),
+              _SettingsCard(
+                onBackup: () => _backup(context, ref),
+                onRestore: () => _restore(context, ref),
+                onReminder: () => context.go('/preparation?tab=4'),
+                onAbout: () => _showAbout(context),
               ),
             ],
           );
@@ -241,95 +167,128 @@ class ProfileScreen extends ConsumerWidget {
   }
 }
 
-class _WeddingCard extends StatelessWidget {
+// ============================================================
+// Profile Card
+// ============================================================
+
+class _ProfileCard extends StatelessWidget {
   final WeddingProfile profile;
-  const _WeddingCard({required this.profile});
+  final VoidCallback onEdit;
+  const _ProfileCard({required this.profile, required this.onEdit});
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
     final df = DateFormat('d MMMM yyyy', 'id_ID');
-    final dateText = profile.weddingDate != null
-        ? df.format(profile.weddingDate!)
-        : 'Belum diatur';
-    final days = profile.weddingDate != null
-        ? DateTime(profile.weddingDate!.year, profile.weddingDate!.month,
-                profile.weddingDate!.day)
-            .difference(DateTime(
-                DateTime.now().year, DateTime.now().month, DateTime.now().day))
-            .inDays
-        : null;
+    final weddingText = profile.weddingDate != null ? df.format(profile.weddingDate!) : 'Belum diatur';
+    final engagementText = profile.engagementDate != null ? df.format(profile.engagementDate!) : 'Belum diatur';
+    final locationText = (profile.weddingLocation?.isNotEmpty ?? false) ? profile.weddingLocation! : 'Belum diatur';
 
     return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
+        color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        gradient: LinearGradient(
-          colors: [scheme.primary, scheme.secondary],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        border: Border.all(color: AppTheme.line),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: Text(
-                  '${profile.partnerOne} & ${profile.partnerTwo}',
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: scheme.onPrimary,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+              // FIX: dijadikan const
+              const SizedBox(
+                width: 54,
+                height: 54,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: Color(0xFFF0EDFF),
+                    shape: BoxShape.circle,
                   ),
+                  child: Icon(Icons.favorite, color: AppTheme.primary, size: 26),
                 ),
               ),
-              IconButton(
-                tooltip: 'Edit profil',
-                icon: Icon(Icons.edit, color: scheme.onPrimary),
-                onPressed: () => context.push('/profile/edit', extra: profile),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 4),
+                    Text(
+                      '${profile.partnerOne} & ${profile.partnerTwo}',
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: AppTheme.ink),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 6),
+                    // FIX: dijadikan const (menggunakan BorderRadius.all)
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: Color(0xFFE3F8EF),
+                          borderRadius: BorderRadius.all(Radius.circular(20)),
+                        ),
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                          child: Text(
+                            'Profil aktif',
+                            style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: AppTheme.success),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              TextButton(
+                onPressed: onEdit,
+                style: TextButton.styleFrom(
+                  foregroundColor: AppTheme.primary,
+                  backgroundColor: const Color(0xFFF0EDFF),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  minimumSize: Size.zero,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.edit, size: 14),
+                    SizedBox(width: 4),
+                    Text('Edit', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                  ],
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 4),
-          _row(context, Icons.event, dateText),
-          if (profile.weddingLocation != null &&
-              profile.weddingLocation!.isNotEmpty) ...[
-            const SizedBox(height: 4),
-            _row(context, Icons.location_on, profile.weddingLocation!),
-          ],
-          if (days != null && days >= 0) ...[
-            const SizedBox(height: 12),
-            Text(
-              '$days hari lagi',
-              style: TextStyle(
-                color: scheme.onPrimary,
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
+          const SizedBox(height: 16),
+          const Divider(height: 1, color: AppTheme.line),
+          const SizedBox(height: 12),
+          _infoRow('Tanggal pernikahan', weddingText),
+          const SizedBox(height: 10),
+          _infoRow('Tanggal lamaran', engagementText),
+          const SizedBox(height: 10),
+          _infoRow('Lokasi', locationText),
         ],
       ),
     );
   }
 
-  Widget _row(BuildContext context, IconData icon, String text) {
-    final scheme = Theme.of(context).colorScheme;
+  Widget _infoRow(String label, String value) {
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, size: 14, color: scheme.onPrimary),
-        const SizedBox(width: 6),
         Expanded(
+          flex: 2,
+          child: Text(label, style: const TextStyle(fontSize: 12, color: AppTheme.muted, fontWeight: FontWeight.w500)),
+        ),
+        Expanded(
+          flex: 3,
           child: Text(
-            text,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(color: scheme.onPrimary, fontSize: 13),
+            value,
+            textAlign: TextAlign.right,
+            style: const TextStyle(fontSize: 13, color: AppTheme.ink, fontWeight: FontWeight.w700),
           ),
         ),
       ],
@@ -337,20 +296,121 @@ class _WeddingCard extends StatelessWidget {
   }
 }
 
-class _SectionLabel extends StatelessWidget {
-  final String label;
-  const _SectionLabel(this.label);
+// ============================================================
+// Settings Card
+// ============================================================
+
+class _SettingsCard extends StatelessWidget {
+  final VoidCallback onBackup;
+  final VoidCallback onRestore;
+  final VoidCallback onReminder;
+  final VoidCallback onAbout;
+  const _SettingsCard({
+    required this.onBackup,
+    required this.onRestore,
+    required this.onReminder,
+    required this.onAbout,
+  });
 
   @override
   Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppTheme.line),
+      ),
+      child: Column(
+        children: [
+          const Padding(
+            padding: EdgeInsets.only(top: 12, bottom: 4),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text('Pengaturan & Data', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppTheme.ink)),
+            ),
+          ),
+          _row(
+            title: 'Backup data',
+            subtitle: 'Simpan semua data sebagai JSON',
+            actionLabel: 'Backup',
+            onAction: onBackup,
+          ),
+          const Divider(height: 1, color: AppTheme.line),
+          _row(
+            title: 'Restore data',
+            subtitle: 'Pulihkan dari file JSON',
+            actionLabel: 'Pilih file',
+            onAction: onRestore,
+          ),
+          const Divider(height: 1, color: AppTheme.line),
+          _row(
+            title: 'Pengingat',
+            subtitle: 'Jadwal dan notifikasi persiapan',
+            actionLabel: 'Kelola',
+            onAction: onReminder,
+          ),
+          const Divider(height: 1, color: AppTheme.line),
+          _row(
+            title: 'Tentang aplikasi',
+            subtitle: 'Wedding Planner v1.0.0',
+            actionLabel: 'Info',
+            onAction: onAbout,
+            trailingPill: 'v1.0.0',
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _row({
+    required String title,
+    required String subtitle,
+    required String actionLabel,
+    required VoidCallback onAction,
+    String? trailingPill,
+  }) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8, left: 4),
-      child: Text(
-        label,
-        style: Theme.of(context)
-            .textTheme
-            .labelLarge
-            ?.copyWith(color: Theme.of(context).colorScheme.primary),
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppTheme.ink)),
+                const SizedBox(height: 2),
+                Text(subtitle, style: const TextStyle(fontSize: 11, color: AppTheme.muted)),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          if (trailingPill != null)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF0EDFF),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                trailingPill,
+                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.primary),
+              ),
+            )
+          else
+            TextButton(
+              onPressed: onAction,
+              style: TextButton.styleFrom(
+                foregroundColor: AppTheme.primary,
+                backgroundColor: const Color(0xFFF0EDFF),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                minimumSize: Size.zero,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              ),
+              child: Text(actionLabel, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+            ),
+        ],
       ),
     );
   }

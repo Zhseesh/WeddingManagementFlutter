@@ -32,7 +32,14 @@ final appRouter = GoRouter(
         StatefulShellBranch(routes: [
           GoRoute(
             path: '/preparation',
-            builder: (c, s) => const PreparationScreen(),
+            builder: (c, s) {
+              final tabParam = s.uri.queryParameters['tab'];
+              final initialIndex = int.tryParse(tabParam ?? '0') ?? 0;
+              return PreparationScreen(
+                key: ValueKey('prep-$initialIndex'),
+                initialTabIndex: initialIndex,
+              );
+            },
             routes: [
               GoRoute(
                 path: 'vendor/:id',
