@@ -74,10 +74,8 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen>
       ),
       body: Column(
         children: [
-          if (dashboardAsync.hasValue)
-            _FinanceStats(data: dashboardAsync.value!),
-          if (dashboardAsync.hasValue)
-            const SizedBox(height: 8),
+          if (dashboardAsync.hasValue) _FinanceStats(data: dashboardAsync.value!),
+          if (dashboardAsync.hasValue) const SizedBox(height: 16),
           TabBar(
             controller: _tab,
             labelColor: AppTheme.primary,
@@ -116,78 +114,140 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen>
 }
 
 class _FinanceStats extends StatelessWidget {
-  final dynamic data; // DashboardData
+  final dynamic data; 
   const _FinanceStats({required this.data});
 
   @override
   Widget build(BuildContext context) {
+    final items = [
+      _FinanceStatItem(
+        label: 'Anggaran',
+        value: CurrencyFormatter.format(data.totalBudget),
+        icon: Icons.account_balance_wallet_outlined,
+        color: AppTheme.primary,
+        bg: Color.lerp(AppTheme.primary, Colors.white, 0.88)!,
+      ),
+      _FinanceStatItem(
+        label: 'Pemasukan',
+        value: CurrencyFormatter.format(data.totalIncome),
+        icon: Icons.arrow_downward,
+        color: AppTheme.success,
+        bg: Color.lerp(AppTheme.success, Colors.white, 0.88)!,
+      ),
+      _FinanceStatItem(
+        label: 'Pengeluaran',
+        value: CurrencyFormatter.format(data.totalPaid),
+        icon: Icons.arrow_upward,
+        color: AppTheme.error,
+        bg: Color.lerp(AppTheme.error, Colors.white, 0.88)!,
+      ),
+      _FinanceStatItem(
+        label: 'Sisa',
+        value: CurrencyFormatter.format(data.remainingBudget),
+        icon: Icons.savings_outlined,
+        color: AppTheme.tertiary,
+        bg: Color.lerp(AppTheme.tertiary, Colors.white, 0.88)!,
+      ),
+    ];
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Row(
-        children: [
-          Expanded(
-            child: _MiniStat(
-              label: 'Anggaran',
-              value: CurrencyFormatter.format(data.totalBudget),
-              color: AppTheme.primary,
-            ),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: _MiniStat(
-              label: 'Pemasukan',
-              value: CurrencyFormatter.format(data.totalIncome),
-              color: AppTheme.success,
-            ),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: _MiniStat(
-              label: 'Pengeluaran',
-              value: CurrencyFormatter.format(data.totalPaid),
-              color: AppTheme.error,
-            ),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: _MiniStat(
-              label: 'Sisa',
-              value: CurrencyFormatter.format(data.remainingBudget),
-              color: AppTheme.tertiary,
-            ),
-          ),
-        ],
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final isWide = constraints.maxWidth >= 700;
+          final width = isWide
+              ? (constraints.maxWidth - 12 * 3) / 4
+              : (constraints.maxWidth - 12) / 2;
+          return Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            children: items
+                .map((it) => SizedBox(
+                      width: width,
+                      child: _FinanceStatCard(item: it),
+                    ))
+                .toList(),
+          );
+        },
       ),
     );
   }
 }
 
-class _MiniStat extends StatelessWidget {
+class _FinanceStatItem {
   final String label;
   final String value;
+  final IconData icon;
   final Color color;
-  const _MiniStat({required this.label, required this.value, required this.color});
+  final Color bg;
+  const _FinanceStatItem({
+    required this.label,
+    required this.value,
+    required this.icon,
+    required this.color,
+    required this.bg,
+  });
+}
+
+class _FinanceStatCard extends StatelessWidget {
+  final _FinanceStatItem item;
+  const _FinanceStatCard({required this.item});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppTheme.line),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF30206B).withValues(alpha: 0.06),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          Text(label, style: const TextStyle(fontSize: 10, color: AppTheme.muted, fontWeight: FontWeight.w500), maxLines: 1, overflow: TextOverflow.ellipsis),
-          const SizedBox(height: 2),
-          FittedBox(
-            fit: BoxFit.scaleDown,
-            alignment: Alignment.centerLeft,
-            child: Text(
-              value,
-              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: color),
+          Container(
+            padding: const EdgeInsets.all(9),
+            decoration: BoxDecoration(
+              color: item.bg,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(item.icon, color: item.color, size: 20),
+          ),
+          const SizedBox(width: 11),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  item.label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: AppTheme.muted,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    item.value,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                      color: AppTheme.ink,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -206,22 +266,35 @@ class _TransactionTab extends ConsumerWidget {
 
     return Column(
       children: [
-        Padding(
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-          child: SizedBox(
-            width: double.infinity,
-            child: SegmentedButton<String?>(
-              segments: const [
-                ButtonSegment(value: null, label: Text('Semua', style: TextStyle(fontSize: 13))),
-                ButtonSegment(value: 'income', label: Text('Masuk', style: TextStyle(fontSize: 13))),
-                ButtonSegment(value: 'expense', label: Text('Keluar', style: TextStyle(fontSize: 13))),
-              ],
-              selected: {filter},
-              expandedInsets: EdgeInsets.zero,
-              onSelectionChanged: (s) {
-                ref.read(transactionTypeFilterProvider.notifier).state = s.first;
-              },
-            ),
+          child: Row(
+            children: [
+              FilterChip(
+                label: const Text('Semua'),
+                selected: filter == null,
+                onSelected: (_) => ref
+                    .read(transactionTypeFilterProvider.notifier)
+                    .state = null,
+              ),
+              const SizedBox(width: 6),
+              FilterChip(
+                label: const Text('Masuk'),
+                selected: filter == 'income',
+                onSelected: (_) => ref
+                    .read(transactionTypeFilterProvider.notifier)
+                    .state = 'income',
+              ),
+              const SizedBox(width: 6),
+              FilterChip(
+                label: const Text('Keluar'),
+                selected: filter == 'expense',
+                onSelected: (_) => ref
+                    .read(transactionTypeFilterProvider.notifier)
+                    .state = 'expense',
+              ),
+            ],
           ),
         ),
         Expanded(
@@ -231,7 +304,10 @@ class _TransactionTab extends ConsumerWidget {
             data: (items) {
               if (items.isEmpty) {
                 return const Center(
-                  child: Text('Belum ada transaksi.', style: TextStyle(color: AppTheme.muted)),
+                  child: Text(
+                    'Belum ada transaksi.',
+                    style: TextStyle(color: AppTheme.muted),
+                  ),
                 );
               }
               return RefreshIndicator(
@@ -243,7 +319,8 @@ class _TransactionTab extends ConsumerWidget {
                   physics: const AlwaysScrollableScrollPhysics(),
                   padding: const EdgeInsets.only(bottom: 100),
                   itemCount: items.length,
-                  separatorBuilder: (_, __) => const Divider(height: 1, color: AppTheme.line),
+                  separatorBuilder: (_, __) =>
+                      const Divider(height: 1, color: AppTheme.line),
                   itemBuilder: (context, i) => _TransactionTile(tx: items[i]),
                 ),
               );
@@ -272,13 +349,21 @@ class _TransactionTile extends StatelessWidget {
     return ListTile(
       leading: CircleAvatar(
         backgroundColor: Color.lerp(color, Colors.white, 0.85),
-        child: Icon(isIncome ? Icons.arrow_downward : Icons.arrow_upward, color: color, size: 18),
+        child: Icon(
+          isIncome ? Icons.arrow_downward : Icons.arrow_upward,
+          color: color,
+          size: 18,
+        ),
       ),
       title: Text(
         title,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
-        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.ink),
+        style: const TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+          color: AppTheme.ink,
+        ),
       ),
       subtitle: Text(
         '${DateFormat('d MMM yyyy', 'id_ID').format(tx.transactionDate)}${tx.isVoid ? ' · VOID' : ''}',
@@ -286,7 +371,11 @@ class _TransactionTile extends StatelessWidget {
       ),
       trailing: Text(
         '$sign${CurrencyFormatter.format(tx.amount)}',
-        style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 13),
+        style: TextStyle(
+          color: color,
+          fontWeight: FontWeight.bold,
+          fontSize: 13,
+        ),
       ),
     );
   }
