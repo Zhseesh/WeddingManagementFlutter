@@ -79,35 +79,20 @@ class ReportsScreen extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              'Laporan',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
-            ),
-            Text(
-              'Ringkasan dan analisis keuangan',
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w500,
-                color: AppTheme.muted,
-              ),
-            ),
+            Text('Laporan', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+            Text('Ringkasan dan analisis keuangan', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w500, color: AppTheme.muted)),
           ],
         ),
       ),
       body: Column(
         children: [
-          _FilterSection(
-            filter: filter,
-            onPickCustom: () => _pickCustomRange(context, ref),
-          ),
+          _FilterSection(filter: filter, onPickCustom: () => _pickCustomRange(context, ref)),
           Expanded(
             child: async.when(
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (e, _) => Center(child: Text('Error: $e')),
               data: (data) {
-                if (data == null) {
-                  return const Center(child: Text('Profil belum dibuat.'));
-                }
+                if (data == null) return const Center(child: Text('Profil belum dibuat.'));
                 return RefreshIndicator(
                   onRefresh: () async {
                     ref.invalidate(reportDataProvider);
@@ -131,7 +116,6 @@ class ReportsScreen extends ConsumerWidget {
 class _FilterSection extends ConsumerWidget {
   final ReportFilter filter;
   final VoidCallback onPickCustom;
-
   const _FilterSection({required this.filter, required this.onPickCustom});
 
   @override
@@ -151,29 +135,16 @@ class _FilterSection extends ConsumerWidget {
             scrollDirection: Axis.horizontal,
             child: Row(
               children: [
-                _periodChip(
-                  'Bulan Ini',
-                  _sameAs(filter.period, ReportPeriod.thisMonth()),
-                  () => ref.read(reportFilterProvider.notifier).state = filter.withPeriod(ReportPeriod.thisMonth()),
-                ),
+                _periodChip('Bulan Ini', _sameAs(filter.period, ReportPeriod.thisMonth()),
+                    () => ref.read(reportFilterProvider.notifier).state = filter.withPeriod(ReportPeriod.thisMonth())),
                 const SizedBox(width: 6),
-                _periodChip(
-                  '3 Bulan',
-                  _sameAs(filter.period, ReportPeriod.last3Months()),
-                  () => ref.read(reportFilterProvider.notifier).state = filter.withPeriod(ReportPeriod.last3Months()),
-                ),
+                _periodChip('3 Bulan', _sameAs(filter.period, ReportPeriod.last3Months()),
+                    () => ref.read(reportFilterProvider.notifier).state = filter.withPeriod(ReportPeriod.last3Months())),
                 const SizedBox(width: 6),
-                _periodChip(
-                  'Tahun Ini',
-                  _sameAs(filter.period, ReportPeriod.thisYear()),
-                  () => ref.read(reportFilterProvider.notifier).state = filter.withPeriod(ReportPeriod.thisYear()),
-                ),
+                _periodChip('Tahun Ini', _sameAs(filter.period, ReportPeriod.thisYear()),
+                    () => ref.read(reportFilterProvider.notifier).state = filter.withPeriod(ReportPeriod.thisYear())),
                 const SizedBox(width: 6),
-                _periodChip(
-                  isCustom ? '${df.format(filter.period.start)} - ${df.format(filter.period.end)}' : 'Custom',
-                  isCustom,
-                  onPickCustom,
-                ),
+                _periodChip(isCustom ? '${df.format(filter.period.start)} - ${df.format(filter.period.end)}' : 'Custom', isCustom, onPickCustom),
               ],
             ),
           ),
@@ -185,11 +156,7 @@ class _FilterSection extends ConsumerWidget {
                 child: DropdownButtonFormField<int?>(
                   initialValue: filter.categoryId,
                   isDense: true,
-                  decoration: const InputDecoration(
-                    labelText: 'Kategori',
-                    isDense: true,
-                    contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 12),
-                  ),
+                  decoration: const InputDecoration(labelText: 'Kategori', isDense: true, contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 12)),
                   items: [
                     const DropdownMenuItem(value: null, child: Text('Semua')),
                     ...catsAsync.maybeWhen(
@@ -206,11 +173,7 @@ class _FilterSection extends ConsumerWidget {
                 child: DropdownButtonFormField<String?>(
                   initialValue: filter.type,
                   isDense: true,
-                  decoration: const InputDecoration(
-                    labelText: 'Tipe',
-                    isDense: true,
-                    contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 12),
-                  ),
+                  decoration: const InputDecoration(labelText: 'Tipe', isDense: true, contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 12)),
                   items: const [
                     DropdownMenuItem(value: null, child: Text('Semua')),
                     DropdownMenuItem(value: 'income', child: Text('Masuk')),
@@ -227,11 +190,7 @@ class _FilterSection extends ConsumerWidget {
   }
 
   Widget _periodChip(String label, bool selected, VoidCallback onTap) {
-    return ChoiceChip(
-      label: Text(label),
-      selected: selected,
-      onSelected: (_) => onTap(),
-    );
+    return ChoiceChip(label: Text(label), selected: selected, onSelected: (_) => onTap());
   }
 
   static bool _sameAs(ReportPeriod a, ReportPeriod b) =>
@@ -248,11 +207,7 @@ class _ReportContent extends StatelessWidget {
   final VoidCallback onExportPdf;
   final VoidCallback onExportCsv;
 
-  const _ReportContent({
-    required this.data,
-    required this.onExportPdf,
-    required this.onExportCsv,
-  });
+  const _ReportContent({required this.data, required this.onExportPdf, required this.onExportCsv});
 
   @override
   Widget build(BuildContext context) {
@@ -272,6 +227,10 @@ class _ReportContent extends StatelessWidget {
   }
 }
 
+// ============================================================
+// Stat Cards
+// ============================================================
+
 class _StatsGrid extends StatelessWidget {
   final ReportData data;
   const _StatsGrid({required this.data});
@@ -279,34 +238,14 @@ class _StatsGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final items = [
-      _StatItem(
-        label: 'Pemasukan',
-        value: CurrencyFormatter.format(data.totalIncome),
-        icon: Icons.arrow_downward,
-        color: AppTheme.success,
-        bg: Color.lerp(AppTheme.success, Colors.white, 0.88)!,
-      ),
-      _StatItem(
-        label: 'Pengeluaran',
-        value: CurrencyFormatter.format(data.totalExpense),
-        icon: Icons.arrow_upward,
-        color: AppTheme.error,
-        bg: Color.lerp(AppTheme.error, Colors.white, 0.88)!,
-      ),
-      _StatItem(
-        label: 'Transaksi',
-        value: '${data.transactions.length}',
-        icon: Icons.receipt_long_outlined,
-        color: AppTheme.primary,
-        bg: Color.lerp(AppTheme.primary, Colors.white, 0.88)!,
-      ),
-      _StatItem(
-        label: 'Vendor Aktif',
-        value: '${data.vendors.length}',
-        icon: Icons.store_outlined,
-        color: AppTheme.tertiary,
-        bg: Color.lerp(AppTheme.tertiary, Colors.white, 0.88)!,
-      ),
+      _StatItem(label: 'Pemasukan', value: CurrencyFormatter.format(data.totalIncome), icon: Icons.arrow_downward,
+          color: AppTheme.success, bg: Color.lerp(AppTheme.success, Colors.white, 0.88)!),
+      _StatItem(label: 'Pengeluaran', value: CurrencyFormatter.format(data.totalExpense), icon: Icons.arrow_upward,
+          color: AppTheme.error, bg: Color.lerp(AppTheme.error, Colors.white, 0.88)!),
+      _StatItem(label: 'Transaksi', value: '${data.transactions.length}', icon: Icons.receipt_long_outlined,
+          color: AppTheme.primary, bg: Color.lerp(AppTheme.primary, Colors.white, 0.88)!),
+      _StatItem(label: 'Vendor Aktif', value: '${data.vendors.length}', icon: Icons.store_outlined,
+          color: AppTheme.tertiary, bg: Color.lerp(AppTheme.tertiary, Colors.white, 0.88)!),
     ];
 
     return LayoutBuilder(
@@ -344,9 +283,7 @@ class _StatCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppTheme.line),
-        boxShadow: [
-          BoxShadow(color: const Color(0xFF30206B).withValues(alpha: 0.06), blurRadius: 20, offset: const Offset(0, 8)),
-        ],
+        boxShadow: [BoxShadow(color: const Color(0xFF30206B).withValues(alpha: 0.06), blurRadius: 20, offset: const Offset(0, 8))],
       ),
       child: Row(
         children: [
@@ -376,6 +313,10 @@ class _StatCard extends StatelessWidget {
   }
 }
 
+// ============================================================
+// Donut Chart Card (disingkat agar tidak menabrak chart)
+// ============================================================
+
 class _DonutCard extends StatelessWidget {
   final ReportData data;
   const _DonutCard({required this.data});
@@ -388,23 +329,37 @@ class _DonutCard extends StatelessWidget {
 
     final palette = [
       AppTheme.primary,
-      AppTheme.secondary,
-      AppTheme.tertiary,
       AppTheme.success,
       AppTheme.warning,
+      AppTheme.tertiary,
+      AppTheme.error,
       const Color(0xFFE91E63),
       const Color(0xFF00BCD4),
     ];
 
-    final sections = data.categories.asMap().entries.map((entry) {
+    List<CategoryBreakdown> displayCats;
+    if (data.categories.length > 4) {
+      final top = data.categories.take(4).toList();
+      final rest = data.categories.skip(4).toList();
+      final restTotal = rest.fold<int>(0, (a, b) => a + b.total);
+      final restCount = rest.fold<int>(0, (a, b) => a + b.transactionCount);
+      displayCats = [
+        ...top,
+        CategoryBreakdown(categoryId: null, name: 'Lainnya', total: restTotal, transactionCount: restCount),
+      ];
+    } else {
+      displayCats = data.categories;
+    }
+
+    final sections = displayCats.asMap().entries.map((entry) {
       final i = entry.key;
       final c = entry.value;
       final pct = (c.total / data.totalExpense) * 100;
       return PieChartSectionData(
         value: c.total.toDouble(),
         color: palette[i % palette.length],
-        title: pct > 5 ? '${pct.toStringAsFixed(0)}%' : '',
-        radius: 40,
+        title: pct >= 8 ? '${pct.toStringAsFixed(0)}%' : '',
+        radius: 38,
         titleStyle: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white),
       );
     }).toList();
@@ -424,15 +379,15 @@ class _DonutCard extends StatelessWidget {
           Row(
             children: [
               SizedBox(
-                height: 150,
-                width: 150,
+                height: 130,
+                width: 130,
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
                     PieChart(
                       PieChartData(
                         sections: sections,
-                        centerSpaceRadius: 45,
+                        centerSpaceRadius: 38,
                         sectionsSpace: 2,
                         startDegreeOffset: -90,
                       ),
@@ -440,31 +395,51 @@ class _DonutCard extends StatelessWidget {
                     Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(
-                          CurrencyFormatter.format(data.totalExpense),
-                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: AppTheme.ink),
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          // FIX: gunakan shortFormat → "57Jt" bukan "Rp 57.000.000"
+                          child: Text(
+                            CurrencyFormatter.shortFormat(data.totalExpense),
+                            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: AppTheme.ink),
+                          ),
                         ),
-                        const Text('Total keluar', style: TextStyle(fontSize: 9, color: AppTheme.muted)),
+                        const Text('Total keluar', style: TextStyle(fontSize: 8, color: AppTheme.muted)),
                       ],
                     ),
                   ],
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 14),
               Expanded(
                 child: Column(
-                  children: data.categories.take(5).toList().asMap().entries.map((entry) {
+                  mainAxisSize: MainAxisSize.min,
+                  children: displayCats.asMap().entries.map((entry) {
                     final i = entry.key;
                     final c = entry.value;
-                    final pct = ((c.total / data.totalExpense) * 100).toStringAsFixed(1);
+                    final pct = data.totalExpense == 0 ? 0.0 : (c.total / data.totalExpense) * 100;
                     return Padding(
-                      padding: const EdgeInsets.only(bottom: 8),
+                      padding: const EdgeInsets.only(bottom: 6),
                       child: Row(
                         children: [
-                          Container(width: 10, height: 10, decoration: BoxDecoration(color: palette[i % palette.length], shape: BoxShape.circle)),
-                          const SizedBox(width: 8),
-                          Expanded(child: Text(c.name, style: const TextStyle(fontSize: 11, color: AppTheme.ink), maxLines: 1, overflow: TextOverflow.ellipsis)),
-                          Text('$pct%', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.ink)),
+                          Container(
+                            width: 8,
+                            height: 8,
+                            decoration: BoxDecoration(color: palette[i % palette.length], shape: BoxShape.circle),
+                          ),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: Text(
+                              c.name,
+                              style: const TextStyle(fontSize: 10, color: AppTheme.ink, fontWeight: FontWeight.w500),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            '${pct.toStringAsFixed(1)}%',
+                            style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: AppTheme.ink),
+                          ),
                         ],
                       ),
                     );
@@ -478,6 +453,10 @@ class _DonutCard extends StatelessWidget {
     );
   }
 }
+
+// ============================================================
+// Export Card
+// ============================================================
 
 class _ExportCard extends StatelessWidget {
   final VoidCallback onExportPdf;
@@ -498,19 +477,9 @@ class _ExportCard extends StatelessWidget {
         children: [
           const Text('Ekspor Laporan', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
           const SizedBox(height: 12),
-          _row(
-            icon: Icons.picture_as_pdf,
-            title: 'Laporan PDF',
-            subtitle: 'Ringkasan untuk dicetak',
-            onTap: onExportPdf,
-          ),
+          _row(icon: Icons.picture_as_pdf, title: 'Laporan PDF', subtitle: 'Ringkasan untuk dicetak', onTap: onExportPdf),
           const Divider(height: 20, color: AppTheme.line),
-          _row(
-            icon: Icons.table_chart,
-            title: 'Data Transaksi CSV',
-            subtitle: 'Untuk spreadsheet',
-            onTap: onExportCsv,
-          ),
+          _row(icon: Icons.table_chart, title: 'Data Transaksi CSV', subtitle: 'Untuk spreadsheet', onTap: onExportCsv),
         ],
       ),
     );
@@ -550,6 +519,10 @@ class _ExportCard extends StatelessWidget {
     );
   }
 }
+
+// ============================================================
+// Transaction Details
+// ============================================================
 
 class _TransactionDetails extends StatelessWidget {
   final ReportData data;
