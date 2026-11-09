@@ -1,41 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:weddingmanagementf/app/theme/app_theme.dart';
 import 'package:weddingmanagementf/core/utils/currency_formatter.dart';
 import 'package:weddingmanagementf/features/budget/presentation/providers/budget_providers.dart';
 import 'package:weddingmanagementf/features/dashboard/presentation/providers/dashboard_providers.dart';
 import 'package:weddingmanagementf/features/transactions/presentation/providers/transaction_providers.dart';
 import 'package:weddingmanagementf/features/vendors/data/vendor_model.dart';
-import 'package:weddingmanagementf/features/vendors/presentation/payment_form_screen.dart';
+import 'package:weddingmanagementf/features/vendors/presentation/payment_form_sheet.dart';
 import 'package:weddingmanagementf/features/vendors/presentation/providers/vendor_providers.dart';
+import 'package:weddingmanagementf/features/vendors/presentation/vendor_form_sheet.dart';
 
 class VendorDetailScreen extends ConsumerWidget {
   final int vendorId;
   const VendorDetailScreen({super.key, required this.vendorId});
 
-  Future<void> _voidPayment(
-    BuildContext context,
-    WidgetRef ref,
-    PaymentRecord p,
-  ) async {
+  Future<void> _void(
+      BuildContext context, WidgetRef ref, PaymentRecord p) async {
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Void pembayaran?'),
         content: const Text(
-          'Transaksi terkait tidak dihapus, tetapi tidak akan dihitung '
-          'sebagai pembayaran vendor.',
-        ),
+            'Transaksi terkait tidak dihapus, tetapi tidak dihitung sebagai pembayaran.'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Batal'),
-          ),
+              onPressed: () => Navigator.of(ctx).pop(false),
+              child: const Text('Batal')),
           FilledButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('Void'),
-          ),
+              onPressed: () => Navigator.of(ctx).pop(true),
+              child: const Text('Void')),
         ],
       ),
     );
@@ -47,10 +41,6 @@ class VendorDetailScreen extends ConsumerWidget {
     ref.invalidate(dashboardDataProvider);
     ref.invalidate(budgetSummaryProvider);
     ref.invalidate(categorySpendingProvider);
-    if (!context.mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Pembayaran di-void.')),
-    );
   }
 
   @override
@@ -66,10 +56,7 @@ class VendorDetailScreen extends ConsumerWidget {
             onPressed: () {
               final detail = async.asData?.value;
               if (detail == null) return;
-              context.push(
-                '/preparation/vendor/edit',
-                extra: detail.summary.vendor,
-              );
+              showVendorFormSheet(context, initial: detail.summary.vendor);
             },
           ),
         ],
@@ -82,7 +69,6 @@ class VendorDetailScreen extends ConsumerWidget {
             return const Center(child: Text('Vendor tidak ditemukan.'));
           }
           final s = detail.summary;
-          final scheme = Theme.of(context).colorScheme;
           return ListView(
             padding: const EdgeInsets.all(16),
             children: [
@@ -90,62 +76,36 @@ class VendorDetailScreen extends ConsumerWidget {
               const SizedBox(height: 16),
               _InfoCard(vendor: s.vendor),
               const SizedBox(height: 20),
-              Row(
-                children: [
-                  Text(
-                    'Riwayat Pembayaran',
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleMedium
-                        ?.copyWith(fontWeight: FontWeight.w600),
-                  ),
-                  const Spacer(),
-                  Text(
-                    '${detail.payments.length} entri',
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                ],
+              Text(
+                'Riwayat Pembayaran (${detail.payments.length})',
+                style: const TextStyle(
+                    fontSize: 15, fontWeight: FontWeight.w700),
               ),
               const SizedBox(height: 8),
               if (detail.payments.isEmpty)
                 Container(
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
-                    color: scheme.surfaceContainerHighest,
+                    color: const Color(0xFFF7F6FC),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Center(
-                    child: Text('Belum ada pembayaran.'),
-                  ),
+                  child: const Center(child: Text('Belum ada pembayaran.')),
                 )
               else
-                Column(
-                  children: detail.payments
-                      .map((p) => _PaymentTile(
-                            record: p,
-                            onVoid: p.isVoid
-                                ? null
-                                : () => _voidPayment(context, ref, p),
-                          ))
-                      .toList(),
-                ),
+                ...detail.payments.map((p) => _PaymentTile(
+                      record: p,
+                      onVoid: p.isVoid ? null : () => _void(context, ref, p),
+                    )),
               const SizedBox(height: 80),
             ],
           );
         },
       ),
       floatingActionButton: async.maybeWhen(
-        data: (detail) => detail == null
+        data: (d) => d == null
             ? null
             : FloatingActionButton.extended(
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) =>
-                          PaymentFormScreen(summary: detail.summary),
-                    ),
-                  );
-                },
+                onPressed: () => showPaymentFormSheet(context, d.summary),
                 icon: const Icon(Icons.add),
                 label: const Text('Catat Pembayaran'),
               ),
@@ -161,14 +121,13 @@ class _HeaderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
     final pct = (summary.progress * 100).round();
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
-        gradient: LinearGradient(
-          colors: [scheme.primary, scheme.secondary],
+        gradient: const LinearGradient(
+          colors: [AppTheme.primary, AppTheme.secondary],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -179,37 +138,31 @@ class _HeaderCard extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: Text(
-                  summary.vendor.name,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: scheme.onPrimary,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                child: Text(summary.vendor.name,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold)),
               ),
               Chip(
                 label: Text(summary.vendor.statusEnum.label),
-                backgroundColor: scheme.onPrimary,
-                labelStyle: TextStyle(color: scheme.primary),
+                backgroundColor: Colors.white,
+                labelStyle: const TextStyle(color: AppTheme.primary),
                 visualDensity: VisualDensity.compact,
               ),
             ],
           ),
           const SizedBox(height: 12),
-          Text(
-            'Sisa Tagihan',
-            style: TextStyle(color: scheme.onPrimary, fontSize: 12),
-          ),
+          const Text('Sisa Tagihan',
+              style: TextStyle(color: Colors.white, fontSize: 12)),
           Text(
             CurrencyFormatter.format(summary.remaining),
-            style: TextStyle(
-              color: scheme.onPrimary,
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
+            style: const TextStyle(
+                color: Colors.white,
+                fontSize: 24,
+                fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 12),
           ClipRRect(
@@ -217,19 +170,14 @@ class _HeaderCard extends StatelessWidget {
             child: LinearProgressIndicator(
               value: summary.progress,
               minHeight: 8,
-              backgroundColor: Color.lerp(
-                scheme.primary,
-                scheme.onPrimary,
-                0.7,
-              ),
-              valueColor: AlwaysStoppedAnimation(scheme.onPrimary),
+              backgroundColor: Colors.white24,
+              valueColor: const AlwaysStoppedAnimation(Colors.white),
             ),
           ),
           const SizedBox(height: 8),
           Text(
-            '$pct% · Dibayar ${CurrencyFormatter.format(summary.totalPaid)} / '
-            '${CurrencyFormatter.format(summary.vendor.agreedPrice)}',
-            style: TextStyle(color: scheme.onPrimary, fontSize: 12),
+            '$pct% · Dibayar ${CurrencyFormatter.format(summary.totalPaid)} / ${CurrencyFormatter.format(summary.vendor.agreedPrice)}',
+            style: const TextStyle(color: Colors.white, fontSize: 12),
           ),
         ],
       ),
@@ -244,7 +192,6 @@ class _InfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: EdgeInsets.zero,
       child: Column(
         children: [
           if (vendor.contactName != null)
@@ -265,22 +212,6 @@ class _InfoCard extends StatelessWidget {
               title: const Text('Alamat'),
               subtitle: Text(vendor.address!),
             ),
-          if (vendor.bookingDate != null)
-            ListTile(
-              leading: const Icon(Icons.event_available),
-              title: const Text('Tanggal Booking'),
-              subtitle: Text(
-                DateFormat('d MMM yyyy', 'id_ID').format(vendor.bookingDate!),
-              ),
-            ),
-          if (vendor.eventDate != null)
-            ListTile(
-              leading: const Icon(Icons.event),
-              title: const Text('Tanggal Acara'),
-              subtitle: Text(
-                DateFormat('d MMM yyyy', 'id_ID').format(vendor.eventDate!),
-              ),
-            ),
           if (vendor.notes != null)
             ListTile(
               leading: const Icon(Icons.notes),
@@ -300,18 +231,15 @@ class _PaymentTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
         leading: CircleAvatar(
           backgroundColor: record.isVoid
-              ? scheme.surfaceContainerHighest
-              : Color.lerp(scheme.surface, scheme.tertiary, 0.15),
-          child: Icon(
-            Icons.payments_outlined,
-            color: record.isVoid ? scheme.onSurfaceVariant : scheme.tertiary,
-          ),
+              ? AppTheme.line
+              : const Color(0xFFE4F8EF),
+          child: Icon(Icons.payments_outlined,
+              color: record.isVoid ? AppTheme.muted : AppTheme.success),
         ),
         title: Text(
           CurrencyFormatter.format(record.amount),
@@ -328,8 +256,7 @@ class _PaymentTile extends StatelessWidget {
         trailing: record.isVoid
             ? null
             : IconButton(
-                icon: Icon(Icons.undo, color: scheme.error),
-                tooltip: 'Void',
+                icon: const Icon(Icons.undo, color: AppTheme.error),
                 onPressed: onVoid,
               ),
       ),

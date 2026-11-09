@@ -1,142 +1,120 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:weddingmanagementf/app/theme/app_theme.dart';
+import 'package:weddingmanagementf/features/checklist/presentation/checklist_form_sheet.dart';
+import 'package:weddingmanagementf/features/dowry/presentation/dowry_form_sheet.dart';
+import 'package:weddingmanagementf/features/engagement/presentation/engagement_form_sheet.dart';
+import 'package:weddingmanagementf/features/preparation/presentation/tabs/checklist_tab.dart';
+import 'package:weddingmanagementf/features/preparation/presentation/tabs/dowry_tab.dart';
+import 'package:weddingmanagementf/features/preparation/presentation/tabs/engagement_tab.dart';
+import 'package:weddingmanagementf/features/preparation/presentation/tabs/reminder_tab.dart';
+import 'package:weddingmanagementf/features/preparation/presentation/tabs/vendor_tab.dart';
+import 'package:weddingmanagementf/features/reminders/presentation/reminder_form_sheet.dart';
+import 'package:weddingmanagementf/features/vendors/presentation/vendor_form_sheet.dart';
 
-class PreparationScreen extends StatelessWidget {
+class PreparationScreen extends ConsumerStatefulWidget {
   const PreparationScreen({super.key});
+  @override
+  ConsumerState<PreparationScreen> createState() => _PreparationScreenState();
+}
+
+class _PreparationScreenState extends ConsumerState<PreparationScreen>
+    with SingleTickerProviderStateMixin {
+  late final TabController _tab;
+
+  @override
+  void initState() {
+    super.initState();
+    _tab = TabController(length: 5, vsync: this);
+    _tab.addListener(() => setState(() {}));
+  }
+
+  @override
+  void dispose() {
+    _tab.dispose();
+    super.dispose();
+  }
+
+  void _onAdd() {
+    switch (_tab.index) {
+      case 0:
+        showVendorFormSheet(context);
+      case 1:
+        showChecklistFormSheet(context);
+      case 2:
+        showEngagementFormSheet(context);
+      case 3:
+        showDowryFormSheet(context);
+      case 4:
+        showReminderFormSheet(context);
+    }
+  }
+
+  static const _fabLabels = [
+    'Vendor',
+    'Checklist',
+    'Lamaran',
+    'Seserahan',
+    'Pengingat',
+  ];
 
   @override
   Widget build(BuildContext context) {
-    const items = <_PrepItem>[
-      _PrepItem(
-        title: 'Vendor',
-        description: 'Kelola vendor, pembayaran, dan DP',
-        icon: Icons.store,
-        route: '/preparation/vendors',
-      ),
-      _PrepItem(
-        title: 'Lamaran',
-        description: 'Kebutuhan lamaran',
-        icon: Icons.favorite_border,
-        route: '/preparation/engagement',
-      ),
-      _PrepItem(
-        title: 'Seserahan',
-        description: 'Daftar seserahan',
-        icon: Icons.card_giftcard,
-        route: '/preparation/dowry',
-      ),
-      _PrepItem(
-        title: 'Checklist',
-        description: 'Tugas persiapan',
-        icon: Icons.checklist,
-        route: '/preparation/checklists',
-      ),
-      _PrepItem(
-        title: 'Pengingat',
-        description: 'Notifikasi & jadwal penting',
-        icon: Icons.alarm,
-        route: '/preparation/reminders',
-      ),
-    ];
-
     return Scaffold(
-      appBar: AppBar(title: const Text('Persiapan')),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          Text(
-            'Modul Persiapan',
-            style: Theme.of(context)
-                .textTheme
-                .titleMedium
-                ?.copyWith(fontWeight: FontWeight.w600),
-          ),
-          const SizedBox(height: 12),
-          ...items.map((item) => Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: _PrepCard(item: item),
-              )),
+      appBar: AppBar(
+        title: const Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Persiapan',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+            ),
+            Text(
+              'Vendor, kebutuhan, dan pengingat',
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
+                color: AppTheme.muted,
+              ),
+            ),
+          ],
+        ),
+        bottom: TabBar(
+          controller: _tab,
+          isScrollable: true,
+          tabAlignment: TabAlignment.start,
+          labelColor: AppTheme.primary,
+          unselectedLabelColor: AppTheme.muted,
+          indicatorColor: AppTheme.primary,
+          indicatorSize: TabBarIndicatorSize.label,
+          labelStyle:
+              const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+          unselectedLabelStyle:
+              const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+          tabs: const [
+            Tab(text: 'Vendor'),
+            Tab(text: 'Checklist'),
+            Tab(text: 'Lamaran'),
+            Tab(text: 'Seserahan'),
+            Tab(text: 'Pengingat'),
+          ],
+        ),
+      ),
+      body: TabBarView(
+        controller: _tab,
+        children: const [
+          VendorTab(),
+          ChecklistTab(),
+          EngagementTab(),
+          DowryTab(),
+          ReminderTab(),
         ],
       ),
-    );
-  }
-}
-
-class _PrepItem {
-  final String title;
-  final String description;
-  final IconData icon;
-  final String? route;
-  const _PrepItem({
-    required this.title,
-    required this.description,
-    required this.icon,
-    required this.route,
-  });
-}
-
-class _PrepCard extends StatelessWidget {
-  final _PrepItem item;
-  const _PrepCard({required this.item});
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final enabled = item.route != null;
-    return Card(
-      margin: EdgeInsets.zero,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16),
-        onTap: enabled ? () => context.push(item.route!) : null,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: enabled
-                      ? Color.lerp(scheme.surface, scheme.primary, 0.12)
-                      : scheme.surfaceContainerHighest,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Icon(
-                  item.icon,
-                  color: enabled ? scheme.primary : scheme.onSurfaceVariant,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      item.title,
-                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.w600,
-                            color: enabled
-                                ? scheme.onSurface
-                                : scheme.onSurfaceVariant,
-                          ),
-                    ),
-                    Text(
-                      item.description,
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                  ],
-                ),
-              ),
-              if (!enabled)
-                Chip(
-                  label: const Text('Segera'),
-                  visualDensity: VisualDensity.compact,
-                  labelStyle: Theme.of(context).textTheme.labelSmall,
-                )
-              else
-                Icon(Icons.chevron_right, color: scheme.onSurfaceVariant),
-            ],
-          ),
-        ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _onAdd,
+        icon: const Icon(Icons.add),
+        label: Text(_fabLabels[_tab.index]),
       ),
     );
   }

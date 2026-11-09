@@ -1,0 +1,85 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:weddingmanagementf/app/theme/app_theme.dart';
+import 'package:weddingmanagementf/core/utils/currency_formatter.dart';
+import 'package:weddingmanagementf/features/dowry/presentation/dowry_form_sheet.dart';
+import 'package:weddingmanagementf/features/dowry/presentation/providers/dowry_providers.dart';
+
+class DowryTab extends ConsumerWidget {
+  const DowryTab({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final async = ref.watch(dowryListProvider);
+    return async.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, _) => Center(child: Text('Error: $e')),
+      data: (items) {
+        if (items.isEmpty) {
+          return const Center(
+            child: Padding(
+              padding: EdgeInsets.all(32),
+              child: Text(
+                'Belum ada item seserahan.\nTekan + untuk menambah.',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 12, color: AppTheme.muted),
+              ),
+            ),
+          );
+        }
+        return RefreshIndicator(
+          onRefresh: () async {
+            ref.invalidate(dowryListProvider);
+            await ref.read(dowryListProvider.future);
+          },
+          child: ListView.separated(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 100),
+            itemCount: items.length,
+            separatorBuilder: (_, __) => const SizedBox(height: 8),
+            itemBuilder: (_, i) {
+              final item = items[i];
+              return Card(
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(16),
+                  onTap: () => showDowryFormSheet(context, initial: item),
+                  child: Padding(
+                    padding: const EdgeInsets.all(14),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(item.name,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w700)),
+                            ),
+                            Chip(
+                              label: Text(item.statusEnum.label),
+                              visualDensity: VisualDensity.compact,
+                              labelStyle: const TextStyle(fontSize: 10),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          '${item.quantity} × ${CurrencyFormatter.format(item.actualPrice > 0 ? item.actualPrice : item.estimatedPrice)}',
+                          style: const TextStyle(
+                              fontSize: 12, color: AppTheme.muted),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+}
