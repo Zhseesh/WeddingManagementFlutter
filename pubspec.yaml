@@ -1,5 +1,5 @@
 name: weddingmanagementf
-description: "Wedding Management"
+description: "Wedding Planner & Finance Management"
 publish_to: 'none'
 version: 1.0.0+1
 
@@ -16,13 +16,14 @@ dependencies:
   go_router: ^14.0.0
   google_fonts: ^6.2.1
   shared_preferences: ^2.3.2
-  pdf: ^3.11.1          
-  share_plus: ^10.1.0   
-  path_provider: ^2.1.5 
+  pdf: ^3.11.1
+  share_plus: ^10.1.0
+  path_provider: ^2.1.5
   file_picker: ^8.1.2
-  flutter_local_notifications: ^17.2.4   
-  timezone: ^0.9.4                       
-  flutter_timezone: ^3.0.1               
+  flutter_local_notifications: ^17.2.4
+  timezone: ^0.9.4
+  flutter_timezone: ^3.0.1
+  fl_chart: ^0.69.0       
 
 dev_dependencies:
   flutter_test:
