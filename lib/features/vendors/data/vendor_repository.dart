@@ -91,6 +91,7 @@ class VendorRepository {
   /// Auto-update status vendor bila perlu.
   Future<int> recordPayment({
     required VendorModel vendor,
+    int? categoryId, // <-- TAMBAHKAN INI
     required int amount,
     required DateTime date,
     required String paymentMethod,
@@ -100,10 +101,9 @@ class VendorRepository {
     return db.transaction<int>((txn) async {
       final now = DateTime.now().toIso8601String();
 
-      // 1. Insert transaksi (sumber nominal satu-satunya)
       final txId = await txn.insert('transactions', {
         'profile_id': vendor.profileId,
-        'category_id': vendor.categoryId,
+        'category_id': categoryId ?? vendor.categoryId, // <-- GUNAKAN PARAMETER BARU
         'type': 'expense',
         'amount': amount,
         'transaction_date': date.toIso8601String().substring(0, 10),

@@ -118,4 +118,8 @@ class BudgetRepository {
       whereArgs: [categoryId],
     );
   }
+  Future<void> deleteCategory(int categoryId) async {
+    final db = await _dbHelper.database;
+    await db.delete('budget_categories', where: 'id = ?', whereArgs: [categoryId]);
+  }
 }

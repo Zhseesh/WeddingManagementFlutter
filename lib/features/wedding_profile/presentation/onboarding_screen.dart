@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../../app/app_init.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -17,20 +16,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     _OnboardingPage(
       icon: Icons.favorite,
       title: 'Rencanakan Pernikahan Impian',
-      description:
-          'Kelola anggaran, vendor, hingga persiapan administrasi KUA dalam satu aplikasi.',
+      description: 'Kelola anggaran, vendor, hingga persiapan administrasi KUA dalam satu aplikasi.',
     ),
     _OnboardingPage(
       icon: Icons.account_balance_wallet,
       title: 'Kelola Anggaran dengan Mudah',
-      description:
-          'Catat pemasukan, pengeluaran, dan pantau sisa anggaran secara real-time.',
+      description: 'Catat pemasukan, pengeluaran, dan pantau sisa anggaran secara real-time.',
     ),
     _OnboardingPage(
       icon: Icons.checklist,
       title: 'Pantau Semua Persiapan',
-      description:
-          'Lacak vendor, cicilan, lamaran, seserahan, dan checklist dalam satu tempat.',
+      description: 'Lacak vendor, cicilan, lamaran, seserahan, dan checklist dalam satu tempat.',
     ),
   ];
 
@@ -40,9 +36,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     super.dispose();
   }
 
-  Future<void> _finish() async {
-    await markOnboardingDone();
-    if (!mounted) return;
+  void _finish() {
+    // Jangan panggil markOnboardingDone di sini!
     context.go('/setup-profile');
   }
 
@@ -120,9 +115,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         height: 8,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(4),
-                          color: active
-                              ? scheme.primary
-                              : scheme.outlineVariant,
+                          color: active ? scheme.primary : scheme.outlineVariant,
                         ),
                       );
                     }),
@@ -130,9 +123,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   const SizedBox(height: 24),
                   ElevatedButton(
                     onPressed: _next,
-                    child: Text(
-                      _currentPage == _pages.length - 1 ? 'Mulai' : 'Lanjut',
-                    ),
+                    child: Text(_currentPage == _pages.length - 1 ? 'Mulai' : 'Lanjut'),
                   ),
                 ],
               ),
@@ -148,9 +139,5 @@ class _OnboardingPage {
   final IconData icon;
   final String title;
   final String description;
-  const _OnboardingPage({
-    required this.icon,
-    required this.title,
-    required this.description,
-  });
+  const _OnboardingPage({required this.icon, required this.title, required this.description});
 }

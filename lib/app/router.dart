@@ -32,14 +32,7 @@ final appRouter = GoRouter(
         StatefulShellBranch(routes: [
           GoRoute(
             path: '/preparation',
-            builder: (c, s) {
-              final tabParam = s.uri.queryParameters['tab'];
-              final initialIndex = int.tryParse(tabParam ?? '0') ?? 0;
-              return PreparationScreen(
-                key: ValueKey('prep-$initialIndex'),
-                initialTabIndex: initialIndex,
-              );
-            },
+            builder: (c, s) => const PreparationScreen(),
             routes: [
               GoRoute(
                 path: 'vendor/:id',
@@ -56,14 +49,7 @@ final appRouter = GoRouter(
         StatefulShellBranch(routes: [
           GoRoute(
             path: '/finance',
-            builder: (c, s) {
-              final tabParam = s.uri.queryParameters['tab'];
-              final initialIndex = int.tryParse(tabParam ?? '0') ?? 0;
-              return FinanceScreen(
-                key: ValueKey('finance-$initialIndex'),
-                initialTabIndex: initialIndex,
-              );
-            },
+            builder: (c, s) => const FinanceScreen(),
             routes: [
               GoRoute(
                 path: 'transaction/:id',

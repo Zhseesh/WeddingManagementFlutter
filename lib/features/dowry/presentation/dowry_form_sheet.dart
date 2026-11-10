@@ -120,12 +120,36 @@ class _DowryFormSheetState extends ConsumerState<_DowryFormSheet> {
     }
   }
 
+  Future<void> _delete() async {
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Hapus item?'),
+        content: const Text('Item ini akan dihapus permanen.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Batal')),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: Theme.of(ctx).colorScheme.error),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Hapus'),
+          ),
+        ],
+      ),
+    );
+    if (ok != true) return;
+    await ref.read(dowryRepositoryProvider).delete(widget.initial!.id!);
+    ref.invalidate(dowryListProvider);
+    if (!mounted) return;
+    Navigator.pop(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     return FormSheetScaffold(
       title: _isEdit ? 'Edit Seserahan' : 'Tambah Seserahan',
       onSave: _submit,
       saving: _saving,
+      onDelete: _isEdit ? _delete : null,
       child: Form(
         key: _formKey,
         child: Column(

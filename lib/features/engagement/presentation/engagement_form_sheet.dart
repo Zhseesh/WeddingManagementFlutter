@@ -140,12 +140,36 @@ class _EngagementFormSheetState extends ConsumerState<_EngagementFormSheet> {
     }
   }
 
+  Future<void> _delete() async {
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Hapus item?'),
+        content: const Text('Item ini akan dihapus permanen.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Batal')),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: Theme.of(ctx).colorScheme.error),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Hapus'),
+          ),
+        ],
+      ),
+    );
+    if (ok != true) return;
+    await ref.read(engagementRepositoryProvider).delete(widget.initial!.id!);
+    ref.invalidate(engagementListProvider);
+    if (!mounted) return;
+    Navigator.pop(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     return FormSheetScaffold(
       title: _isEdit ? 'Edit Item Lamaran' : 'Tambah Item Lamaran',
       onSave: _submit,
       saving: _saving,
+      onDelete: _isEdit ? _delete : null,
       child: Form(
         key: _formKey,
         child: Column(

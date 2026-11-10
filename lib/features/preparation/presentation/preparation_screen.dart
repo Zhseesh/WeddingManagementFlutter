@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:weddingmanagementf/app/theme/app_theme.dart';
+import 'package:weddingmanagementf/core/providers/navigation_providers.dart';
 import 'package:weddingmanagementf/features/checklist/presentation/checklist_form_sheet.dart';
 import 'package:weddingmanagementf/features/dowry/presentation/dowry_form_sheet.dart';
 import 'package:weddingmanagementf/features/engagement/presentation/engagement_form_sheet.dart';
@@ -13,26 +14,27 @@ import 'package:weddingmanagementf/features/reminders/presentation/reminder_form
 import 'package:weddingmanagementf/features/vendors/presentation/vendor_form_sheet.dart';
 
 class PreparationScreen extends ConsumerStatefulWidget {
-  final int initialTabIndex;
-  const PreparationScreen({super.key, this.initialTabIndex = 0});
+  const PreparationScreen({super.key});
 
   @override
   ConsumerState<PreparationScreen> createState() => _PreparationScreenState();
 }
 
-class _PreparationScreenState extends ConsumerState<PreparationScreen>
-    with SingleTickerProviderStateMixin {
+class _PreparationScreenState extends ConsumerState<PreparationScreen> with SingleTickerProviderStateMixin {
   late final TabController _tab;
 
   @override
   void initState() {
     super.initState();
-    _tab = TabController(
-      length: 5,
-      vsync: this,
-      initialIndex: widget.initialTabIndex.clamp(0, 4),
-    );
-    _tab.addListener(() => setState(() {}));
+    _tab = TabController(length: 5, vsync: this);
+    _tab.addListener(() {
+      if (mounted) {
+        setState(() {});
+        if (ref.read(prepTabProvider) != _tab.index) {
+          ref.read(prepTabProvider.notifier).state = _tab.index;
+        }
+      }
+    });
   }
 
   @override
@@ -43,16 +45,11 @@ class _PreparationScreenState extends ConsumerState<PreparationScreen>
 
   void _onAdd() {
     switch (_tab.index) {
-      case 0:
-        showVendorFormSheet(context);
-      case 1:
-        showChecklistFormSheet(context);
-      case 2:
-        showEngagementFormSheet(context);
-      case 3:
-        showDowryFormSheet(context);
-      case 4:
-        showReminderFormSheet(context);
+      case 0: showVendorFormSheet(context);
+      case 1: showChecklistFormSheet(context);
+      case 2: showEngagementFormSheet(context);
+      case 3: showDowryFormSheet(context);
+      case 4: showReminderFormSheet(context);
     }
   }
 
@@ -60,6 +57,14 @@ class _PreparationScreenState extends ConsumerState<PreparationScreen>
 
   @override
   Widget build(BuildContext context) {
+    ref.listen<int>(prepTabProvider, (previous, next) {
+      if (_tab.index != next) {
+        _tab.animateTo(next);
+      }
+    });
+
+    final isKeyboardOpen = MediaQuery.viewInsetsOf(context).bottom > 0;
+
     return Scaffold(
       appBar: AppBar(
         title: const Column(
@@ -99,7 +104,7 @@ class _PreparationScreenState extends ConsumerState<PreparationScreen>
           ReminderTab(),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
+      floatingActionButton: isKeyboardOpen ? null : FloatingActionButton.extended(
         onPressed: _onAdd,
         icon: const Icon(Icons.add),
         label: Text(_fabLabels[_tab.index]),

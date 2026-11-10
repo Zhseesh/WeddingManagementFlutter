@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:weddingmanagementf/app/theme/app_theme.dart';
+import 'package:weddingmanagementf/core/providers/navigation_providers.dart'; // Import ini
 import 'package:weddingmanagementf/core/utils/currency_formatter.dart';
 import 'package:weddingmanagementf/features/dashboard/data/dashboard_data.dart';
 import 'package:weddingmanagementf/features/dashboard/presentation/providers/dashboard_providers.dart';
@@ -21,18 +22,8 @@ class DashboardScreen extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              'Beranda',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
-            ),
-            Text(
-              'Wedding Planner & Finance',
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w500,
-                color: AppTheme.muted,
-              ),
-            ),
+            Text('Beranda', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+            Text('Wedding Planner & Finance', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w500, color: AppTheme.muted)),
           ],
         ),
       ),
@@ -57,16 +48,12 @@ class DashboardScreen extends ConsumerWidget {
   }
 }
 
-// ============================================================
-// Content
-// ============================================================
-
-class _DashboardContent extends StatelessWidget {
+class _DashboardContent extends ConsumerWidget {
   final DashboardData data;
   const _DashboardContent({required this.data});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return ListView(
       physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
@@ -78,7 +65,10 @@ class _DashboardContent extends StatelessWidget {
         _SectionHead(
           title: 'Ringkasan Anggaran',
           actionLabel: 'Lihat detail',
-          onAction: () => context.go('/finance?tab=0'), // Ke tab Anggaran
+          onAction: () {
+            ref.read(financeTabProvider.notifier).state = 0;
+            context.go('/finance');
+          },
         ),
         const SizedBox(height: 8),
         _CategoryList(categories: data.categories),
@@ -86,7 +76,10 @@ class _DashboardContent extends StatelessWidget {
         _SectionHead(
           title: 'Aktivitas Terbaru',
           actionLabel: 'Semua',
-          onAction: () => context.go('/finance?tab=1'), // Ke tab Transaksi
+          onAction: () {
+            ref.read(financeTabProvider.notifier).state = 1;
+            context.go('/finance');
+          },
         ),
         const SizedBox(height: 8),
         _RecentTransactionsList(items: data.recentTransactions),
@@ -630,59 +623,71 @@ class _RecentTile extends StatelessWidget {
 // Quick actions (Akses Cepat)
 // ============================================================
 
-class _QuickActionsGrid extends StatelessWidget {
+class _QuickActionsGrid extends ConsumerWidget {
   const _QuickActionsGrid();
 
-  static const _actions = [
-    _QuickAction(
-      label: 'Vendor',
-      icon: Icons.store_outlined,
-      route: '/preparation?tab=0',
-    ),
-    _QuickAction(
-      label: 'Lamaran',
-      icon: Icons.favorite_border,
-      route: '/preparation?tab=2',
-    ),
-    _QuickAction(
-      label: 'Seserahan',
-      icon: Icons.card_giftcard,
-      route: '/preparation?tab=3',
-    ),
-    _QuickAction(
-      label: 'Transaksi',
-      icon: Icons.receipt_long_outlined,
-      route: '/finance?tab=1',
-    ),
-    _QuickAction(
-      label: 'Cicilan',
-      icon: Icons.calendar_month_outlined,
-      route: '/finance?tab=2',
-    ),
-    _QuickAction(
-      label: 'Checklist',
-      icon: Icons.check_circle_outline,
-      route: '/preparation?tab=1',
-    ),
-  ];
-
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final actions = [
+      _QuickAction(
+        label: 'Vendor',
+        icon: Icons.store_outlined,
+        onTap: () {
+          ref.read(prepTabProvider.notifier).state = 0;
+          context.go('/preparation');
+        },
+      ),
+      _QuickAction(
+        label: 'Lamaran',
+        icon: Icons.favorite_border,
+        onTap: () {
+          ref.read(prepTabProvider.notifier).state = 2;
+          context.go('/preparation');
+        },
+      ),
+      _QuickAction(
+        label: 'Seserahan',
+        icon: Icons.card_giftcard,
+        onTap: () {
+          ref.read(prepTabProvider.notifier).state = 3;
+          context.go('/preparation');
+        },
+      ),
+      _QuickAction(
+        label: 'Transaksi',
+        icon: Icons.receipt_long_outlined,
+        onTap: () {
+          ref.read(financeTabProvider.notifier).state = 1;
+          context.go('/finance');
+        },
+      ),
+      _QuickAction(
+        label: 'Cicilan',
+        icon: Icons.calendar_month_outlined,
+        onTap: () {
+          ref.read(financeTabProvider.notifier).state = 2;
+          context.go('/finance');
+        },
+      ),
+      _QuickAction(
+        label: 'Checklist',
+        icon: Icons.check_circle_outline,
+        onTap: () {
+          ref.read(prepTabProvider.notifier).state = 1;
+          context.go('/preparation');
+        },
+      ),
+    ];
+
     return LayoutBuilder(
       builder: (context, constraints) {
         final isWide = constraints.maxWidth >= 700;
         final columns = isWide ? 6 : 3;
-        final width =
-            (constraints.maxWidth - (columns - 1) * 8) / columns;
+        final width = (constraints.maxWidth - (columns - 1) * 8) / columns;
         return Wrap(
           spacing: 8,
           runSpacing: 8,
-          children: _actions
-              .map((a) => SizedBox(
-                    width: width,
-                    child: _QuickActionButton(action: a),
-                  ))
-              .toList(),
+          children: actions.map((a) => SizedBox(width: width, child: _QuickActionButton(action: a))).toList(),
         );
       },
     );
@@ -692,12 +697,8 @@ class _QuickActionsGrid extends StatelessWidget {
 class _QuickAction {
   final String label;
   final IconData icon;
-  final String route;
-  const _QuickAction({
-    required this.label,
-    required this.icon,
-    required this.route,
-  });
+  final VoidCallback onTap;
+  const _QuickAction({required this.label, required this.icon, required this.onTap});
 }
 
 class _QuickActionButton extends StatelessWidget {
@@ -708,29 +709,17 @@ class _QuickActionButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: Colors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
-        side: const BorderSide(color: AppTheme.line),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15), side: const BorderSide(color: AppTheme.line)),
       child: InkWell(
         borderRadius: BorderRadius.circular(15),
-        onTap: () => context.go(action.route), // Changed push to go
+        onTap: action.onTap,
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 4),
           child: Column(
             children: [
               Icon(action.icon, size: 22, color: AppTheme.primary),
               const SizedBox(height: 6),
-              Text(
-                action.label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
-                  color: AppTheme.ink,
-                ),
-              ),
+              Text(action.label, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.ink)),
             ],
           ),
         ),

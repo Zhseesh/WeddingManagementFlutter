@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:weddingmanagementf/app/theme/app_theme.dart';
+import 'package:weddingmanagementf/core/providers/navigation_providers.dart';
 import 'package:weddingmanagementf/core/utils/currency_formatter.dart';
 import 'package:weddingmanagementf/features/budget/presentation/budget_screen.dart';
 import 'package:weddingmanagementf/features/dashboard/presentation/providers/dashboard_providers.dart';
@@ -12,8 +14,7 @@ import 'package:weddingmanagementf/features/transactions/presentation/providers/
 import 'package:weddingmanagementf/features/transactions/presentation/transaction_form_sheet.dart';
 
 class FinanceScreen extends ConsumerStatefulWidget {
-  final int initialTabIndex;
-  const FinanceScreen({super.key, this.initialTabIndex = 0});
+  const FinanceScreen({super.key});
 
   @override
   ConsumerState<FinanceScreen> createState() => _FinanceScreenState();
@@ -26,13 +27,14 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen>
   @override
   void initState() {
     super.initState();
-    _tab = TabController(
-      length: 3,
-      vsync: this,
-      initialIndex: widget.initialTabIndex.clamp(0, 2),
-    );
+    _tab = TabController(length: 3, vsync: this);
     _tab.addListener(() {
-      if (mounted) setState(() {});
+      if (mounted) {
+        setState(() {});
+        if (ref.read(financeTabProvider) != _tab.index) {
+          ref.read(financeTabProvider.notifier).state = _tab.index;
+        }
+      }
     });
   }
 
@@ -42,6 +44,7 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen>
     super.dispose();
   }
 
+  // FIX: kurung kurawal eksplisit
   void _onAdd() {
     if (_tab.index == 1) {
       showTransactionFormSheet(context);
@@ -54,7 +57,14 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen>
 
   @override
   Widget build(BuildContext context) {
+    ref.listen<int>(financeTabProvider, (previous, next) {
+      if (_tab.index != next) {
+        _tab.animateTo(next);
+      }
+    });
+
     final dashboardAsync = ref.watch(dashboardDataProvider);
+    final isKeyboardOpen = MediaQuery.viewInsetsOf(context).bottom > 0;
 
     return Scaffold(
       appBar: AppBar(
@@ -62,24 +72,20 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen>
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              'Keuangan',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
-            ),
-            Text(
-              'Anggaran, transaksi, dan cicilan',
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w500,
-                color: AppTheme.muted,
-              ),
-            ),
+            Text('Keuangan',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+            Text('Anggaran, transaksi, dan cicilan',
+                style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                    color: AppTheme.muted)),
           ],
         ),
       ),
       body: Column(
         children: [
-          if (dashboardAsync.hasValue) _FinanceStats(data: dashboardAsync.value!),
+          if (dashboardAsync.hasValue)
+            _FinanceStats(data: dashboardAsync.value!),
           if (dashboardAsync.hasValue) const SizedBox(height: 16),
           TabBar(
             controller: _tab,
@@ -87,8 +93,10 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen>
             unselectedLabelColor: AppTheme.muted,
             indicatorColor: AppTheme.primary,
             indicatorSize: TabBarIndicatorSize.label,
-            labelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
-            unselectedLabelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+            labelStyle:
+                const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+            unselectedLabelStyle:
+                const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
             tabs: const [
               Tab(text: 'Anggaran'),
               Tab(text: 'Transaksi'),
@@ -107,7 +115,7 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen>
           ),
         ],
       ),
-      floatingActionButton: _tab.index > 0
+      floatingActionButton: (_tab.index > 0 && !isKeyboardOpen)
           ? FloatingActionButton.extended(
               onPressed: _onAdd,
               icon: const Icon(Icons.add),
@@ -287,9 +295,8 @@ class _TransactionTab extends ConsumerWidget {
               FilterChip(
                 label: const Text('Semua'),
                 selected: filter == null,
-                onSelected: (_) => ref
-                    .read(transactionTypeFilterProvider.notifier)
-                    .state = null,
+                onSelected: (_) =>
+                    ref.read(transactionTypeFilterProvider.notifier).state = null,
               ),
               const SizedBox(width: 6),
               FilterChip(
@@ -360,6 +367,7 @@ class _TransactionTile extends StatelessWidget {
             ? tx.source!
             : (isIncome ? 'Pemasukan' : 'Pengeluaran'));
     return ListTile(
+      onTap: () => context.push('/finance/transaction/${tx.id}'),
       leading: CircleAvatar(
         backgroundColor: Color.lerp(color, Colors.white, 0.85),
         child: Icon(
@@ -372,10 +380,11 @@ class _TransactionTile extends StatelessWidget {
         title,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 13,
           fontWeight: FontWeight.w600,
-          color: AppTheme.ink,
+          color: tx.isVoid ? AppTheme.muted : AppTheme.ink,
+          decoration: tx.isVoid ? TextDecoration.lineThrough : null,
         ),
       ),
       subtitle: Text(
@@ -385,9 +394,10 @@ class _TransactionTile extends StatelessWidget {
       trailing: Text(
         '$sign${CurrencyFormatter.format(tx.amount)}',
         style: TextStyle(
-          color: color,
+          color: tx.isVoid ? AppTheme.muted : color,
           fontWeight: FontWeight.bold,
           fontSize: 13,
+          decoration: tx.isVoid ? TextDecoration.lineThrough : null,
         ),
       ),
     );

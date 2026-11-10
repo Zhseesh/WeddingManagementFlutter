@@ -132,12 +132,36 @@ class _ReminderFormSheetState extends ConsumerState<_ReminderFormSheet> {
     }
   }
 
+  Future<void> _delete() async {
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Hapus pengingat?'),
+        content: const Text('Pengingat ini akan dihapus permanen.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Batal')),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: Theme.of(ctx).colorScheme.error),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Hapus'),
+          ),
+        ],
+      ),
+    );
+    if (ok != true) return;
+    await ref.read(reminderRepositoryProvider).delete(widget.initial!.id!);
+    ref.invalidate(reminderListProvider);
+    if (!mounted) return;
+    Navigator.pop(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     return FormSheetScaffold(
       title: _isEdit ? 'Edit Pengingat' : 'Tambah Pengingat',
       onSave: _submit,
       saving: _saving,
+      onDelete: _isEdit ? _delete : null,
       child: Form(
         key: _formKey,
         child: Column(

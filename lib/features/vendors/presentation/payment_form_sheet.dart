@@ -34,6 +34,7 @@ class _PaymentFormSheetState extends ConsumerState<_PaymentFormSheet> {
   final _descCtrl = TextEditingController();
   DateTime _date = DateTime.now();
   String _method = 'Transfer';
+  int? _categoryId; // <-- STATE BARU
   bool _saving = false;
   static const _methods = ['Cash', 'Transfer', 'E-Wallet', 'Kartu', 'Lainnya'];
 
@@ -75,11 +76,11 @@ class _PaymentFormSheetState extends ConsumerState<_PaymentFormSheet> {
     try {
       await ref.read(vendorRepositoryProvider).recordPayment(
             vendor: widget.summary.vendor,
+            categoryId: _categoryId, // <-- KIRIM KE REPO
             amount: amount,
             date: _date,
             paymentMethod: _method,
-            description:
-                _descCtrl.text.trim().isEmpty ? null : _descCtrl.text.trim(),
+            description: _descCtrl.text.trim().isEmpty ? null : _descCtrl.text.trim(),
           );
       ref.invalidate(vendorListProvider);
       ref.invalidate(vendorDetailProvider(widget.summary.vendor.id!));
@@ -92,14 +93,15 @@ class _PaymentFormSheetState extends ConsumerState<_PaymentFormSheet> {
     } catch (e) {
       if (!mounted) return;
       setState(() => _saving = false);
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Gagal: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gagal: $e')));
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final s = widget.summary;
+    final catsAsync = ref.watch(budgetCategoriesProvider); // <-- AMBIL KATEGORI
+
     return FormSheetScaffold(
       title: 'Catat Pembayaran',
       onSave: _submit,
@@ -135,10 +137,7 @@ class _PaymentFormSheetState extends ConsumerState<_PaymentFormSheet> {
             TextFormField(
               controller: _amountCtrl,
               keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                labelText: 'Nominal Pembayaran',
-                prefixText: 'Rp ',
-              ),
+              decoration: const InputDecoration(labelText: 'Nominal Pembayaran', prefixText: 'Rp '),
               validator: (v) {
                 if (v == null || v.trim().isEmpty) return 'Wajib diisi';
                 if (CurrencyFormatter.parse(v) <= 0) return 'Harus > Rp0';
@@ -158,17 +157,29 @@ class _PaymentFormSheetState extends ConsumerState<_PaymentFormSheet> {
             DropdownButtonFormField<String>(
               initialValue: _method,
               decoration: const InputDecoration(labelText: 'Metode'),
-              items: _methods
-                  .map((m) => DropdownMenuItem(value: m, child: Text(m)))
-                  .toList(),
+              items: _methods.map((m) => DropdownMenuItem(value: m, child: Text(m))).toList(),
               onChanged: (v) => setState(() => _method = v ?? 'Transfer'),
+            ),
+            const SizedBox(height: 12),
+            // DROPDOWN KATEGORI BARU
+            catsAsync.when(
+              loading: () => const LinearProgressIndicator(),
+              error: (e, _) => Text('Error: $e'),
+              data: (cats) => DropdownButtonFormField<int?>(
+                initialValue: _categoryId,
+                decoration: const InputDecoration(labelText: 'Kategori Anggaran (opsional)'),
+                items: [
+                  const DropdownMenuItem<int?>(value: null, child: Text('— Tanpa kategori —')),
+                  ...cats.map((c) => DropdownMenuItem<int?>(value: c.id, child: Text(c.name))),
+                ],
+                onChanged: (v) => setState(() => _categoryId = v),
+              ),
             ),
             const SizedBox(height: 12),
             TextFormField(
               controller: _descCtrl,
               maxLines: 2,
-              decoration:
-                  const InputDecoration(labelText: 'Catatan (opsional)'),
+              decoration: const InputDecoration(labelText: 'Catatan (opsional)'),
             ),
           ],
         ),
