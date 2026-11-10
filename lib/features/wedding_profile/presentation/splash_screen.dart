@@ -30,7 +30,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
         case AppInitState.needsSetup:
           context.go('/setup-profile');
         case AppInitState.ready:
-          context.go('/dashboard');
+          context.go('/app');
       }
     } catch (e) {
       if (!mounted) return;
@@ -53,10 +53,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
               const SizedBox(height: 16),
               Text(
                 'Wedding Planner',
-                style: Theme.of(context)
-                    .textTheme
-                    .headlineSmall
-                    ?.copyWith(fontWeight: FontWeight.bold),
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               Text(
@@ -64,11 +61,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
               const SizedBox(height: 32),
-              const SizedBox(
-                width: 24,
-                height: 24,
-                child: CircularProgressIndicator(strokeWidth: 2.5),
-              ),
+              const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2.5)),
             ],
           ),
         ),

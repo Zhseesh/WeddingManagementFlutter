@@ -20,14 +20,12 @@ class FinanceScreen extends ConsumerStatefulWidget {
   ConsumerState<FinanceScreen> createState() => _FinanceScreenState();
 }
 
-class _FinanceScreenState extends ConsumerState<FinanceScreen>
-    with SingleTickerProviderStateMixin {
+class _FinanceScreenState extends ConsumerState<FinanceScreen> with SingleTickerProviderStateMixin {
   late final TabController _tab;
 
   @override
   void initState() {
     super.initState();
-    // Lapis 1: Baca initial index dari provider saat initState
     final initialIndex = ref.read(financeTabProvider).clamp(0, 2);
     _tab = TabController(length: 3, vsync: this, initialIndex: initialIndex);
 
@@ -59,25 +57,21 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen>
 
   @override
   Widget build(BuildContext context) {
-    // Lapis 2: Listen perubahan provider saat widget sudah hidup
     ref.listen<int>(financeTabProvider, (previous, next) {
-      if (mounted && _tab.index != next) {
-        _tab.animateTo(next);
-      }
+      if (mounted && _tab.index != next) _tab.animateTo(next);
     });
 
-    // Lapis 3: Fallback — kalau index belum sama, jadwalkan perbaikan
     final targetIndex = ref.watch(financeTabProvider).clamp(0, 2);
     if (_tab.index != targetIndex) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted && _tab.index != targetIndex) {
-          _tab.animateTo(targetIndex);
-        }
+        if (mounted && _tab.index != targetIndex) _tab.animateTo(targetIndex);
       });
     }
 
     final dashboardAsync = ref.watch(dashboardDataProvider);
-    final isKeyboardOpen = MediaQuery.viewInsetsOf(context).bottom > 0;
+    
+    // FIX KEYBOARD
+    final isKeyboardOpen = MediaQuery.of(context).viewInsets.bottom > 0;
 
     return Scaffold(
       appBar: AppBar(
@@ -128,13 +122,18 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen>
           ),
         ],
       ),
-      floatingActionButton: (_tab.index > 0 && !isKeyboardOpen)
-          ? FloatingActionButton.extended(
-              onPressed: _onAdd,
-              icon: const Icon(Icons.add),
-              label: Text(_fabLabels[_tab.index]),
-            )
-          : null,
+      floatingActionButton: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 200),
+        transitionBuilder: (child, animation) => ScaleTransition(scale: animation, child: child),
+        child: (_tab.index > 0 && !isKeyboardOpen)
+            ? FloatingActionButton.extended(
+                key: ValueKey(_tab.index),
+                onPressed: _onAdd,
+                icon: const Icon(Icons.add),
+                label: Text(_fabLabels[_tab.index]),
+              )
+            : const SizedBox.shrink(),
+      ),
     );
   }
 }

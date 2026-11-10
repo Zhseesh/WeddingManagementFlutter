@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:weddingmanagementf/app/theme/app_theme.dart';
-import 'package:weddingmanagementf/core/providers/navigation_providers.dart'; // Import ini
+import 'package:weddingmanagementf/core/providers/navigation_providers.dart';
 import 'package:weddingmanagementf/core/utils/currency_formatter.dart';
 import 'package:weddingmanagementf/features/dashboard/data/dashboard_data.dart';
 import 'package:weddingmanagementf/features/dashboard/presentation/providers/dashboard_providers.dart';
@@ -48,6 +47,13 @@ class DashboardScreen extends ConsumerWidget {
   }
 }
 
+// Helper untuk pindah tab
+void _goToTab(WidgetRef ref, {required int mainTab, int? prepSubTab, int? financeSubTab}) {
+  ref.read(mainTabProvider.notifier).state = mainTab;
+  if (prepSubTab != null) ref.read(prepTabProvider.notifier).state = prepSubTab;
+  if (financeSubTab != null) ref.read(financeTabProvider.notifier).state = financeSubTab;
+}
+
 class _DashboardContent extends ConsumerWidget {
   final DashboardData data;
   const _DashboardContent({required this.data});
@@ -65,10 +71,7 @@ class _DashboardContent extends ConsumerWidget {
         _SectionHead(
           title: 'Ringkasan Anggaran',
           actionLabel: 'Lihat detail',
-          onAction: () {
-            ref.read(financeTabProvider.notifier).state = 0;
-            context.go('/finance');
-          },
+          onAction: () => _goToTab(ref, mainTab: 2, financeSubTab: 0),
         ),
         const SizedBox(height: 8),
         _CategoryList(categories: data.categories),
@@ -76,10 +79,7 @@ class _DashboardContent extends ConsumerWidget {
         _SectionHead(
           title: 'Aktivitas Terbaru',
           actionLabel: 'Semua',
-          onAction: () {
-            ref.read(financeTabProvider.notifier).state = 1;
-            context.go('/finance');
-          },
+          onAction: () => _goToTab(ref, mainTab: 2, financeSubTab: 1),
         ),
         const SizedBox(height: 8),
         _RecentTransactionsList(items: data.recentTransactions),
@@ -629,54 +629,18 @@ class _QuickActionsGrid extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final actions = [
-      _QuickAction(
-        label: 'Vendor',
-        icon: Icons.store_outlined,
-        onTap: () {
-          ref.read(prepTabProvider.notifier).state = 0;
-          context.go('/preparation');
-        },
-      ),
-      _QuickAction(
-        label: 'Lamaran',
-        icon: Icons.favorite_border,
-        onTap: () {
-          ref.read(prepTabProvider.notifier).state = 2;
-          context.go('/preparation');
-        },
-      ),
-      _QuickAction(
-        label: 'Seserahan',
-        icon: Icons.card_giftcard,
-        onTap: () {
-          ref.read(prepTabProvider.notifier).state = 3;
-          context.go('/preparation');
-        },
-      ),
-      _QuickAction(
-        label: 'Transaksi',
-        icon: Icons.receipt_long_outlined,
-        onTap: () {
-          ref.read(financeTabProvider.notifier).state = 1;
-          context.go('/finance');
-        },
-      ),
-      _QuickAction(
-        label: 'Cicilan',
-        icon: Icons.calendar_month_outlined,
-        onTap: () {
-          ref.read(financeTabProvider.notifier).state = 2;
-          context.go('/finance');
-        },
-      ),
-      _QuickAction(
-        label: 'Checklist',
-        icon: Icons.check_circle_outline,
-        onTap: () {
-          ref.read(prepTabProvider.notifier).state = 1;
-          context.go('/preparation');
-        },
-      ),
+      _QuickAction(label: 'Vendor', icon: Icons.store_outlined,
+          onTap: () => _goToTab(ref, mainTab: 1, prepSubTab: 0)),
+      _QuickAction(label: 'Lamaran', icon: Icons.favorite_border,
+          onTap: () => _goToTab(ref, mainTab: 1, prepSubTab: 2)),
+      _QuickAction(label: 'Seserahan', icon: Icons.card_giftcard,
+          onTap: () => _goToTab(ref, mainTab: 1, prepSubTab: 3)),
+      _QuickAction(label: 'Transaksi', icon: Icons.receipt_long_outlined,
+          onTap: () => _goToTab(ref, mainTab: 2, financeSubTab: 1)),
+      _QuickAction(label: 'Cicilan', icon: Icons.calendar_month_outlined,
+          onTap: () => _goToTab(ref, mainTab: 2, financeSubTab: 2)),
+      _QuickAction(label: 'Checklist', icon: Icons.check_circle_outline,
+          onTap: () => _goToTab(ref, mainTab: 1, prepSubTab: 1)),
     ];
 
     return LayoutBuilder(
@@ -687,7 +651,9 @@ class _QuickActionsGrid extends ConsumerWidget {
         return Wrap(
           spacing: 8,
           runSpacing: 8,
-          children: actions.map((a) => SizedBox(width: width, child: _QuickActionButton(action: a))).toList(),
+          children: actions
+              .map((a) => SizedBox(width: width, child: _QuickActionButton(action: a)))
+              .toList(),
         );
       },
     );

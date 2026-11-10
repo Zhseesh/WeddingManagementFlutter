@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:weddingmanagementf/app/app_init.dart'; // Tambahkan ini
+import 'package:weddingmanagementf/app/app_init.dart';
 import 'package:weddingmanagementf/core/utils/currency_formatter.dart';
 import 'package:weddingmanagementf/features/wedding_profile/data/wedding_profile_model.dart';
 import 'package:weddingmanagementf/features/wedding_profile/presentation/providers/wedding_profile_providers.dart';
@@ -87,13 +87,10 @@ class _SetupProfileScreenState extends ConsumerState<SetupProfileScreen> {
         initialBudget: budget,
       );
 
-      // Tandai onboarding selesai SETELAH profil berhasil dibuat
       await markOnboardingDone();
-
       ref.invalidate(activeWeddingProfileProvider);
-
       if (!mounted) return;
-      context.go('/dashboard');
+      context.go('/app');
     } catch (e) {
       if (!mounted) return;
       setState(() => _submitting = false);

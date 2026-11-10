@@ -15,6 +15,7 @@ import 'package:weddingmanagementf/features/dashboard/presentation/providers/das
 import 'package:weddingmanagementf/features/dowry/presentation/providers/dowry_providers.dart';
 import 'package:weddingmanagementf/features/engagement/presentation/providers/engagement_providers.dart';
 import 'package:weddingmanagementf/features/installments/presentation/providers/installment_providers.dart';
+import 'package:weddingmanagementf/core/providers/navigation_providers.dart';
 import 'package:weddingmanagementf/features/reminders/presentation/providers/reminder_providers.dart';
 import 'package:weddingmanagementf/features/reports/presentation/providers/report_providers.dart';
 import 'package:weddingmanagementf/features/transactions/presentation/providers/transaction_providers.dart';
@@ -156,7 +157,10 @@ class ProfileScreen extends ConsumerWidget {
               _SettingsCard(
                 onBackup: () => _backup(context, ref),
                 onRestore: () => _restore(context, ref),
-                onReminder: () => context.go('/preparation?tab=4'),
+                onReminder: () {
+                  ref.read(mainTabProvider.notifier).state = 1;
+                  ref.read(prepTabProvider.notifier).state = 4;
+                },
                 onAbout: () => _showAbout(context),
               ),
             ],
