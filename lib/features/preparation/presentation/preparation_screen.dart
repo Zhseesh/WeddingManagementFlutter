@@ -20,13 +20,17 @@ class PreparationScreen extends ConsumerStatefulWidget {
   ConsumerState<PreparationScreen> createState() => _PreparationScreenState();
 }
 
-class _PreparationScreenState extends ConsumerState<PreparationScreen> with SingleTickerProviderStateMixin {
+class _PreparationScreenState extends ConsumerState<PreparationScreen>
+    with SingleTickerProviderStateMixin {
   late final TabController _tab;
 
   @override
   void initState() {
     super.initState();
-    _tab = TabController(length: 5, vsync: this);
+    // Lapis 1: Baca initial index dari provider saat initState
+    final initialIndex = ref.read(prepTabProvider).clamp(0, 4);
+    _tab = TabController(length: 5, vsync: this, initialIndex: initialIndex);
+
     _tab.addListener(() {
       if (mounted) {
         setState(() {});
@@ -45,11 +49,16 @@ class _PreparationScreenState extends ConsumerState<PreparationScreen> with Sing
 
   void _onAdd() {
     switch (_tab.index) {
-      case 0: showVendorFormSheet(context);
-      case 1: showChecklistFormSheet(context);
-      case 2: showEngagementFormSheet(context);
-      case 3: showDowryFormSheet(context);
-      case 4: showReminderFormSheet(context);
+      case 0:
+        showVendorFormSheet(context);
+      case 1:
+        showChecklistFormSheet(context);
+      case 2:
+        showEngagementFormSheet(context);
+      case 3:
+        showDowryFormSheet(context);
+      case 4:
+        showReminderFormSheet(context);
     }
   }
 
@@ -57,11 +66,23 @@ class _PreparationScreenState extends ConsumerState<PreparationScreen> with Sing
 
   @override
   Widget build(BuildContext context) {
+    // Lapis 2: Listen perubahan provider saat widget sudah hidup
     ref.listen<int>(prepTabProvider, (previous, next) {
-      if (_tab.index != next) {
+      if (mounted && _tab.index != next) {
         _tab.animateTo(next);
       }
     });
+
+    // Lapis 3: Fallback — kalau index belum sama (mis. provider diubah sebelum
+    // widget sempat init), jadwalkan perbaikan di frame berikutnya
+    final targetIndex = ref.watch(prepTabProvider).clamp(0, 4);
+    if (_tab.index != targetIndex) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && _tab.index != targetIndex) {
+          _tab.animateTo(targetIndex);
+        }
+      });
+    }
 
     final isKeyboardOpen = MediaQuery.viewInsetsOf(context).bottom > 0;
 
@@ -71,8 +92,13 @@ class _PreparationScreenState extends ConsumerState<PreparationScreen> with Sing
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Persiapan', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
-            Text('Vendor, kebutuhan, dan pengingat', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w500, color: AppTheme.muted)),
+            Text('Persiapan',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+            Text('Vendor, kebutuhan, dan pengingat',
+                style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                    color: AppTheme.muted)),
           ],
         ),
         bottom: TabBar(
@@ -83,8 +109,10 @@ class _PreparationScreenState extends ConsumerState<PreparationScreen> with Sing
           unselectedLabelColor: AppTheme.muted,
           indicatorColor: AppTheme.primary,
           indicatorSize: TabBarIndicatorSize.label,
-          labelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
-          unselectedLabelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+          labelStyle:
+              const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+          unselectedLabelStyle:
+              const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
           tabs: const [
             Tab(text: 'Vendor'),
             Tab(text: 'Checklist'),
@@ -104,11 +132,13 @@ class _PreparationScreenState extends ConsumerState<PreparationScreen> with Sing
           ReminderTab(),
         ],
       ),
-      floatingActionButton: isKeyboardOpen ? null : FloatingActionButton.extended(
-        onPressed: _onAdd,
-        icon: const Icon(Icons.add),
-        label: Text(_fabLabels[_tab.index]),
-      ),
+      floatingActionButton: isKeyboardOpen
+          ? null
+          : FloatingActionButton.extended(
+              onPressed: _onAdd,
+              icon: const Icon(Icons.add),
+              label: Text(_fabLabels[_tab.index]),
+            ),
     );
   }
 }

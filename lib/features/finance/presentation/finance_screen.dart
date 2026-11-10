@@ -27,7 +27,10 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen>
   @override
   void initState() {
     super.initState();
-    _tab = TabController(length: 3, vsync: this);
+    // Lapis 1: Baca initial index dari provider saat initState
+    final initialIndex = ref.read(financeTabProvider).clamp(0, 2);
+    _tab = TabController(length: 3, vsync: this, initialIndex: initialIndex);
+
     _tab.addListener(() {
       if (mounted) {
         setState(() {});
@@ -44,7 +47,6 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen>
     super.dispose();
   }
 
-  // FIX: kurung kurawal eksplisit
   void _onAdd() {
     if (_tab.index == 1) {
       showTransactionFormSheet(context);
@@ -57,11 +59,22 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen>
 
   @override
   Widget build(BuildContext context) {
+    // Lapis 2: Listen perubahan provider saat widget sudah hidup
     ref.listen<int>(financeTabProvider, (previous, next) {
-      if (_tab.index != next) {
+      if (mounted && _tab.index != next) {
         _tab.animateTo(next);
       }
     });
+
+    // Lapis 3: Fallback — kalau index belum sama, jadwalkan perbaikan
+    final targetIndex = ref.watch(financeTabProvider).clamp(0, 2);
+    if (_tab.index != targetIndex) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && _tab.index != targetIndex) {
+          _tab.animateTo(targetIndex);
+        }
+      });
+    }
 
     final dashboardAsync = ref.watch(dashboardDataProvider);
     final isKeyboardOpen = MediaQuery.viewInsetsOf(context).bottom > 0;
@@ -127,11 +140,11 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen>
 }
 
 // ============================================================
-// Finance Stats (2x2 Grid seperti Dashboard)
+// Finance Stats
 // ============================================================
 
 class _FinanceStats extends StatelessWidget {
-  final dynamic data; // DashboardData
+  final dynamic data;
   const _FinanceStats({required this.data});
 
   @override
@@ -179,10 +192,8 @@ class _FinanceStats extends StatelessWidget {
             spacing: 12,
             runSpacing: 12,
             children: items
-                .map((it) => SizedBox(
-                      width: width,
-                      child: _FinanceStatCard(item: it),
-                    ))
+                .map((it) =>
+                    SizedBox(width: width, child: _FinanceStatCard(item: it)))
                 .toList(),
           );
         },
@@ -295,8 +306,9 @@ class _TransactionTab extends ConsumerWidget {
               FilterChip(
                 label: const Text('Semua'),
                 selected: filter == null,
-                onSelected: (_) =>
-                    ref.read(transactionTypeFilterProvider.notifier).state = null,
+                onSelected: (_) => ref
+                    .read(transactionTypeFilterProvider.notifier)
+                    .state = null,
               ),
               const SizedBox(width: 6),
               FilterChip(
@@ -337,11 +349,10 @@ class _TransactionTab extends ConsumerWidget {
                 },
                 child: ListView.separated(
                   physics: const AlwaysScrollableScrollPhysics(),
-                  padding: const EdgeInsets.only(bottom: 100),
+                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 100),
                   itemCount: items.length,
-                  separatorBuilder: (_, __) =>
-                      const Divider(height: 1, color: AppTheme.line),
-                  itemBuilder: (context, i) => _TransactionTile(tx: items[i]),
+                  separatorBuilder: (_, __) => const SizedBox(height: 8),
+                  itemBuilder: (context, i) => _TransactionCard(tx: items[i]),
                 ),
               );
             },
@@ -352,52 +363,83 @@ class _TransactionTab extends ConsumerWidget {
   }
 }
 
-class _TransactionTile extends StatelessWidget {
+class _TransactionCard extends StatelessWidget {
   final TransactionModel tx;
-  const _TransactionTile({required this.tx});
+  const _TransactionCard({required this.tx});
 
   @override
   Widget build(BuildContext context) {
     final isIncome = tx.isIncome;
     final color = isIncome ? AppTheme.success : AppTheme.error;
+    final bgColor = Color.lerp(color, Colors.white, 0.85)!;
     final sign = isIncome ? '+' : '-';
     final title = tx.description?.isNotEmpty == true
         ? tx.description!
         : (tx.source?.isNotEmpty == true
             ? tx.source!
             : (isIncome ? 'Pemasukan' : 'Pengeluaran'));
-    return ListTile(
-      onTap: () => context.push('/finance/transaction/${tx.id}'),
-      leading: CircleAvatar(
-        backgroundColor: Color.lerp(color, Colors.white, 0.85),
-        child: Icon(
-          isIncome ? Icons.arrow_downward : Icons.arrow_upward,
-          color: color,
-          size: 18,
-        ),
-      ),
-      title: Text(
-        title,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-        style: TextStyle(
-          fontSize: 13,
-          fontWeight: FontWeight.w600,
-          color: tx.isVoid ? AppTheme.muted : AppTheme.ink,
-          decoration: tx.isVoid ? TextDecoration.lineThrough : null,
-        ),
-      ),
-      subtitle: Text(
-        '${DateFormat('d MMM yyyy', 'id_ID').format(tx.transactionDate)}${tx.isVoid ? ' · VOID' : ''}',
-        style: const TextStyle(fontSize: 11),
-      ),
-      trailing: Text(
-        '$sign${CurrencyFormatter.format(tx.amount)}',
-        style: TextStyle(
-          color: tx.isVoid ? AppTheme.muted : color,
-          fontWeight: FontWeight.bold,
-          fontSize: 13,
-          decoration: tx.isVoid ? TextDecoration.lineThrough : null,
+    final df = DateFormat('d MMM yyyy', 'id_ID');
+
+    return Card(
+      margin: EdgeInsets.zero,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: () => context.push('/finance/transaction/${tx.id}'),
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: tx.isVoid ? AppTheme.line : bgColor,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  isIncome ? Icons.arrow_downward : Icons.arrow_upward,
+                  color: tx.isVoid ? AppTheme.muted : color,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: tx.isVoid ? AppTheme.muted : AppTheme.ink,
+                        decoration:
+                            tx.isVoid ? TextDecoration.lineThrough : null,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '${df.format(tx.transactionDate)}${tx.isVoid ? ' · VOID' : ''}',
+                      style: const TextStyle(
+                          fontSize: 11, color: AppTheme.muted),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                '$sign${CurrencyFormatter.format(tx.amount)}',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w800,
+                  color: tx.isVoid ? AppTheme.muted : color,
+                  decoration: tx.isVoid ? TextDecoration.lineThrough : null,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
