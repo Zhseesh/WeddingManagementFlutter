@@ -122,17 +122,13 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen> with SingleTicker
           ),
         ],
       ),
-      floatingActionButton: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 200),
-        transitionBuilder: (child, animation) => ScaleTransition(scale: animation, child: child),
-        child: (_tab.index > 0 && !isKeyboardOpen)
-            ? FloatingActionButton.extended(
-                key: ValueKey(_tab.index),
-                onPressed: _onAdd,
-                icon: const Icon(Icons.add),
-                label: Text(_fabLabels[_tab.index]),
-              )
-            : const SizedBox.shrink(),
+      floatingActionButton: Visibility(
+        visible: (_tab.index > 0 && !isKeyboardOpen),
+        child: FloatingActionButton.extended(
+          onPressed: _onAdd,
+          icon: const Icon(Icons.add),
+          label: Text(_fabLabels[_tab.index]),
+        ),
       ),
     );
   }

@@ -75,7 +75,7 @@ class _PreparationScreenState extends ConsumerState<PreparationScreen>
       });
     }
 
-    final isKeyboardOpen = MediaQuery.of(context).viewInsets.bottom > 0;
+    final isKeyboardOpen = MediaQuery.viewInsetsOf(context).bottom > 0;
 
     return Scaffold(
       appBar: AppBar(
@@ -117,17 +117,15 @@ class _PreparationScreenState extends ConsumerState<PreparationScreen>
           ReminderTab(),
         ],
       ),
-      floatingActionButton: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 200),
-        transitionBuilder: (child, animation) => ScaleTransition(scale: animation, child: child),
-        child: isKeyboardOpen
-            ? const SizedBox.shrink()
-            : FloatingActionButton.extended(
-                key: ValueKey(_tab.index),
-                onPressed: _onAdd,
-                icon: const Icon(Icons.add),
-                label: Text(_fabLabels[_tab.index]),
-              ),
+      // FIX BUG 1 & 3: Hapus AnimatedSwitcher. 
+      // Gunakan Visibility agar FAB langsung hilang tanpa animasi transisi.
+      floatingActionButton: Visibility(
+        visible: !isKeyboardOpen,
+        child: FloatingActionButton.extended(
+          onPressed: _onAdd,
+          icon: const Icon(Icons.add),
+          label: Text(_fabLabels[_tab.index]),
+        ),
       ),
     );
   }
