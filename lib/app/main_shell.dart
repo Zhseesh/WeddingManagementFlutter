@@ -26,9 +26,9 @@ class _MainShellState extends ConsumerState<MainShell> {
 
   @override
   Widget build(BuildContext context) {
-    // Sinkronisasi PageView dengan mainTabProvider
     ref.listen<int>(mainTabProvider, (previous, next) {
-      if (_pageController.hasClients && (_pageController.page?.round() ?? 0) != next) {
+      if (_pageController.hasClients &&
+          (_pageController.page?.round() ?? 0) != next) {
         _pageController.animateToPage(
           next,
           duration: const Duration(milliseconds: 400),
@@ -43,14 +43,15 @@ class _MainShellState extends ConsumerState<MainShell> {
       canPop: currentTab == 0,
       onPopInvokedWithResult: (didPop, result) {
         if (!didPop && currentTab != 0) {
-          // Back dari tab selain Beranda → kembali ke Beranda
           ref.read(mainTabProvider.notifier).state = 0;
         }
       },
       child: Scaffold(
+        // FIX: Jangan konsumsi keyboard inset — biar Preparation/Finance bisa
+        // mendeteksi keyboard dan menyembunyikan FAB-nya dengan benar
+        resizeToAvoidBottomInset: false,
         body: PageView(
           controller: _pageController,
-          // Matikan swipe untuk main tab; sub-tab tetap punya swipe sendiri
           physics: const NeverScrollableScrollPhysics(),
           onPageChanged: (i) => ref.read(mainTabProvider.notifier).state = i,
           children: const [
@@ -70,7 +71,6 @@ class _MainShellState extends ConsumerState<MainShell> {
   }
 }
 
-/// Wrapper untuk menjaga state setiap page tetap hidup saat user swipe/pindah tab
 class _KeepAlive extends StatefulWidget {
   final Widget child;
   const _KeepAlive({required this.child});

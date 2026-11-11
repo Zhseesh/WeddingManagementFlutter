@@ -48,15 +48,26 @@ class _PreparationScreenState extends ConsumerState<PreparationScreen>
 
   void _onAdd() {
     switch (_tab.index) {
-      case 0: showVendorFormSheet(context);
-      case 1: showChecklistFormSheet(context);
-      case 2: showEngagementFormSheet(context);
-      case 3: showDowryFormSheet(context);
-      case 4: showReminderFormSheet(context);
+      case 0:
+        showVendorFormSheet(context);
+      case 1:
+        showChecklistFormSheet(context);
+      case 2:
+        showEngagementFormSheet(context);
+      case 3:
+        showDowryFormSheet(context);
+      case 4:
+        showReminderFormSheet(context);
     }
   }
 
-  static const _fabLabels = ['Vendor', 'Checklist', 'Lamaran', 'Seserahan', 'Pengingat'];
+  static const _fabLabels = [
+    'Vendor',
+    'Checklist',
+    'Lamaran',
+    'Seserahan',
+    'Pengingat',
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -75,18 +86,23 @@ class _PreparationScreenState extends ConsumerState<PreparationScreen>
       });
     }
 
-    // Deteksi keyboard
     final isKeyboardOpen = MediaQuery.viewInsetsOf(context).bottom > 0;
 
     return Scaffold(
+      // FIX 1: Jangan konsumsi keyboard inset
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Persiapan', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+            Text('Persiapan',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
             Text('Vendor, kebutuhan, dan pengingat',
-                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w500, color: AppTheme.muted)),
+                style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                    color: AppTheme.muted)),
           ],
         ),
         bottom: TabBar(
@@ -97,8 +113,10 @@ class _PreparationScreenState extends ConsumerState<PreparationScreen>
           unselectedLabelColor: AppTheme.muted,
           indicatorColor: AppTheme.primary,
           indicatorSize: TabBarIndicatorSize.label,
-          labelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
-          unselectedLabelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+          labelStyle:
+              const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+          unselectedLabelStyle:
+              const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
           tabs: const [
             Tab(text: 'Vendor'),
             Tab(text: 'Checklist'),
@@ -108,7 +126,6 @@ class _PreparationScreenState extends ConsumerState<PreparationScreen>
           ],
         ),
       ),
-      // FIX: Pindahkan FAB ke dalam Stack di body. Jangan pakai floatingActionButton Scaffold.
       body: Stack(
         children: [
           TabBarView(
@@ -121,17 +138,29 @@ class _PreparationScreenState extends ConsumerState<PreparationScreen>
               ReminderTab(),
             ],
           ),
-          // FAB hanya muncul jika keyboard TIDAK terbuka
-          if (!isKeyboardOpen)
-            Positioned(
-              right: 16,
-              bottom: 16,
-              child: FloatingActionButton.extended(
-                onPressed: _onAdd,
-                icon: const Icon(Icons.add),
-                label: Text(_fabLabels[_tab.index]),
+          Positioned(
+            right: 16,
+            bottom: 16,
+            child: IgnorePointer(
+              // Blokir tap saat keyboard terbuka atau saat tab sedang
+              // dianimasikan — mencegah "stale tap" dapat form tab lama
+              ignoring: isKeyboardOpen || _tab.indexIsChanging,
+              child: AnimatedSlide(
+                offset: isKeyboardOpen ? const Offset(0, 0.5) : Offset.zero,
+                duration: const Duration(milliseconds: 200),
+                curve: Curves.easeOut,
+                child: AnimatedOpacity(
+                  opacity: isKeyboardOpen ? 0.0 : 1.0,
+                  duration: const Duration(milliseconds: 200),
+                  child: FloatingActionButton.extended(
+                    onPressed: _onAdd,
+                    icon: const Icon(Icons.add),
+                    label: Text(_fabLabels[_tab.index]),
+                  ),
+                ),
               ),
             ),
+          ),
         ],
       ),
     );

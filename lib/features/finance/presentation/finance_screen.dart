@@ -75,25 +75,32 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen>
 
     final dashboardAsync = ref.watch(dashboardDataProvider);
     final isKeyboardOpen = MediaQuery.viewInsetsOf(context).bottom > 0;
+    final showFab = _tab.index > 0 && !isKeyboardOpen;
 
     return Scaffold(
+      // FIX 1: Jangan konsumsi keyboard inset
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Keuangan', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+            Text('Keuangan',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
             Text('Anggaran, transaksi, dan cicilan',
-                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w500, color: AppTheme.muted)),
+                style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                    color: AppTheme.muted)),
           ],
         ),
       ),
-      // FIX: Pindahkan FAB ke dalam Stack
       body: Stack(
         children: [
           Column(
             children: [
-              if (dashboardAsync.hasValue) _FinanceStats(data: dashboardAsync.value!),
+              if (dashboardAsync.hasValue)
+                _FinanceStats(data: dashboardAsync.value!),
               if (dashboardAsync.hasValue) const SizedBox(height: 16),
               TabBar(
                 controller: _tab,
@@ -101,8 +108,10 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen>
                 unselectedLabelColor: AppTheme.muted,
                 indicatorColor: AppTheme.primary,
                 indicatorSize: TabBarIndicatorSize.label,
-                labelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
-                unselectedLabelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+                labelStyle:
+                    const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+                unselectedLabelStyle: const TextStyle(
+                    fontSize: 13, fontWeight: FontWeight.w500),
                 tabs: const [
                   Tab(text: 'Anggaran'),
                   Tab(text: 'Transaksi'),
@@ -121,17 +130,28 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen>
               ),
             ],
           ),
-          // FAB hanya muncul jika di tab Transaksi/Cicilan dan keyboard TIDAK terbuka
-          if (_tab.index > 0 && !isKeyboardOpen)
-            Positioned(
-              right: 16,
-              bottom: 16,
-              child: FloatingActionButton.extended(
-                onPressed: _onAdd,
-                icon: const Icon(Icons.add),
-                label: Text(_fabLabels[_tab.index]),
+          // FAB muncul/hilang smooth saat pindah tab dan saat keyboard buka/tutup
+          Positioned(
+            right: 16,
+            bottom: 16,
+            child: IgnorePointer(
+              ignoring: !showFab || _tab.indexIsChanging,
+              child: AnimatedSlide(
+                offset: showFab ? Offset.zero : const Offset(0, 0.5),
+                duration: const Duration(milliseconds: 200),
+                curve: Curves.easeOut,
+                child: AnimatedOpacity(
+                  opacity: showFab ? 1.0 : 0.0,
+                  duration: const Duration(milliseconds: 200),
+                  child: FloatingActionButton.extended(
+                    onPressed: _onAdd,
+                    icon: const Icon(Icons.add),
+                    label: Text(_tab.index > 0 ? _fabLabels[_tab.index] : ''),
+                  ),
+                ),
               ),
             ),
+          ),
         ],
       ),
     );
