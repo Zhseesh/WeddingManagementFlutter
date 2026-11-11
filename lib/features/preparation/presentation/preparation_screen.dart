@@ -117,16 +117,14 @@ class _PreparationScreenState extends ConsumerState<PreparationScreen>
           ReminderTab(),
         ],
       ),
-      // FIX BUG 1 & 3: Hapus AnimatedSwitcher. 
-      // Gunakan Visibility agar FAB langsung hilang tanpa animasi transisi.
-      floatingActionButton: Visibility(
-        visible: !isKeyboardOpen,
-        child: FloatingActionButton.extended(
-          onPressed: _onAdd,
-          icon: const Icon(Icons.add),
-          label: Text(_fabLabels[_tab.index]),
-        ),
-      ),
+      // FIX: Jika keyboard terbuka, return null. Jangan pakai Visibility.
+      floatingActionButton: isKeyboardOpen
+          ? null
+          : FloatingActionButton.extended(
+              onPressed: _onAdd,
+              icon: const Icon(Icons.add),
+              label: Text(_fabLabels[_tab.index]),
+            ),
     );
   }
 }

@@ -67,61 +67,65 @@ class BudgetScreen extends ConsumerWidget {
   Future<void> _editAllocation(BuildContext context, WidgetRef ref, BudgetCategoryModel cat) async {
     final ctrl = TextEditingController(text: CurrencyFormatter.format(cat.allocatedAmount).replaceAll('Rp ', ''));
 
-    // GANTI KE BOTTOM SHEET
     final action = await showModalBottomSheet<String>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (ctx) => Padding(
-        padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(ctx).bottom),
-        child: Container(
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-          ),
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text('Kategori: ${cat.name}', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
-              const SizedBox(height: 16),
-              TextField(
-                controller: ctrl,
-                keyboardType: TextInputType.number,
-                autofocus: true,
-                decoration: const InputDecoration(labelText: 'Alokasi', prefixText: 'Rp '),
-              ),
-              const SizedBox(height: 24),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () => Navigator.pop(ctx, 'delete'),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: AppTheme.error,
-                        side: const BorderSide(color: AppTheme.error),
-                        minimumSize: const Size(0, 46),
+      builder: (ctx) {
+        final keyboardPadding = MediaQuery.viewInsetsOf(ctx).bottom;
+        final safeAreaPadding = MediaQuery.paddingOf(ctx).bottom;
+        
+        return Padding(
+          padding: EdgeInsets.only(bottom: keyboardPadding),
+          child: Container(
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            ),
+            // FIX: Tambahkan safeAreaPadding.bottom agar saat keyboard turun tidak tenggelam
+            padding: EdgeInsets.fromLTRB(16, 16, 16, 16 + safeAreaPadding),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text('Kategori: ${cat.name}', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: ctrl,
+                  keyboardType: TextInputType.number,
+                  autofocus: true,
+                  decoration: const InputDecoration(labelText: 'Alokasi', prefixText: 'Rp '),
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.pop(ctx, 'delete'),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppTheme.error,
+                          side: const BorderSide(color: AppTheme.error),
+                          minimumSize: const Size(0, 46),
+                        ),
+                        child: const Text('Hapus'),
                       ),
-                      child: const Text('Hapus'),
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    flex: 2,
-                    child: ElevatedButton(
-                      onPressed: () => Navigator.pop(ctx, 'save'),
-                      style: ElevatedButton.styleFrom(minimumSize: const Size(0, 46)),
-                      child: const Text('Simpan Perubahan'),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      flex: 2,
+                      child: ElevatedButton(
+                        onPressed: () => Navigator.pop(ctx, 'save'),
+                        style: ElevatedButton.styleFrom(minimumSize: const Size(0, 46)),
+                        child: const Text('Simpan Perubahan'),
+                      ),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-            ],
+                  ],
+                ),
+              ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
 
     if (!context.mounted) return;

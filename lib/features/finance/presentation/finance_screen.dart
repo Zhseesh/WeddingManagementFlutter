@@ -20,7 +20,8 @@ class FinanceScreen extends ConsumerStatefulWidget {
   ConsumerState<FinanceScreen> createState() => _FinanceScreenState();
 }
 
-class _FinanceScreenState extends ConsumerState<FinanceScreen> with SingleTickerProviderStateMixin {
+class _FinanceScreenState extends ConsumerState<FinanceScreen>
+    with SingleTickerProviderStateMixin {
   late final TabController _tab;
 
   @override
@@ -58,20 +59,22 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen> with SingleTicker
   @override
   Widget build(BuildContext context) {
     ref.listen<int>(financeTabProvider, (previous, next) {
-      if (mounted && _tab.index != next) _tab.animateTo(next);
+      if (mounted && _tab.index != next) {
+        _tab.animateTo(next);
+      }
     });
 
     final targetIndex = ref.watch(financeTabProvider).clamp(0, 2);
     if (_tab.index != targetIndex) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted && _tab.index != targetIndex) _tab.animateTo(targetIndex);
+        if (mounted && _tab.index != targetIndex) {
+          _tab.animateTo(targetIndex);
+        }
       });
     }
 
     final dashboardAsync = ref.watch(dashboardDataProvider);
-    
-    // FIX KEYBOARD
-    final isKeyboardOpen = MediaQuery.of(context).viewInsets.bottom > 0;
+    final isKeyboardOpen = MediaQuery.viewInsetsOf(context).bottom > 0;
 
     return Scaffold(
       appBar: AppBar(
@@ -79,20 +82,15 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen> with SingleTicker
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Keuangan',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+            Text('Keuangan', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
             Text('Anggaran, transaksi, dan cicilan',
-                style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w500,
-                    color: AppTheme.muted)),
+                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w500, color: AppTheme.muted)),
           ],
         ),
       ),
       body: Column(
         children: [
-          if (dashboardAsync.hasValue)
-            _FinanceStats(data: dashboardAsync.value!),
+          if (dashboardAsync.hasValue) _FinanceStats(data: dashboardAsync.value!),
           if (dashboardAsync.hasValue) const SizedBox(height: 16),
           TabBar(
             controller: _tab,
@@ -100,10 +98,8 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen> with SingleTicker
             unselectedLabelColor: AppTheme.muted,
             indicatorColor: AppTheme.primary,
             indicatorSize: TabBarIndicatorSize.label,
-            labelStyle:
-                const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
-            unselectedLabelStyle:
-                const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+            labelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+            unselectedLabelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
             tabs: const [
               Tab(text: 'Anggaran'),
               Tab(text: 'Transaksi'),
@@ -122,14 +118,14 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen> with SingleTicker
           ),
         ],
       ),
-      floatingActionButton: Visibility(
-        visible: (_tab.index > 0 && !isKeyboardOpen),
-        child: FloatingActionButton.extended(
-          onPressed: _onAdd,
-          icon: const Icon(Icons.add),
-          label: Text(_fabLabels[_tab.index]),
-        ),
-      ),
+      // FIX: Jika keyboard terbuka, return null.
+      floatingActionButton: (_tab.index > 0 && !isKeyboardOpen)
+          ? FloatingActionButton.extended(
+              onPressed: _onAdd,
+              icon: const Icon(Icons.add),
+              label: Text(_fabLabels[_tab.index]),
+            )
+          : null,
     );
   }
 }
