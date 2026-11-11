@@ -88,44 +88,52 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen>
           ],
         ),
       ),
-      body: Column(
+      // FIX: Pindahkan FAB ke dalam Stack
+      body: Stack(
         children: [
-          if (dashboardAsync.hasValue) _FinanceStats(data: dashboardAsync.value!),
-          if (dashboardAsync.hasValue) const SizedBox(height: 16),
-          TabBar(
-            controller: _tab,
-            labelColor: AppTheme.primary,
-            unselectedLabelColor: AppTheme.muted,
-            indicatorColor: AppTheme.primary,
-            indicatorSize: TabBarIndicatorSize.label,
-            labelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
-            unselectedLabelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
-            tabs: const [
-              Tab(text: 'Anggaran'),
-              Tab(text: 'Transaksi'),
-              Tab(text: 'Cicilan'),
+          Column(
+            children: [
+              if (dashboardAsync.hasValue) _FinanceStats(data: dashboardAsync.value!),
+              if (dashboardAsync.hasValue) const SizedBox(height: 16),
+              TabBar(
+                controller: _tab,
+                labelColor: AppTheme.primary,
+                unselectedLabelColor: AppTheme.muted,
+                indicatorColor: AppTheme.primary,
+                indicatorSize: TabBarIndicatorSize.label,
+                labelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+                unselectedLabelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+                tabs: const [
+                  Tab(text: 'Anggaran'),
+                  Tab(text: 'Transaksi'),
+                  Tab(text: 'Cicilan'),
+                ],
+              ),
+              Expanded(
+                child: TabBarView(
+                  controller: _tab,
+                  children: const [
+                    BudgetScreen(),
+                    _TransactionTab(),
+                    InstallmentListScreen(),
+                  ],
+                ),
+              ),
             ],
           ),
-          Expanded(
-            child: TabBarView(
-              controller: _tab,
-              children: const [
-                BudgetScreen(),
-                _TransactionTab(),
-                InstallmentListScreen(),
-              ],
+          // FAB hanya muncul jika di tab Transaksi/Cicilan dan keyboard TIDAK terbuka
+          if (_tab.index > 0 && !isKeyboardOpen)
+            Positioned(
+              right: 16,
+              bottom: 16,
+              child: FloatingActionButton.extended(
+                onPressed: _onAdd,
+                icon: const Icon(Icons.add),
+                label: Text(_fabLabels[_tab.index]),
+              ),
             ),
-          ),
         ],
       ),
-      // FIX: Jika keyboard terbuka, return null.
-      floatingActionButton: (_tab.index > 0 && !isKeyboardOpen)
-          ? FloatingActionButton.extended(
-              onPressed: _onAdd,
-              icon: const Icon(Icons.add),
-              label: Text(_fabLabels[_tab.index]),
-            )
-          : null,
     );
   }
 }

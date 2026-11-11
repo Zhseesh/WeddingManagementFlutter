@@ -75,6 +75,7 @@ class _PreparationScreenState extends ConsumerState<PreparationScreen>
       });
     }
 
+    // Deteksi keyboard
     final isKeyboardOpen = MediaQuery.viewInsetsOf(context).bottom > 0;
 
     return Scaffold(
@@ -107,24 +108,32 @@ class _PreparationScreenState extends ConsumerState<PreparationScreen>
           ],
         ),
       ),
-      body: TabBarView(
-        controller: _tab,
-        children: const [
-          VendorTab(),
-          ChecklistTab(),
-          EngagementTab(),
-          DowryTab(),
-          ReminderTab(),
+      // FIX: Pindahkan FAB ke dalam Stack di body. Jangan pakai floatingActionButton Scaffold.
+      body: Stack(
+        children: [
+          TabBarView(
+            controller: _tab,
+            children: const [
+              VendorTab(),
+              ChecklistTab(),
+              EngagementTab(),
+              DowryTab(),
+              ReminderTab(),
+            ],
+          ),
+          // FAB hanya muncul jika keyboard TIDAK terbuka
+          if (!isKeyboardOpen)
+            Positioned(
+              right: 16,
+              bottom: 16,
+              child: FloatingActionButton.extended(
+                onPressed: _onAdd,
+                icon: const Icon(Icons.add),
+                label: Text(_fabLabels[_tab.index]),
+              ),
+            ),
         ],
       ),
-      // FIX: Jika keyboard terbuka, return null. Jangan pakai Visibility.
-      floatingActionButton: isKeyboardOpen
-          ? null
-          : FloatingActionButton.extended(
-              onPressed: _onAdd,
-              icon: const Icon(Icons.add),
-              label: Text(_fabLabels[_tab.index]),
-            ),
     );
   }
 }
