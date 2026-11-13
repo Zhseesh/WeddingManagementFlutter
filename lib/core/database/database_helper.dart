@@ -53,10 +53,16 @@ class DatabaseHelper {
     int oldVersion,
     int newVersion,
   ) async {
-    // Migrasi akan ditambahkan sesuai versi skema
-    // jangan pernah DROP database pengguna
     assert(oldVersion < newVersion);
     assert(db.isOpen);
+
+    // v1 → v2: tambah tabel `guests` untuk fitur Tamu Undangan.
+    if (oldVersion < 2) {
+      final batch = db.batch();
+      batch.execute(DatabaseSchema.createGuestsTableQuery);
+      batch.execute(DatabaseSchema.createGuestsIndexQuery);
+      await batch.commit(noResult: true);
+    }
   }
 
   Future<void> close() async {

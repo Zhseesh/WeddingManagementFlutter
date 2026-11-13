@@ -1,6 +1,6 @@
 class DatabaseSchema {
   static const String dbName = 'wedding_planner.db';
-  static const int dbVersion = 1;
+  static const int dbVersion = 2; // bumped: 1 → 2 (tabel guests)
 
   static const String tableWeddingProfiles = 'wedding_profiles';
   static const String tableBudgets = 'budgets';
@@ -17,6 +17,23 @@ class DatabaseSchema {
   static const String tableReminders = 'reminders';
   static const String tableAttachments = 'attachments';
   static const String tableSettings = 'settings';
+  static const String tableGuests = 'guests';
+
+  // Query tabel guests (dipisah agar _onUpgrade bisa reuse)
+  static const String createGuestsTableQuery = '''
+    CREATE TABLE $tableGuests (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      profile_id INTEGER NOT NULL,
+      name TEXT NOT NULL,
+      is_invited INTEGER NOT NULL DEFAULT 0,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      FOREIGN KEY (profile_id) REFERENCES $tableWeddingProfiles(id) ON DELETE CASCADE
+    )
+  ''';
+
+  static const String createGuestsIndexQuery =
+      'CREATE INDEX idx_guests_profile ON $tableGuests(profile_id);';
 
   static const List<String> createTableQueries = [
     // 1. Wedding Profiles
@@ -34,7 +51,9 @@ class DatabaseSchema {
       updated_at TEXT NOT NULL
     )
     ''',
-    // 2. Budgets
+    // 2. Guests (BARU — child dari wedding_profiles)
+    createGuestsTableQuery,
+    // 3. Budgets
     '''
     CREATE TABLE $tableBudgets (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -48,7 +67,7 @@ class DatabaseSchema {
       FOREIGN KEY (profile_id) REFERENCES $tableWeddingProfiles(id) ON DELETE CASCADE
     )
     ''',
-    // 3. Budget Categories
+    // 4. Budget Categories
     '''
     CREATE TABLE $tableBudgetCategories (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -64,7 +83,7 @@ class DatabaseSchema {
       UNIQUE(budget_id, name)
     )
     ''',
-    // 4. Vendors
+    // 5. Vendors
     '''
     CREATE TABLE $tableVendors (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -85,7 +104,7 @@ class DatabaseSchema {
       FOREIGN KEY (category_id) REFERENCES $tableBudgetCategories(id) ON DELETE SET NULL
     )
     ''',
-    // 5. Transactions
+    // 6. Transactions
     '''
     CREATE TABLE $tableTransactions (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -104,7 +123,7 @@ class DatabaseSchema {
       FOREIGN KEY (category_id) REFERENCES $tableBudgetCategories(id) ON DELETE SET NULL
     )
     ''',
-    // 6. Vendor Payments
+    // 7. Vendor Payments
     '''
     CREATE TABLE $tableVendorPayments (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -115,7 +134,7 @@ class DatabaseSchema {
       FOREIGN KEY (transaction_id) REFERENCES $tableTransactions(id) ON DELETE CASCADE
     )
     ''',
-    // 7. Installments
+    // 8. Installments
     '''
     CREATE TABLE $tableInstallments (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -132,7 +151,7 @@ class DatabaseSchema {
       FOREIGN KEY (vendor_id) REFERENCES $tableVendors(id) ON DELETE SET NULL
     )
     ''',
-    // 8. Installment Schedules
+    // 9. Installment Schedules
     '''
     CREATE TABLE $tableInstallmentSchedules (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -145,7 +164,7 @@ class DatabaseSchema {
       UNIQUE(installment_id, sequence_number)
     )
     ''',
-    // 9. Installment Payments
+    // 10. Installment Payments
     '''
     CREATE TABLE $tableInstallmentPayments (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -156,7 +175,7 @@ class DatabaseSchema {
       FOREIGN KEY (transaction_id) REFERENCES $tableTransactions(id) ON DELETE CASCADE
     )
     ''',
-    // 10. Engagement Items
+    // 11. Engagement Items
     '''
     CREATE TABLE $tableEngagementItems (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -174,7 +193,7 @@ class DatabaseSchema {
       FOREIGN KEY (profile_id) REFERENCES $tableWeddingProfiles(id) ON DELETE CASCADE
     )
     ''',
-    // 11. Dowry Items
+    // 12. Dowry Items
     '''
     CREATE TABLE $tableDowryItems (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -191,7 +210,7 @@ class DatabaseSchema {
       FOREIGN KEY (profile_id) REFERENCES $tableWeddingProfiles(id) ON DELETE CASCADE
     )
     ''',
-    // 12. Checklists
+    // 13. Checklists
     '''
     CREATE TABLE $tableChecklists (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -208,7 +227,7 @@ class DatabaseSchema {
       FOREIGN KEY (profile_id) REFERENCES $tableWeddingProfiles(id) ON DELETE CASCADE
     )
     ''',
-    // 13. Reminders
+    // 14. Reminders
     '''
     CREATE TABLE $tableReminders (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -224,7 +243,7 @@ class DatabaseSchema {
       FOREIGN KEY (profile_id) REFERENCES $tableWeddingProfiles(id) ON DELETE CASCADE
     )
     ''',
-    // 14. Attachments
+    // 15. Attachments
     '''
     CREATE TABLE $tableAttachments (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -238,7 +257,7 @@ class DatabaseSchema {
       FOREIGN KEY (profile_id) REFERENCES $tableWeddingProfiles(id) ON DELETE CASCADE
     )
     ''',
-    // 15. Settings
+    // 16. Settings
     '''
     CREATE TABLE $tableSettings (
       key TEXT PRIMARY KEY,
@@ -260,7 +279,8 @@ class DatabaseSchema {
     'CREATE INDEX idx_checklists_profile ON $tableChecklists(profile_id);',
     'CREATE INDEX idx_reminders_date ON $tableReminders(reminder_date, is_enabled);',
     'CREATE INDEX idx_attachments_ref ON $tableAttachments(reference_type, reference_id);',
-    'CREATE UNIQUE INDEX idx_budget_active_profile ON $tableBudgets(profile_id) WHERE is_active = 1;'
+    createGuestsIndexQuery,
+    'CREATE UNIQUE INDEX idx_budget_active_profile ON $tableBudgets(profile_id) WHERE is_active = 1;',
   ];
 
   static const List<String> createViewQueries = [
@@ -313,7 +333,7 @@ class DatabaseSchema {
   ];
 
   static const List<String> createTriggerQueries = [
-    // Trigger validasi Vendor Payments harus expense dan profil sama
+    // Trigger validasi Vendor Payments
     '''
     CREATE TRIGGER trg_vendor_payment_validate
     BEFORE INSERT ON $tableVendorPayments
@@ -328,7 +348,7 @@ class DatabaseSchema {
       END;
     END;
     ''',
-    // Trigger validasi Installment Payments harus expense dan profil sama
+    // Trigger validasi Installment Payments
     '''
     CREATE TRIGGER trg_installment_payment_validate
     BEFORE INSERT ON $tableInstallmentPayments

@@ -14,6 +14,7 @@ import 'package:weddingmanagementf/features/checklist/presentation/providers/che
 import 'package:weddingmanagementf/features/dashboard/presentation/providers/dashboard_providers.dart';
 import 'package:weddingmanagementf/features/dowry/presentation/providers/dowry_providers.dart';
 import 'package:weddingmanagementf/features/engagement/presentation/providers/engagement_providers.dart';
+import 'package:weddingmanagementf/features/guests/presentation/providers/guest_providers.dart';
 import 'package:weddingmanagementf/features/installments/presentation/providers/installment_providers.dart';
 import 'package:weddingmanagementf/core/providers/navigation_providers.dart';
 import 'package:weddingmanagementf/features/reminders/presentation/providers/reminder_providers.dart';
@@ -41,6 +42,7 @@ class ProfileScreen extends ConsumerWidget {
     ref.invalidate(dowryListProvider);
     ref.invalidate(reminderListProvider);
     ref.invalidate(reportDataProvider);
+    ref.invalidate(guestListProvider);
   }
 
   Future<void> _backup(BuildContext context, WidgetRef ref) async {

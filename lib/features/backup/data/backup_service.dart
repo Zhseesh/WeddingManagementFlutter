@@ -9,11 +9,10 @@ class BackupService {
   static const int schemaVersion = 1;
   static const String appId = 'weddingmanagementf';
 
-  /// Urutan tabel: parent dulu, child belakang.
-  /// Dipakai saat export, dan saat import (insert order).
   static const List<String> tables = [
     'settings',
     'wedding_profiles',
+    'guests', // BARU — child dari wedding_profiles
     'budgets',
     'budget_categories',
     'vendors',
@@ -29,7 +28,6 @@ class BackupService {
     'attachments',
   ];
 
-  /// Kebalikan dari `tables` untuk delete (child dulu).
   static const List<String> _deleteOrder = [
     'installment_payments',
     'vendor_payments',
@@ -44,6 +42,7 @@ class BackupService {
     'dowry_items',
     'reminders',
     'attachments',
+    'guests', // BARU — harus dihapus sebelum wedding_profiles
     'wedding_profiles',
     'settings',
   ];
@@ -63,8 +62,6 @@ class BackupService {
     return const JsonEncoder.withIndent('  ').convert(out);
   }
 
-  /// Validasi file backup sebelum import. Return null kalau valid,
-  /// atau pesan error kalau tidak valid.
   String? validateJson(String raw) {
     late final dynamic parsed;
     try {
@@ -94,7 +91,7 @@ class BackupService {
         return 'File backup kehilangan tabel "$t".';
       }
     }
-    return null; // valid
+    return null;
   }
 
   Future<void> importFromJson(String raw) async {
@@ -104,12 +101,9 @@ class BackupService {
     final db = await _dbHelper.database;
 
     await db.transaction((txn) async {
-      // 1. Hapus semua (child → parent)
       for (final t in _deleteOrder) {
         await txn.delete(t);
       }
-
-      // 2. Insert semua (parent → child)
       for (final t in tables) {
         final rows = data[t];
         if (rows is! List) continue;

@@ -5,9 +5,11 @@ import 'package:weddingmanagementf/core/providers/navigation_providers.dart';
 import 'package:weddingmanagementf/features/checklist/presentation/checklist_form_sheet.dart';
 import 'package:weddingmanagementf/features/dowry/presentation/dowry_form_sheet.dart';
 import 'package:weddingmanagementf/features/engagement/presentation/engagement_form_sheet.dart';
+import 'package:weddingmanagementf/features/guests/presentation/guest_form_sheet.dart';
 import 'package:weddingmanagementf/features/preparation/presentation/tabs/checklist_tab.dart';
 import 'package:weddingmanagementf/features/preparation/presentation/tabs/dowry_tab.dart';
 import 'package:weddingmanagementf/features/preparation/presentation/tabs/engagement_tab.dart';
+import 'package:weddingmanagementf/features/preparation/presentation/tabs/guest_tab.dart';
 import 'package:weddingmanagementf/features/preparation/presentation/tabs/reminder_tab.dart';
 import 'package:weddingmanagementf/features/preparation/presentation/tabs/vendor_tab.dart';
 import 'package:weddingmanagementf/features/reminders/presentation/reminder_form_sheet.dart';
@@ -27,8 +29,8 @@ class _PreparationScreenState extends ConsumerState<PreparationScreen>
   @override
   void initState() {
     super.initState();
-    final initialIndex = ref.read(prepTabProvider).clamp(0, 4);
-    _tab = TabController(length: 5, vsync: this, initialIndex: initialIndex);
+    final initialIndex = ref.read(prepTabProvider).clamp(0, 5);
+    _tab = TabController(length: 6, vsync: this, initialIndex: initialIndex);
 
     _tab.addListener(() {
       if (mounted) {
@@ -58,6 +60,8 @@ class _PreparationScreenState extends ConsumerState<PreparationScreen>
         showDowryFormSheet(context);
       case 4:
         showReminderFormSheet(context);
+      case 5:
+        showGuestAddDialog(context, ref);
     }
   }
 
@@ -67,6 +71,7 @@ class _PreparationScreenState extends ConsumerState<PreparationScreen>
     'Lamaran',
     'Seserahan',
     'Pengingat',
+    'Tamu',
   ];
 
   @override
@@ -77,7 +82,7 @@ class _PreparationScreenState extends ConsumerState<PreparationScreen>
       }
     });
 
-    final targetIndex = ref.watch(prepTabProvider).clamp(0, 4);
+    final targetIndex = ref.watch(prepTabProvider).clamp(0, 5);
     if (_tab.index != targetIndex) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted && _tab.index != targetIndex) {
@@ -89,7 +94,6 @@ class _PreparationScreenState extends ConsumerState<PreparationScreen>
     final isKeyboardOpen = MediaQuery.viewInsetsOf(context).bottom > 0;
 
     return Scaffold(
-      // FIX 1: Jangan konsumsi keyboard inset
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: const Column(
@@ -123,6 +127,7 @@ class _PreparationScreenState extends ConsumerState<PreparationScreen>
             Tab(text: 'Lamaran'),
             Tab(text: 'Seserahan'),
             Tab(text: 'Pengingat'),
+            Tab(text: 'Tamu'),
           ],
         ),
       ),
@@ -136,14 +141,13 @@ class _PreparationScreenState extends ConsumerState<PreparationScreen>
               EngagementTab(),
               DowryTab(),
               ReminderTab(),
+              GuestTab(),
             ],
           ),
           Positioned(
             right: 16,
             bottom: 16,
             child: IgnorePointer(
-              // Blokir tap saat keyboard terbuka atau saat tab sedang
-              // dianimasikan — mencegah "stale tap" dapat form tab lama
               ignoring: isKeyboardOpen || _tab.indexIsChanging,
               child: AnimatedSlide(
                 offset: isKeyboardOpen ? const Offset(0, 0.5) : Offset.zero,
