@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
@@ -54,27 +55,34 @@ class ProfileScreen extends ConsumerWidget {
       final stamp = DateFormat('yyyyMMdd_HHmmss').format(DateTime.now());
       final file = File('${dir.path}/backup_wedding_$stamp.json');
       await file.writeAsString(json);
-      await Share.shareXFiles([XFile(file.path)], subject: 'Backup Wedding Planner');
+      await SharePlus.instance.share(
+        ShareParams(
+          files: [XFile(file.path)],
+          subject: 'Backup Wedding Planner',
+        ),
+      );
     } catch (e) {
       messenger.showSnackBar(SnackBar(content: Text('Gagal backup: $e')));
     }
   }
 
-  Future<void> _restore(BuildContext context, WidgetRef ref) async {
+    Future<void> _restore(BuildContext context, WidgetRef ref) async {
     final messenger = ScaffoldMessenger.of(context);
 
-    final result = await FilePicker.platform.pickFiles(
+    final files = await FilePicker.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['json'],
-      withData: true,
     );
-    if (result == null || result.files.isEmpty) return;
-    final file = result.files.first;
-    final raw = file.bytes != null
-        ? String.fromCharCodes(file.bytes!)
-        : (file.path != null ? await File(file.path!).readAsString() : null);
-    if (raw == null) {
-      messenger.showSnackBar(const SnackBar(content: Text('Gagal membaca file.')));
+    if (files.isEmpty) return;
+    final file = files.first;
+
+    final String raw;
+    try {
+      raw = utf8.decode(await file.readAsBytes());
+    } catch (_) {
+      messenger.showSnackBar(
+        const SnackBar(content: Text('Gagal membaca file.')),
+      );
       return;
     }
 
@@ -89,10 +97,19 @@ class ProfileScreen extends ConsumerWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Restore data?'),
-        content: const Text('Semua data saat ini akan DIGANTI dengan data dari file backup. Aplikasi akan otomatis menyimpan backup data saat ini terlebih dahulu.'),
+        content: const Text(
+          'Semua data saat ini akan DIGANTI dengan data dari file backup. '
+          'Aplikasi akan otomatis menyimpan backup data saat ini terlebih dahulu.',
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: const Text('Batal')),
-          FilledButton(onPressed: () => Navigator.of(ctx).pop(true), child: const Text('Restore')),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Batal'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('Restore'),
+          ),
         ],
       ),
     );
@@ -111,10 +128,15 @@ class ProfileScreen extends ConsumerWidget {
       _invalidateAll(ref);
       if (!context.mounted) return;
       messenger.showSnackBar(
-        const SnackBar(content: Text('Restore berhasil. Data dimuat ulang.'), duration: Duration(seconds: 3)),
+        const SnackBar(
+          content: Text('Restore berhasil. Data dimuat ulang.'),
+          duration: Duration(seconds: 3),
+        ),
       );
     } catch (e) {
-      messenger.showSnackBar(SnackBar(content: Text('Restore gagal (data lama aman): $e')));
+      messenger.showSnackBar(
+        SnackBar(content: Text('Restore gagal (data lama aman): $e')),
+      );
     }
   }
 

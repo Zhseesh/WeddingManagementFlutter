@@ -47,7 +47,12 @@ class ReportsScreen extends ConsumerWidget {
       final stamp = DateFormat('yyyyMMdd_HHmmss').format(DateTime.now());
       final file = File('${dir.path}/laporan_$stamp.pdf');
       await file.writeAsBytes(bytes);
-      await Share.shareXFiles([XFile(file.path)], subject: 'Laporan Keuangan Pernikahan');
+      await SharePlus.instance.share(
+        ShareParams(
+          files: [XFile(file.path)],
+          subject: 'Laporan Keuangan Pernikahan',
+        ),
+      );
     } catch (e) {
       messenger.showSnackBar(SnackBar(content: Text('Gagal export PDF: $e')));
     }
@@ -62,7 +67,12 @@ class ReportsScreen extends ConsumerWidget {
       final stamp = DateFormat('yyyyMMdd_HHmmss').format(DateTime.now());
       final file = File('${dir.path}/laporan_$stamp.csv');
       await file.writeAsString(csv);
-      await Share.shareXFiles([XFile(file.path)], subject: 'Laporan Keuangan Pernikahan (CSV)');
+      await SharePlus.instance.share(
+        ShareParams(
+          files: [XFile(file.path)],
+          subject: 'Laporan Keuangan Pernikahan (CSV)',
+        ),
+      );
     } catch (e) {
       messenger.showSnackBar(SnackBar(content: Text('Gagal export CSV: $e')));
     }
