@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:weddingmanagementf/app/theme/app_theme.dart';
 
 class AnimatedBottomNav extends StatelessWidget {
