@@ -18,11 +18,19 @@ subprojects {
 subprojects {
     project.evaluationDependsOn(":app")
 }
+
+// Paksa semua sub-project (termasuk plugin) memakai JVM 17 untuk
+// Kotlin DAN Java — supaya tidak ada mismatch "Inconsistent JVM-target".
+// Pakai compilerOptions DSL (kotlinOptions deprecated sejak Kotlin 2.x).
 subprojects {
     tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-        kotlinOptions {
-            jvmTarget = "17"
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
         }
+    }
+    tasks.withType<JavaCompile>().configureEach {
+        sourceCompatibility = "17"
+        targetCompatibility = "17"
     }
 }
 
