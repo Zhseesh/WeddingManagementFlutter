@@ -7,7 +7,7 @@ class FormSheetScaffold extends StatelessWidget {
   final VoidCallback onSave;
   final String saveLabel;
   final bool saving;
-  final VoidCallback? onDelete; // FITUR BARU
+  final VoidCallback? onDelete;
 
   const FormSheetScaffold({
     super.key,
@@ -21,33 +21,78 @@ class FormSheetScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
+    final mediaQuery = MediaQuery.of(context);
+    final keyboardInset = mediaQuery.viewInsets.bottom;
+    final screenHeight = mediaQuery.size.height;
+    final topSafeArea = mediaQuery.padding.top;
+
+    // FIX: maxHeight dikurangi keyboardInset supaya top edge sheet
+    // tidak naik melewati batas atas layar saat keyboard terbuka.
+    // Guard minimum 200px untuk layar kecil / landscape.
+    final rawMaxHeight = (screenHeight - topSafeArea) * 0.92 - keyboardInset;
+    final maxSheetHeight = rawMaxHeight < 200.0 ? 200.0 : rawMaxHeight;
+
     return Padding(
-      padding: EdgeInsets.only(bottom: bottomInset),
+      // Padding ini yang "mengangkat" sheet di atas keyboard.
+      // viewInsets.bottom di Android sudah animasi natural (IME animation),
+      // jadi Padding biasa sudah cukup smooth — tidak perlu AnimatedPadding.
+      padding: EdgeInsets.only(bottom: keyboardInset),
       child: Container(
-        constraints: BoxConstraints(maxHeight: MediaQuery.sizeOf(context).height * 0.92),
-        decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+        constraints: BoxConstraints(maxHeight: maxSheetHeight),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            // Header — tetap di atas sheet
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 14, 8, 8),
               child: Row(
                 children: [
-                  Expanded(child: Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppTheme.ink))),
+                  Expanded(
+                    child: Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: AppTheme.ink,
+                      ),
+                    ),
+                  ),
                   if (onDelete != null)
                     IconButton(
                       icon: const Icon(Icons.delete_outline, color: AppTheme.error),
                       tooltip: 'Hapus',
                       onPressed: onDelete,
                     ),
-                  IconButton(icon: const Icon(Icons.close), color: AppTheme.ink, onPressed: () => Navigator.pop(context)),
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    color: AppTheme.ink,
+                    onPressed: () => Navigator.pop(context),
+                  ),
                 ],
               ),
             ),
             const Divider(height: 1, color: AppTheme.line),
-            Flexible(child: SingleChildScrollView(padding: const EdgeInsets.all(16), child: child)),
+            
+            // Konten form — scrollable, mengecil saat keyboard terbuka.
+            // Flexible dengan SingleChildScrollView: saat maxHeight mengecil
+            // (karena keyboard), area ini ikut mengecil dan konten jadi
+            // scrollable — natural, tidak overflow.
+            Flexible(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: child,
+              ),
+            ),
+            
             const Divider(height: 1, color: AppTheme.line),
+            
+            // Tombol Batal & Simpan — tetap di bottom sheet,
+            // selalu terlihat di atas keyboard (karena sheet "duduk"
+            // di atas keyboard via Padding luar).
             SafeArea(
               top: false,
               child: Padding(
@@ -57,7 +102,14 @@ class FormSheetScaffold extends StatelessWidget {
                     Expanded(
                       child: OutlinedButton(
                         onPressed: () => Navigator.pop(context),
-                        style: OutlinedButton.styleFrom(minimumSize: const Size(0, 46), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), side: const BorderSide(color: AppTheme.line), foregroundColor: AppTheme.ink),
+                        style: OutlinedButton.styleFrom(
+                          minimumSize: const Size(0, 46),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          side: const BorderSide(color: AppTheme.line),
+                          foregroundColor: AppTheme.ink,
+                        ),
                         child: const Text('Batal'),
                       ),
                     ),
@@ -65,7 +117,16 @@ class FormSheetScaffold extends StatelessWidget {
                     Expanded(
                       child: ElevatedButton(
                         onPressed: saving ? null : onSave,
-                        child: saving ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) : Text(saveLabel),
+                        child: saving
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : Text(saveLabel),
                       ),
                     ),
                   ],
