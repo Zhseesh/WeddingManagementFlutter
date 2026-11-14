@@ -21,32 +21,26 @@ class FormSheetScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = AppTheme.of(context);
     final mediaQuery = MediaQuery.of(context);
     final keyboardInset = mediaQuery.viewInsets.bottom;
     final screenHeight = mediaQuery.size.height;
     final topSafeArea = mediaQuery.padding.top;
 
-    // FIX: maxHeight dikurangi keyboardInset supaya top edge sheet
-    // tidak naik melewati batas atas layar saat keyboard terbuka.
-    // Guard minimum 200px untuk layar kecil / landscape.
     final rawMaxHeight = (screenHeight - topSafeArea) * 0.92 - keyboardInset;
     final maxSheetHeight = rawMaxHeight < 200.0 ? 200.0 : rawMaxHeight;
 
     return Padding(
-      // Padding ini yang "mengangkat" sheet di atas keyboard.
-      // viewInsets.bottom di Android sudah animasi natural (IME animation),
-      // jadi Padding biasa sudah cukup smooth — tidak perlu AnimatedPadding.
       padding: EdgeInsets.only(bottom: keyboardInset),
       child: Container(
         constraints: BoxConstraints(maxHeight: maxSheetHeight),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        decoration: BoxDecoration(
+          color: palette.surface,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Header — tetap di atas sheet
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 14, 8, 8),
               child: Row(
@@ -54,10 +48,10 @@ class FormSheetScaffold extends StatelessWidget {
                   Expanded(
                     child: Text(
                       title,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
-                        color: AppTheme.ink,
+                        color: palette.ink,
                       ),
                     ),
                   ),
@@ -69,30 +63,20 @@ class FormSheetScaffold extends StatelessWidget {
                     ),
                   IconButton(
                     icon: const Icon(Icons.close),
-                    color: AppTheme.ink,
+                    color: palette.ink,
                     onPressed: () => Navigator.pop(context),
                   ),
                 ],
               ),
             ),
-            const Divider(height: 1, color: AppTheme.line),
-            
-            // Konten form — scrollable, mengecil saat keyboard terbuka.
-            // Flexible dengan SingleChildScrollView: saat maxHeight mengecil
-            // (karena keyboard), area ini ikut mengecil dan konten jadi
-            // scrollable — natural, tidak overflow.
+            Divider(height: 1, color: palette.line),
             Flexible(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(16),
                 child: child,
               ),
             ),
-            
-            const Divider(height: 1, color: AppTheme.line),
-            
-            // Tombol Batal & Simpan — tetap di bottom sheet,
-            // selalu terlihat di atas keyboard (karena sheet "duduk"
-            // di atas keyboard via Padding luar).
+            Divider(height: 1, color: palette.line),
             SafeArea(
               top: false,
               child: Padding(
@@ -107,8 +91,8 @@ class FormSheetScaffold extends StatelessWidget {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          side: const BorderSide(color: AppTheme.line),
-                          foregroundColor: AppTheme.ink,
+                          side: BorderSide(color: palette.line),
+                          foregroundColor: palette.ink,
                         ),
                         child: const Text('Batal'),
                       ),

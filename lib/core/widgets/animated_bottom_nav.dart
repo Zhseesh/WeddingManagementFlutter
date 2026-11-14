@@ -21,8 +21,11 @@ class AnimatedBottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = AppTheme.of(context);
+    final scheme = Theme.of(context).colorScheme;
+
     return Container(
-      color: Colors.white,
+      color: palette.surface,
       child: SafeArea(
         top: false,
         child: SizedBox(
@@ -32,7 +35,6 @@ class AnimatedBottomNav extends StatelessWidget {
               final itemWidth = constraints.maxWidth / 5;
               return Stack(
                 children: [
-                  // Sliding pill indicator
                   AnimatedPositioned(
                     duration: const Duration(milliseconds: 400),
                     curve: Curves.easeOutCubic,
@@ -42,12 +44,11 @@ class AnimatedBottomNav extends StatelessWidget {
                     height: 56,
                     child: Container(
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF0EDFF),
+                        color: palette.softPrimary,
                         borderRadius: BorderRadius.circular(16),
                       ),
                     ),
                   ),
-                  // Items
                   Row(
                     children: List.generate(5, (i) {
                       final isActive = i == currentIndex;
@@ -60,7 +61,6 @@ class AnimatedBottomNav extends StatelessWidget {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                // Icon pop animation via scale + elastic
                                 AnimatedScale(
                                   duration: const Duration(milliseconds: 350),
                                   curve: Curves.elasticOut,
@@ -70,7 +70,7 @@ class AnimatedBottomNav extends StatelessWidget {
                                     child: Icon(
                                       isActive ? _items[i].activeIcon : _items[i].icon,
                                       key: ValueKey('${i}_$isActive'),
-                                      color: isActive ? AppTheme.primary : AppTheme.muted,
+                                      color: isActive ? scheme.primary : palette.muted,
                                       size: 22,
                                     ),
                                   ),
@@ -81,7 +81,7 @@ class AnimatedBottomNav extends StatelessWidget {
                                   style: TextStyle(
                                     fontSize: 10,
                                     fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
-                                    color: isActive ? AppTheme.primary : AppTheme.muted,
+                                    color: isActive ? scheme.primary : palette.muted,
                                   ),
                                   child: Text(_items[i].label),
                                 ),
