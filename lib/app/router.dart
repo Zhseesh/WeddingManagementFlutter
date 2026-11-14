@@ -1,5 +1,6 @@
-import 'package:material_ui/material_ui.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:weddingmanagementf/app/main_shell.dart';
 import 'package:weddingmanagementf/features/wedding_profile/data/wedding_profile_model.dart';
 import 'package:weddingmanagementf/features/wedding_profile/presentation/edit_profile_screen.dart';
@@ -10,20 +11,18 @@ import 'package:weddingmanagementf/features/installments/presentation/installmen
 import 'package:weddingmanagementf/features/transactions/presentation/transaction_detail_screen.dart';
 import 'package:weddingmanagementf/features/vendors/presentation/vendor_detail_screen.dart';
 
-final _rootNavigatorKey = GlobalKey<NavigatorState>();
+/// Navigator key publik — bisa dipakai oleh NotificationService untuk
+/// navigasi programatik (e.g. saat user tap notifikasi).
+final rootNavigatorKey = GlobalKey<NavigatorState>();
 
 final appRouter = GoRouter(
-  navigatorKey: _rootNavigatorKey,
+  navigatorKey: rootNavigatorKey,
   initialLocation: '/splash',
   routes: [
     GoRoute(path: '/splash', builder: (c, s) => const SplashScreen()),
     GoRoute(path: '/onboarding', builder: (c, s) => const OnboardingScreen()),
     GoRoute(path: '/setup-profile', builder: (c, s) => const SetupProfileScreen()),
-
-    // Main shell — Beranda, Persiapan, Keuangan, Laporan, Profil
     GoRoute(path: '/app', builder: (c, s) => const MainShell()),
-
-    // Nested pages (dipush di atas MainShell, bukan bagian dari tab)
     GoRoute(
       path: '/preparation/vendor/:id',
       builder: (c, s) {
@@ -66,3 +65,7 @@ final appRouter = GoRouter(
     ),
   ],
 );
+
+/// Provider wrapper agar GoRouter bisa diakses dari ProviderContainer
+/// (dipakai NotificationService saat handle tap).
+final routerProvider = Provider<GoRouter>((ref) => appRouter);

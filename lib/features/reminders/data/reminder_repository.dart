@@ -28,6 +28,7 @@ class ReminderRepository {
         title: m.title,
         body: m.description ?? 'Pengingat pernikahan',
         when: m.reminderDate,
+        payload: NotificationService.reminderPayload,
       );
     }
     return id;
@@ -50,6 +51,7 @@ class ReminderRepository {
         title: m.title,
         body: m.description ?? 'Pengingat pernikahan',
         when: m.reminderDate,
+        payload: NotificationService.reminderPayload,
       );
     }
   }

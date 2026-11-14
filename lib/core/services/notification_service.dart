@@ -1,8 +1,12 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/data/latest.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
+import 'package:weddingmanagementf/app/router.dart';
+import 'package:weddingmanagementf/core/database/database_helper.dart';
+import 'package:weddingmanagementf/core/providers/navigation_providers.dart';
 
 class NotificationService {
   NotificationService._();
@@ -13,13 +17,84 @@ class NotificationService {
   static const String _channelDesc =
       'Pengingat persiapan dan pembayaran pernikahan';
 
+  /// Payload default untuk notifikasi pengingat — deep link ke
+  /// sub-tab Pengingat pada tab Persiapan.
+  static const String reminderPayload = '/preparation/reminder';
+
   final FlutterLocalNotificationsPlugin _plugin =
       FlutterLocalNotificationsPlugin();
   bool _initialized = false;
 
+  ProviderContainer? _container;
+  String? _pendingPayload;
+
+  /// Inject ProviderContainer supaya callback notifikasi bisa mengakses
+  /// state provider (mainTabProvider, prepTabProvider, routerProvider).
+  void attachContainer(ProviderContainer container) {
+    _container = container;
+  }
+
+  /// Ambil payload cold-start (kalau ada) dan reset.
+  /// Dipanggil oleh SplashScreen setelah frame siap.
+  String? consumePendingPayload() {
+    final p = _pendingPayload;
+    _pendingPayload = null;
+    return p;
+  }
+
+  /// Handle payload — dipakai untuk cold start (dipanggil manual dari
+  /// SplashScreen) maupun untuk tap notifikasi saat app sudah hidup.
+  void handlePayload(String payload) {
+    if (payload == reminderPayload) {
+      _navigateToReminder();
+    }
+  }
+
+  void _navigateToReminder() {
+    final container = _container;
+    if (container == null) return;
+
+    // Set state dulu — MainShell & PreparationScreen listen ke provider ini,
+    // jadi PageView & TabBar akan otomatis animasi ke tab yang benar.
+    container.read(mainTabProvider.notifier).state = 1; // Persiapan
+    container.read(prepTabProvider.notifier).state = 4; // Pengingat
+
+    // Kalau user sedang di pushed route (mis. VendorDetailScreen),
+    // pop dulu ke root supaya MainShell terlihat.
+    final router = container.read(routerProvider);
+    router.go('/app');
+  }
+
   Future<void> rescheduleAllPending() async {
-    // Implementasi: baca semua reminder dengan isEnabled=true dan isCompleted=false
-    // yang reminderDate-nya di masa depan, lalu panggil schedule()
+    if (!_initialized) await init();
+    try {
+      final db = await DatabaseHelper().database;
+      final now = DateTime.now().toIso8601String();
+      final rows = await db.query(
+        'reminders',
+        where: 'is_enabled = 1 AND is_completed = 0 AND reminder_date > ?',
+        whereArgs: [now],
+        orderBy: 'reminder_date ASC',
+      );
+      for (final row in rows) {
+        final id = row['id'] as int?;
+        final title = row['title'] as String?;
+        final description = row['description'] as String?;
+        final rawDate = row['reminder_date'] as String?;
+        if (id == null || title == null || rawDate == null) continue;
+        final when = DateTime.tryParse(rawDate);
+        if (when == null) continue;
+        await schedule(
+          id: id,
+          title: title,
+          body: description ?? 'Pengingat pernikahan',
+          when: when,
+          payload: reminderPayload,
+        );
+      }
+    } catch (_) {
+      // Notifikasi bukan fitur kritis
+    }
   }
 
   Future<void> init() async {
@@ -37,6 +112,7 @@ class NotificationService {
           AndroidInitializationSettings('@mipmap/ic_launcher');
       await _plugin.initialize(
         const InitializationSettings(android: androidSettings),
+        onDidReceiveNotificationResponse: _onNotificationTap,
       );
 
       final androidPlugin = _plugin.resolvePlatformSpecificImplementation<
@@ -51,10 +127,26 @@ class NotificationService {
           enableVibration: true,
         ),
       );
+
+      // Cold start: apakah app dibuka karena tap notifikasi?
+      final launchDetails = await _plugin.getNotificationAppLaunchDetails();
+      if (launchDetails?.didNotificationLaunchApp ?? false) {
+        final payload = launchDetails!.notificationResponse?.payload;
+        if (payload != null && payload.isNotEmpty) {
+          _pendingPayload = payload;
+        }
+      }
+
       _initialized = true;
     } catch (_) {
       // Notifikasi bukan fitur kritis
     }
+  }
+
+  void _onNotificationTap(NotificationResponse response) {
+    final payload = response.payload;
+    if (payload == null || payload.isEmpty) return;
+    handlePayload(payload);
   }
 
   Future<bool> ensurePermission() async {
@@ -71,13 +163,11 @@ class NotificationService {
     }
   }
 
-  /// Tes instan: tampilkan notifikasi SEKARANG (bukan scheduled).
-  /// Kalau method ini berhasil tapi `schedule` tidak, masalahnya di
-  /// penjadwalan (izin exact alarm / OEM background restriction).
   Future<void> showNow({
     required int id,
     required String title,
     required String body,
+    String? payload,
   }) async {
     if (!_initialized) await init();
     try {
@@ -95,6 +185,7 @@ class NotificationService {
             icon: '@mipmap/ic_launcher',
           ),
         ),
+        payload: payload ?? reminderPayload,
       );
     } catch (_) {}
   }
@@ -104,6 +195,7 @@ class NotificationService {
     required String title,
     required String body,
     required DateTime when,
+    String? payload,
   }) async {
     if (!_initialized) await init();
     if (when.isBefore(DateTime.now())) return;
@@ -112,15 +204,12 @@ class NotificationService {
         AndroidFlutterLocalNotificationsPlugin>();
     if (android == null) return;
 
-    // Cek apakah exact alarm diizinkan. Ini pengganti
-    // resolveAndroidScheduleMode yang tidak tersedia di versi 17.x.
     final canScheduleExact =
         (await android.canScheduleExactNotifications()) ?? false;
     final mode = canScheduleExact
         ? AndroidScheduleMode.exactAllowWhileIdle
         : AndroidScheduleMode.inexactAllowWhileIdle;
 
-    // FIX: NotificationDetails sekarang const
     const notificationDetails = NotificationDetails(
       android: AndroidNotificationDetails(
         _channelId,
@@ -132,6 +221,8 @@ class NotificationService {
       ),
     );
 
+    final effectivePayload = payload ?? reminderPayload;
+
     try {
       await _plugin.zonedSchedule(
         id,
@@ -142,10 +233,9 @@ class NotificationService {
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,
         androidScheduleMode: mode,
+        payload: effectivePayload,
       );
     } on PlatformException catch (e) {
-      // Fallback jika exact ditolak sistem (meski canScheduleExact=true,
-      // race condition bisa terjadi)
       if (e.code == 'exact_alarms_not_permitted') {
         try {
           await _plugin.zonedSchedule(
@@ -157,6 +247,7 @@ class NotificationService {
             uiLocalNotificationDateInterpretation:
                 UILocalNotificationDateInterpretation.absoluteTime,
             androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+            payload: effectivePayload,
           );
         } catch (_) {}
       }

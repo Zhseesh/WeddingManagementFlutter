@@ -1,6 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:weddingmanagementf/core/services/notification_service.dart';
 import '../../../app/app_init.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
@@ -26,10 +27,16 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
       if (!mounted) return;
       switch (state) {
         case AppInitState.needsOnboarding:
+          NotificationService.instance.consumePendingPayload();
           context.go('/onboarding');
         case AppInitState.needsSetup:
+          NotificationService.instance.consumePendingPayload();
           context.go('/setup-profile');
         case AppInitState.ready:
+          final payload = NotificationService.instance.consumePendingPayload();
+          if (payload != null) {
+            NotificationService.instance.handlePayload(payload);
+          }
           context.go('/app');
       }
     } catch (e) {
@@ -53,7 +60,9 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
               const SizedBox(height: 16),
               Text(
                 'Wedding Planner',
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
               ),
               const SizedBox(height: 8),
               Text(
@@ -61,7 +70,11 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
               const SizedBox(height: 32),
-              const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2.5)),
+              const SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(strokeWidth: 2.5),
+              ),
             ],
           ),
         ),
