@@ -16,7 +16,19 @@ class MainShell extends ConsumerStatefulWidget {
 }
 
 class _MainShellState extends ConsumerState<MainShell> {
-  final _pageController = PageController();
+  late final PageController _pageController;
+
+  @override
+  void initState() {
+    super.initState();
+    // FIX: baca initial tab dari provider. Kalau cold start dari notifikasi,
+    // mainTabProvider sudah di-set ke 1 di SplashScreen sebelum MainShell
+    // mount. Tanpa initialPage, PageController selalu mulai dari 0 dan
+    // PageView tidak pernah animasi ke tab tujuan (karena listener fire
+    // saat hasClients masih false).
+    final initialTab = ref.read(mainTabProvider);
+    _pageController = PageController(initialPage: initialTab);
+  }
 
   @override
   void dispose() {
@@ -47,8 +59,6 @@ class _MainShellState extends ConsumerState<MainShell> {
         }
       },
       child: Scaffold(
-        // FIX: Jangan konsumsi keyboard inset — biar Preparation/Finance bisa
-        // mendeteksi keyboard dan menyembunyikan FAB-nya dengan benar
         resizeToAvoidBottomInset: false,
         body: PageView(
           controller: _pageController,
