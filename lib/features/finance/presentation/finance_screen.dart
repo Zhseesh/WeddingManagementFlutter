@@ -58,6 +58,7 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen>
 
   @override
   Widget build(BuildContext context) {
+    final palette = AppTheme.of(context);
     ref.listen<int>(financeTabProvider, (previous, next) {
       if (mounted && _tab.index != next) {
         _tab.animateTo(next);
@@ -78,20 +79,19 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen>
     final showFab = _tab.index > 0 && !isKeyboardOpen;
 
     return Scaffold(
-      // FIX 1: Jangan konsumsi keyboard inset
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: const Column(
+        title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Keuangan',
+            const Text('Keuangan',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
             Text('Anggaran, transaksi, dan cicilan',
                 style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w500,
-                    color: AppTheme.muted)),
+                    color: palette.muted)),
           ],
         ),
       ),
@@ -105,7 +105,7 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen>
               TabBar(
                 controller: _tab,
                 labelColor: AppTheme.primary,
-                unselectedLabelColor: AppTheme.muted,
+                unselectedLabelColor: palette.muted,
                 indicatorColor: AppTheme.primary,
                 indicatorSize: TabBarIndicatorSize.label,
                 labelStyle:
@@ -130,7 +130,6 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen>
               ),
             ],
           ),
-          // FAB muncul/hilang smooth saat pindah tab dan saat keyboard buka/tutup
           Positioned(
             right: 16,
             bottom: 16,
@@ -168,34 +167,35 @@ class _FinanceStats extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = AppTheme.of(context);
     final items = [
       _FinanceStatItem(
         label: 'Anggaran',
         value: CurrencyFormatter.format(data.totalBudget),
         icon: Icons.account_balance_wallet_outlined,
         color: AppTheme.primary,
-        bg: Color.lerp(AppTheme.primary, Colors.white, 0.88)!,
+        bg: Color.lerp(AppTheme.primary, palette.surface, 0.88)!,
       ),
       _FinanceStatItem(
         label: 'Pemasukan',
         value: CurrencyFormatter.format(data.totalIncome),
         icon: Icons.arrow_downward,
         color: AppTheme.success,
-        bg: Color.lerp(AppTheme.success, Colors.white, 0.88)!,
+        bg: Color.lerp(AppTheme.success, palette.surface, 0.88)!,
       ),
       _FinanceStatItem(
         label: 'Pengeluaran',
         value: CurrencyFormatter.format(data.totalPaid),
         icon: Icons.arrow_upward,
         color: AppTheme.error,
-        bg: Color.lerp(AppTheme.error, Colors.white, 0.88)!,
+        bg: Color.lerp(AppTheme.error, palette.surface, 0.88)!,
       ),
       _FinanceStatItem(
         label: 'Sisa',
         value: CurrencyFormatter.format(data.remainingBudget),
         icon: Icons.savings_outlined,
         color: AppTheme.tertiary,
-        bg: Color.lerp(AppTheme.tertiary, Colors.white, 0.88)!,
+        bg: Color.lerp(AppTheme.tertiary, palette.surface, 0.88)!,
       ),
     ];
 
@@ -242,15 +242,16 @@ class _FinanceStatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = AppTheme.of(context);
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: palette.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppTheme.line),
+        border: Border.all(color: palette.line),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF30206B).withValues(alpha: 0.06),
+            color: palette.shadow,
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -275,9 +276,9 @@ class _FinanceStatCard extends StatelessWidget {
                   item.label,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
-                    color: AppTheme.muted,
+                    color: palette.muted,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -287,10 +288,10 @@ class _FinanceStatCard extends StatelessWidget {
                   alignment: Alignment.centerLeft,
                   child: Text(
                     item.value,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w800,
-                      color: AppTheme.ink,
+                      color: palette.ink,
                     ),
                   ),
                 ),
@@ -312,6 +313,7 @@ class _TransactionTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final palette = AppTheme.of(context);
     final listAsync = ref.watch(transactionListProvider);
     final filter = ref.watch(transactionTypeFilterProvider);
 
@@ -354,10 +356,10 @@ class _TransactionTab extends ConsumerWidget {
             error: (e, _) => Center(child: Text('Error: $e')),
             data: (items) {
               if (items.isEmpty) {
-                return const Center(
+                return Center(
                   child: Text(
                     'Belum ada transaksi.',
-                    style: TextStyle(color: AppTheme.muted),
+                    style: TextStyle(color: palette.muted),
                   ),
                 );
               }
@@ -388,9 +390,10 @@ class _TransactionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = AppTheme.of(context);
     final isIncome = tx.isIncome;
     final color = isIncome ? AppTheme.success : AppTheme.error;
-    final bgColor = Color.lerp(color, Colors.white, 0.85)!;
+    final bgColor = Color.lerp(color, palette.surface, 0.85)!;
     final sign = isIncome ? '+' : '-';
     final title = tx.description?.isNotEmpty == true
         ? tx.description!
@@ -412,12 +415,12 @@ class _TransactionCard extends StatelessWidget {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: tx.isVoid ? AppTheme.line : bgColor,
+                  color: tx.isVoid ? palette.line : bgColor,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
                   isIncome ? Icons.arrow_downward : Icons.arrow_upward,
-                  color: tx.isVoid ? AppTheme.muted : color,
+                  color: tx.isVoid ? palette.muted : color,
                   size: 20,
                 ),
               ),
@@ -433,7 +436,7 @@ class _TransactionCard extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
-                        color: tx.isVoid ? AppTheme.muted : AppTheme.ink,
+                        color: tx.isVoid ? palette.muted : palette.ink,
                         decoration:
                             tx.isVoid ? TextDecoration.lineThrough : null,
                       ),
@@ -441,8 +444,7 @@ class _TransactionCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       '${df.format(tx.transactionDate)}${tx.isVoid ? ' · VOID' : ''}',
-                      style: const TextStyle(
-                          fontSize: 11, color: AppTheme.muted),
+                      style: TextStyle(fontSize: 11, color: palette.muted),
                     ),
                   ],
                 ),
@@ -453,7 +455,7 @@ class _TransactionCard extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w800,
-                  color: tx.isVoid ? AppTheme.muted : color,
+                  color: tx.isVoid ? palette.muted : color,
                   decoration: tx.isVoid ? TextDecoration.lineThrough : null,
                 ),
               ),

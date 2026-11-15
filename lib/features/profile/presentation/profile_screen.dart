@@ -66,7 +66,7 @@ class ProfileScreen extends ConsumerWidget {
     }
   }
 
-    Future<void> _restore(BuildContext context, WidgetRef ref) async {
+  Future<void> _restore(BuildContext context, WidgetRef ref) async {
     final messenger = ScaffoldMessenger.of(context);
 
     final files = await FilePicker.pickFiles(
@@ -146,22 +146,29 @@ class ProfileScreen extends ConsumerWidget {
       applicationName: 'Wedding Planner & Finance',
       applicationVersion: '1.0.0',
       children: const [
-        Text('Aplikasi offline-first untuk mengelola persiapan pernikahan dan keuangan.'),
+        Text(
+            'Aplikasi offline-first untuk mengelola persiapan pernikahan dan keuangan.'),
       ],
     );
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final palette = AppTheme.of(context);
     final profileAsync = ref.watch(activeWeddingProfileProvider);
     return Scaffold(
       appBar: AppBar(
-        title: const Column(
+        title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Profil', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
-            Text('Data pernikahan & pengaturan', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w500, color: AppTheme.muted)),
+            const Text('Profil',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+            Text('Data pernikahan & pengaturan',
+                style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                    color: palette.muted)),
           ],
         ),
       ),
@@ -169,7 +176,9 @@ class ProfileScreen extends ConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Error: $e')),
         data: (profile) {
-          if (profile == null) return const Center(child: Text('Profil belum dibuat.'));
+          if (profile == null) {
+            return const Center(child: Text('Profil belum dibuat.'));
+          }
           return ListView(
             padding: const EdgeInsets.all(16),
             children: [
@@ -206,17 +215,24 @@ class _ProfileCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = AppTheme.of(context);
     final df = DateFormat('d MMMM yyyy', 'id_ID');
-    final weddingText = profile.weddingDate != null ? df.format(profile.weddingDate!) : 'Belum diatur';
-    final engagementText = profile.engagementDate != null ? df.format(profile.engagementDate!) : 'Belum diatur';
-    final locationText = (profile.weddingLocation?.isNotEmpty ?? false) ? profile.weddingLocation! : 'Belum diatur';
+    final weddingText = profile.weddingDate != null
+        ? df.format(profile.weddingDate!)
+        : 'Belum diatur';
+    final engagementText = profile.engagementDate != null
+        ? df.format(profile.engagementDate!)
+        : 'Belum diatur';
+    final locationText = (profile.weddingLocation?.isNotEmpty ?? false)
+        ? profile.weddingLocation!
+        : 'Belum diatur';
 
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: palette.surface,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppTheme.line),
+        border: Border.all(color: palette.line),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -224,16 +240,16 @@ class _ProfileCard extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // FIX: dijadikan const
-              const SizedBox(
+              SizedBox(
                 width: 54,
                 height: 54,
                 child: DecoratedBox(
                   decoration: BoxDecoration(
-                    color: Color(0xFFF0EDFF),
+                    color: palette.softPrimary,
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(Icons.favorite, color: AppTheme.primary, size: 26),
+                  child: const Icon(Icons.favorite,
+                      color: AppTheme.primary, size: 26),
                 ),
               ),
               const SizedBox(width: 12),
@@ -244,24 +260,32 @@ class _ProfileCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       '${profile.partnerOne} & ${profile.partnerTwo}',
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: AppTheme.ink),
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w800,
+                          color: palette.ink),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 6),
-                    // FIX: dijadikan const (menggunakan BorderRadius.all)
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 3),
                       child: DecoratedBox(
                         decoration: BoxDecoration(
-                          color: Color(0xFFE3F8EF),
-                          borderRadius: BorderRadius.all(Radius.circular(20)),
+                          color: palette.softSuccess,
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(20)),
                         ),
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                        child: const Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 3),
                           child: Text(
                             'Profil aktif',
-                            style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: AppTheme.success),
+                            style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w700,
+                                color: AppTheme.success),
                           ),
                         ),
                       ),
@@ -273,50 +297,61 @@ class _ProfileCard extends StatelessWidget {
                 onPressed: onEdit,
                 style: TextButton.styleFrom(
                   foregroundColor: AppTheme.primary,
-                  backgroundColor: const Color(0xFFF0EDFF),
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  backgroundColor: palette.softPrimary,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   minimumSize: Size.zero,
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8)),
                 ),
                 child: const Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(Icons.edit, size: 14),
                     SizedBox(width: 4),
-                    Text('Edit', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                    Text('Edit',
+                        style: TextStyle(
+                            fontSize: 12, fontWeight: FontWeight.w700)),
                   ],
                 ),
               ),
             ],
           ),
           const SizedBox(height: 16),
-          const Divider(height: 1, color: AppTheme.line),
+          Divider(height: 1, color: palette.line),
           const SizedBox(height: 12),
-          _infoRow('Tanggal pernikahan', weddingText),
+          _infoRow('Tanggal pernikahan', weddingText, palette),
           const SizedBox(height: 10),
-          _infoRow('Tanggal lamaran', engagementText),
+          _infoRow('Tanggal lamaran', engagementText, palette),
           const SizedBox(height: 10),
-          _infoRow('Lokasi', locationText),
+          _infoRow('Lokasi', locationText, palette),
         ],
       ),
     );
   }
 
-  Widget _infoRow(String label, String value) {
+  Widget _infoRow(String label, String value, AppPalette palette) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(
           flex: 2,
-          child: Text(label, style: const TextStyle(fontSize: 12, color: AppTheme.muted, fontWeight: FontWeight.w500)),
+          child: Text(label,
+              style: TextStyle(
+                  fontSize: 12,
+                  color: palette.muted,
+                  fontWeight: FontWeight.w500)),
         ),
         Expanded(
           flex: 3,
           child: Text(
             value,
             textAlign: TextAlign.right,
-            style: const TextStyle(fontSize: 13, color: AppTheme.ink, fontWeight: FontWeight.w700),
+            style: TextStyle(
+                fontSize: 13,
+                color: palette.ink,
+                fontWeight: FontWeight.w700),
           ),
         ),
       ],
@@ -342,20 +377,25 @@ class _SettingsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = AppTheme.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: palette.surface,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppTheme.line),
+        border: Border.all(color: palette.line),
       ),
       child: Column(
         children: [
-          const Padding(
-            padding: EdgeInsets.only(top: 12, bottom: 4),
+          Padding(
+            padding: const EdgeInsets.only(top: 12, bottom: 4),
             child: Align(
               alignment: Alignment.centerLeft,
-              child: Text('Pengaturan & Data', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppTheme.ink)),
+              child: Text('Pengaturan & Data',
+                  style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: palette.ink)),
             ),
           ),
           _row(
@@ -363,28 +403,32 @@ class _SettingsCard extends StatelessWidget {
             subtitle: 'Simpan semua data sebagai JSON',
             actionLabel: 'Backup',
             onAction: onBackup,
+            palette: palette,
           ),
-          const Divider(height: 1, color: AppTheme.line),
+          Divider(height: 1, color: palette.line),
           _row(
             title: 'Restore data',
             subtitle: 'Pulihkan dari file JSON',
             actionLabel: 'Pilih file',
             onAction: onRestore,
+            palette: palette,
           ),
-          const Divider(height: 1, color: AppTheme.line),
+          Divider(height: 1, color: palette.line),
           _row(
             title: 'Pengingat',
             subtitle: 'Jadwal dan notifikasi persiapan',
             actionLabel: 'Kelola',
             onAction: onReminder,
+            palette: palette,
           ),
-          const Divider(height: 1, color: AppTheme.line),
+          Divider(height: 1, color: palette.line),
           _row(
             title: 'Tentang aplikasi',
             subtitle: 'Wedding Planner v1.0.0',
             actionLabel: 'Info',
             onAction: onAbout,
             trailingPill: 'v1.0.0',
+            palette: palette,
           ),
         ],
       ),
@@ -397,6 +441,7 @@ class _SettingsCard extends StatelessWidget {
     required String actionLabel,
     required VoidCallback onAction,
     String? trailingPill,
+    required AppPalette palette,
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12),
@@ -406,9 +451,14 @@ class _SettingsCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppTheme.ink)),
+                Text(title,
+                    style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: palette.ink)),
                 const SizedBox(height: 2),
-                Text(subtitle, style: const TextStyle(fontSize: 11, color: AppTheme.muted)),
+                Text(subtitle,
+                    style: TextStyle(fontSize: 11, color: palette.muted)),
               ],
             ),
           ),
@@ -417,12 +467,15 @@ class _SettingsCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
-                color: const Color(0xFFF0EDFF),
+                color: palette.softPrimary,
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
                 trailingPill,
-                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.primary),
+                style: const TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: AppTheme.primary),
               ),
             )
           else
@@ -430,13 +483,17 @@ class _SettingsCard extends StatelessWidget {
               onPressed: onAction,
               style: TextButton.styleFrom(
                 foregroundColor: AppTheme.primary,
-                backgroundColor: const Color(0xFFF0EDFF),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                backgroundColor: palette.softPrimary,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 minimumSize: Size.zero,
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8)),
               ),
-              child: Text(actionLabel, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+              child: Text(actionLabel,
+                  style: const TextStyle(
+                      fontSize: 12, fontWeight: FontWeight.w700)),
             ),
         ],
       ),

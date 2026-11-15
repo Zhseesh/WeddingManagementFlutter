@@ -13,16 +13,22 @@ class DashboardScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final palette = AppTheme.of(context);
     final async = ref.watch(dashboardDataProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Column(
+        title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Beranda', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
-            Text('Wedding Planner & Finance', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w500, color: AppTheme.muted)),
+            const Text('Beranda',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+            Text('Wedding Planner & Finance',
+                style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                    color: palette.muted)),
           ],
         ),
       ),
@@ -102,6 +108,7 @@ class _HeroCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = AppTheme.of(context);
     final days = data.daysToWedding;
     final isPast = days < 0;
     final isToday = days == 0;
@@ -118,12 +125,13 @@ class _HeroCard extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Color.lerp(AppTheme.primary, Colors.white, 0.88)!,
-            Color.lerp(AppTheme.primary, Colors.white, 0.94)!,
-            Colors.white,
+            Color.lerp(AppTheme.primary, palette.surface, 0.88)!,
+            Color.lerp(AppTheme.primary, palette.surface, 0.94)!,
+            palette.surface,
           ],
         ),
-        border: Border.all(color: Color.lerp(AppTheme.primary, Colors.white, 0.75)!),
+        border: Border.all(
+            color: Color.lerp(AppTheme.primary, palette.surface, 0.75)!),
       ),
       child: Row(
         children: [
@@ -137,15 +145,19 @@ class _HeroCard extends StatelessWidget {
                       : isToday
                           ? 'HARI BAHAGIA TELAH TIBA'
                           : 'MENUJU HARI BAHAGIA',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
-                    color: AppTheme.muted,
+                    color: palette.muted,
                     letterSpacing: 1.2,
                   ),
                 ),
                 const SizedBox(height: 6),
                 if (!isPast && !isToday) ...[
+                  const Text(
+                    '',
+                    style: TextStyle(fontSize: 36),
+                  ),
                   Text(
                     '$days',
                     style: const TextStyle(
@@ -155,12 +167,12 @@ class _HeroCard extends StatelessWidget {
                       height: 1.1,
                     ),
                   ),
-                  const Text(
+                  Text(
                     'Hari lagi menuju pernikahan',
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
-                      color: AppTheme.ink,
+                      color: palette.ink,
                     ),
                   ),
                 ] else
@@ -175,10 +187,7 @@ class _HeroCard extends StatelessWidget {
                 const SizedBox(height: 6),
                 Text(
                   '${data.profile.partnerOne} & ${data.profile.partnerTwo} · $dateText',
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: AppTheme.muted,
-                  ),
+                  style: TextStyle(fontSize: 12, color: palette.muted),
                 ),
               ],
             ),
@@ -186,7 +195,7 @@ class _HeroCard extends StatelessWidget {
           Icon(
             Icons.favorite,
             size: 56,
-            color: Color.lerp(AppTheme.primary, Colors.white, 0.55),
+            color: Color.lerp(AppTheme.primary, palette.surface, 0.55),
           ),
         ],
       ),
@@ -204,6 +213,7 @@ class _StatsGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = AppTheme.of(context);
     final percent = data.budgetPercent;
     final items = [
       _StatItem(
@@ -211,28 +221,28 @@ class _StatsGrid extends StatelessWidget {
         value: CurrencyFormatter.format(data.totalBudget),
         icon: Icons.account_balance_wallet_outlined,
         color: AppTheme.primary,
-        bg: Color.lerp(AppTheme.primary, Colors.white, 0.88)!,
+        bg: Color.lerp(AppTheme.primary, palette.surface, 0.88)!,
       ),
       _StatItem(
         label: 'Total Terbayar',
         value: CurrencyFormatter.format(data.totalPaid),
         icon: Icons.check_circle_outline,
         color: AppTheme.success,
-        bg: Color.lerp(AppTheme.success, Colors.white, 0.88)!,
+        bg: Color.lerp(AppTheme.success, palette.surface, 0.88)!,
       ),
       _StatItem(
         label: 'Sisa Anggaran',
         value: CurrencyFormatter.format(data.remainingBudget),
         icon: Icons.savings_outlined,
         color: AppTheme.tertiary,
-        bg: Color.lerp(AppTheme.tertiary, Colors.white, 0.88)!,
+        bg: Color.lerp(AppTheme.tertiary, palette.surface, 0.88)!,
       ),
       _StatItem(
         label: 'Progres Anggaran',
         value: '${percent.toStringAsFixed(1)}%',
         icon: Icons.trending_up,
         color: AppTheme.warning,
-        bg: Color.lerp(AppTheme.warning, Colors.white, 0.88)!,
+        bg: Color.lerp(AppTheme.warning, palette.surface, 0.88)!,
       ),
     ];
 
@@ -278,15 +288,16 @@ class _StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = AppTheme.of(context);
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: palette.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppTheme.line),
+        border: Border.all(color: palette.line),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF30206B).withValues(alpha: 0.06),
+            color: palette.shadow,
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -311,9 +322,9 @@ class _StatCard extends StatelessWidget {
                   item.label,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
-                    color: AppTheme.muted,
+                    color: palette.muted,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -323,10 +334,10 @@ class _StatCard extends StatelessWidget {
                   alignment: Alignment.centerLeft,
                   child: Text(
                     item.value,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w800,
-                      color: AppTheme.ink,
+                      color: palette.ink,
                     ),
                   ),
                 ),
@@ -356,15 +367,16 @@ class _SectionHead extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = AppTheme.of(context);
     return Row(
       children: [
         Expanded(
           child: Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w700,
-              color: AppTheme.ink,
+              color: palette.ink,
             ),
           ),
         ),
@@ -373,9 +385,9 @@ class _SectionHead extends StatelessWidget {
             onPressed: onAction,
             style: TextButton.styleFrom(
               foregroundColor: AppTheme.primary,
-              backgroundColor: Color.lerp(AppTheme.primary, Colors.white, 0.9),
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              backgroundColor:
+                  Color.lerp(AppTheme.primary, palette.surface, 0.9),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               minimumSize: Size.zero,
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               shape: RoundedRectangleBorder(
@@ -413,18 +425,19 @@ class _CategoryList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = AppTheme.of(context);
     if (categories.isEmpty) {
       return Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: palette.surface,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppTheme.line),
+          border: Border.all(color: palette.line),
         ),
-        child: const Center(
+        child: Center(
           child: Text(
             'Belum ada kategori anggaran.',
-            style: TextStyle(fontSize: 12, color: AppTheme.muted),
+            style: TextStyle(fontSize: 12, color: palette.muted),
           ),
         ),
       );
@@ -432,9 +445,9 @@ class _CategoryList extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: palette.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppTheme.line),
+        border: Border.all(color: palette.line),
       ),
       child: Column(
         children: categories.map((c) {
@@ -451,20 +464,17 @@ class _CategoryList extends StatelessWidget {
                         c.name,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w700,
-                          color: AppTheme.ink,
+                          color: palette.ink,
                         ),
                       ),
                     ),
                     const SizedBox(width: 8),
                     Text(
                       '${CurrencyFormatter.format(c.spent)} / ${CurrencyFormatter.format(c.budget)}',
-                      style: const TextStyle(
-                        fontSize: 11,
-                        color: AppTheme.muted,
-                      ),
+                      style: TextStyle(fontSize: 11, color: palette.muted),
                     ),
                   ],
                 ),
@@ -474,7 +484,7 @@ class _CategoryList extends StatelessWidget {
                   child: LinearProgressIndicator(
                     value: c.progress,
                     minHeight: 8,
-                    backgroundColor: AppTheme.line,
+                    backgroundColor: palette.line,
                     valueColor: AlwaysStoppedAnimation(color),
                   ),
                 ),
@@ -497,26 +507,27 @@ class _RecentTransactionsList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = AppTheme.of(context);
     if (items.isEmpty) {
       return Container(
         padding: const EdgeInsets.all(28),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: palette.surface,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppTheme.line),
+          border: Border.all(color: palette.line),
         ),
-        child: const Column(
+        child: Column(
           children: [
-            Icon(Icons.receipt_long, size: 40, color: AppTheme.muted),
-            SizedBox(height: 8),
+            Icon(Icons.receipt_long, size: 40, color: palette.muted),
+            const SizedBox(height: 8),
             Text(
               'Belum ada transaksi',
-              style: TextStyle(fontSize: 13, color: AppTheme.ink),
+              style: TextStyle(fontSize: 13, color: palette.ink),
             ),
-            SizedBox(height: 2),
+            const SizedBox(height: 2),
             Text(
               'Tekan + Transaksi untuk mulai mencatat',
-              style: TextStyle(fontSize: 11, color: AppTheme.muted),
+              style: TextStyle(fontSize: 11, color: palette.muted),
             ),
           ],
         ),
@@ -525,9 +536,9 @@ class _RecentTransactionsList extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: palette.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppTheme.line),
+        border: Border.all(color: palette.line),
       ),
       child: Column(
         children: items.asMap().entries.map((entry) {
@@ -538,9 +549,7 @@ class _RecentTransactionsList extends StatelessWidget {
             decoration: BoxDecoration(
               border: isLast
                   ? null
-                  : const Border(
-                      bottom: BorderSide(color: AppTheme.line, width: 1),
-                    ),
+                  : Border(bottom: BorderSide(color: palette.line, width: 1)),
             ),
             child: _RecentTile(tx: tx),
           );
@@ -556,9 +565,10 @@ class _RecentTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = AppTheme.of(context);
     final isIncome = tx.isIncome;
     final color = isIncome ? AppTheme.success : AppTheme.error;
-    final bgColor = Color.lerp(color, Colors.white, 0.85)!;
+    final bgColor = Color.lerp(color, palette.surface, 0.85)!;
     final sign = isIncome ? '+' : '-';
     final title = tx.description?.isNotEmpty == true
         ? tx.description!
@@ -591,16 +601,16 @@ class _RecentTile extends StatelessWidget {
                 title,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
-                  color: AppTheme.ink,
+                  color: palette.ink,
                 ),
               ),
               const SizedBox(height: 2),
               Text(
                 df.format(tx.transactionDate),
-                style: const TextStyle(fontSize: 11, color: AppTheme.muted),
+                style: TextStyle(fontSize: 11, color: palette.muted),
               ),
             ],
           ),
@@ -673,9 +683,12 @@ class _QuickActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = AppTheme.of(context);
     return Material(
-      color: Colors.white,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15), side: const BorderSide(color: AppTheme.line)),
+      color: palette.surface,
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15),
+          side: BorderSide(color: palette.line)),
       child: InkWell(
         borderRadius: BorderRadius.circular(15),
         onTap: action.onTap,
@@ -683,9 +696,16 @@ class _QuickActionButton extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 4),
           child: Column(
             children: [
+              const Icon(Icons.circle, size: 0),
               Icon(action.icon, size: 22, color: AppTheme.primary),
               const SizedBox(height: 6),
-              Text(action.label, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.ink)),
+              Text(action.label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      color: palette.ink)),
             ],
           ),
         ),
@@ -703,13 +723,14 @@ class _EmptyView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
+    final palette = AppTheme.of(context);
+    return Center(
       child: Padding(
-        padding: EdgeInsets.all(32),
+        padding: const EdgeInsets.all(32),
         child: Text(
           'Profil pernikahan belum dibuat. Restart aplikasi untuk setup.',
           textAlign: TextAlign.center,
-          style: TextStyle(color: AppTheme.muted),
+          style: TextStyle(color: palette.muted),
         ),
       ),
     );
@@ -723,28 +744,28 @@ class _ErrorView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = AppTheme.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.error_outline,
-                size: 48, color: AppTheme.error),
+            const Icon(Icons.error_outline, size: 48, color: AppTheme.error),
             const SizedBox(height: 12),
-            const Text(
+            Text(
               'Gagal memuat data',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
-                color: AppTheme.ink,
+                color: palette.ink,
               ),
             ),
             const SizedBox(height: 8),
             Text(
               message,
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 12, color: AppTheme.muted),
+              style: TextStyle(fontSize: 12, color: palette.muted),
             ),
             const SizedBox(height: 16),
             ElevatedButton(
