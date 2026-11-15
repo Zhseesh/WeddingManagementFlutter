@@ -216,6 +216,7 @@ class _InstallmentPaymentFormSheetState
                   initialValue: _method,
                   borderRadius: BorderRadius.circular(16),
                   dropdownColor: AppTheme.of(context).surface,
+                  focusColor: Colors.transparent,
                   decoration: const InputDecoration(labelText: 'Metode'),
                   items: _methods.map((m) => DropdownMenuItem(value: m, child: Text(m))).toList(),
                   onChanged: (v) => setState(() => _method = v ?? 'Transfer'),
@@ -228,6 +229,7 @@ class _InstallmentPaymentFormSheetState
                     initialValue: _categoryId,
                     borderRadius: BorderRadius.circular(16),
                     dropdownColor: AppTheme.of(context).surface,
+                    focusColor: Colors.transparent,
                     decoration: const InputDecoration(labelText: 'Kategori (opsional)'),
                     items: [
                       const DropdownMenuItem<int?>(value: null, child: Text('— Tanpa kategori —')),

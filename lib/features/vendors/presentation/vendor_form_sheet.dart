@@ -178,6 +178,7 @@ class _VendorFormSheetState extends ConsumerState<_VendorFormSheet> {
               initialValue: _status,
               borderRadius: BorderRadius.circular(16),
               dropdownColor: AppTheme.of(context).surface,
+              focusColor: Colors.transparent,
               decoration: const InputDecoration(labelText: 'Status'),
               items: VendorStatus.values
                   .map((s) => DropdownMenuItem(value: s, child: Text(s.label)))

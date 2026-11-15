@@ -203,6 +203,7 @@ class _DowryFormSheetState extends ConsumerState<_DowryFormSheet> {
               initialValue: _status,
               borderRadius: BorderRadius.circular(16),
               dropdownColor: AppTheme.of(context).surface,
+              focusColor: Colors.transparent,
               decoration: const InputDecoration(labelText: 'Status'),
               items: DowryStatus.values
                   .map((s) => DropdownMenuItem(value: s, child: Text(s.label)))
