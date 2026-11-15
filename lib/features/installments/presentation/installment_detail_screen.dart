@@ -1,6 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:weddingmanagementf/app/theme/app_theme.dart';
 import 'package:weddingmanagementf/core/utils/currency_formatter.dart';
 import 'package:weddingmanagementf/features/budget/presentation/providers/budget_providers.dart';
@@ -69,7 +70,7 @@ class InstallmentDetailScreen extends ConsumerWidget {
             data: (d) => d == null
                 ? const SizedBox.shrink()
                 : IconButton(
-                    icon: const Icon(Icons.cancel_outlined),
+                    icon: const Icon(LucideIcons.circleX),
                     tooltip: 'Batalkan cicilan',
                     onPressed: d.summary.installment.status == 'cancelled' ? null : () => _cancelInstallment(context, ref),
                   ),
@@ -211,7 +212,7 @@ class _ScheduleTile extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(vertical: 4),
                     child: Row(
                       children: [
-                        Icon(Icons.payments_outlined, size: 16, color: p.isVoid ? palette.muted : AppTheme.success),
+                        Icon(LucideIcons.banknote, size: 16, color: p.isVoid ? palette.muted : AppTheme.success),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
@@ -223,7 +224,7 @@ class _ScheduleTile extends StatelessWidget {
                             ),
                           ),
                         ),
-                        if (!p.isVoid) IconButton(icon: const Icon(Icons.undo, size: 16, color: AppTheme.error), visualDensity: VisualDensity.compact, onPressed: () => onVoid(p)),
+                        if (!p.isVoid) IconButton(icon: const Icon(LucideIcons.undo2, size: 16, color: AppTheme.error), visualDensity: VisualDensity.compact, onPressed: () => onVoid(p)),
                       ],
                     ),
                   )),

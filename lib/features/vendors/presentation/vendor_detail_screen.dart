@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:weddingmanagementf/app/theme/app_theme.dart';
@@ -46,7 +47,7 @@ class VendorDetailScreen extends ConsumerWidget {
         title: const Text('Detail Vendor'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.edit),
+            icon: const Icon(LucideIcons.pencil),
             tooltip: 'Edit vendor',
             onPressed: () {
               final detail = async.asData?.value;
@@ -100,7 +101,7 @@ class VendorDetailScreen extends ConsumerWidget {
             ? null
             : FloatingActionButton.extended(
                 onPressed: () => showPaymentFormSheet(context, d.summary),
-                icon: const Icon(Icons.add),
+                icon: const Icon(LucideIcons.plus),
                 label: const Text('Catat Pembayaran'),
               ),
         orElse: () => null,
@@ -183,25 +184,25 @@ class _InfoCard extends StatelessWidget {
         children: [
           if (vendor.contactName != null)
             ListTile(
-              leading: const Icon(Icons.person_outline),
+              leading: const Icon(LucideIcons.user),
               title: const Text('Kontak'),
               subtitle: Text(vendor.contactName!),
             ),
           if (vendor.phone != null)
             ListTile(
-              leading: const Icon(Icons.phone),
+              leading: const Icon(LucideIcons.phone),
               title: const Text('Telepon'),
               subtitle: Text(vendor.phone!),
             ),
           if (vendor.address != null)
             ListTile(
-              leading: const Icon(Icons.location_on_outlined),
+              leading: const Icon(LucideIcons.mapPin),
               title: const Text('Alamat'),
               subtitle: Text(vendor.address!),
             ),
           if (vendor.notes != null)
             ListTile(
-              leading: const Icon(Icons.notes),
+              leading: const Icon(LucideIcons.stickyNote),
               title: const Text('Catatan'),
               subtitle: Text(vendor.notes!),
             ),
@@ -224,7 +225,7 @@ class _PaymentTile extends StatelessWidget {
       child: ListTile(
         leading: CircleAvatar(
           backgroundColor: record.isVoid ? palette.line : palette.softSuccess,
-          child: Icon(Icons.payments_outlined,
+          child: Icon(LucideIcons.banknote,
               color: record.isVoid ? palette.muted : AppTheme.success),
         ),
         title: Text(
@@ -244,7 +245,7 @@ class _PaymentTile extends StatelessWidget {
         trailing: record.isVoid
             ? null
             : IconButton(
-                icon: const Icon(Icons.undo, color: AppTheme.error),
+                icon: const Icon(LucideIcons.undo2, color: AppTheme.error),
                 onPressed: onVoid,
               ),
       ),

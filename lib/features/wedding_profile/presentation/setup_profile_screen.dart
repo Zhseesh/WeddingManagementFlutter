@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -122,14 +123,14 @@ class _SetupProfileScreenState extends ConsumerState<SetupProfileScreen> {
               TextFormField(
                 controller: _partnerOneCtrl,
                 textCapitalization: TextCapitalization.words,
-                decoration: const InputDecoration(labelText: 'Nama Calon Pengantin 1', prefixIcon: Icon(Icons.person)),
+                decoration: const InputDecoration(labelText: 'Nama Calon Pengantin 1', prefixIcon: Icon(LucideIcons.user)),
                 validator: (v) => (v == null || v.trim().isEmpty) ? 'Wajib diisi' : null,
               ),
               const SizedBox(height: 12),
               TextFormField(
                 controller: _partnerTwoCtrl,
                 textCapitalization: TextCapitalization.words,
-                decoration: const InputDecoration(labelText: 'Nama Calon Pengantin 2', prefixIcon: Icon(Icons.person)),
+                decoration: const InputDecoration(labelText: 'Nama Calon Pengantin 2', prefixIcon: Icon(LucideIcons.user)),
                 validator: (v) => (v == null || v.trim().isEmpty) ? 'Wajib diisi' : null,
               ),
               const SizedBox(height: 12),
@@ -137,18 +138,18 @@ class _SetupProfileScreenState extends ConsumerState<SetupProfileScreen> {
                 child: Column(
                   children: [
                     ListTile(
-                      leading: const Icon(Icons.event),
+                      leading: const Icon(LucideIcons.calendar),
                       title: const Text('Tanggal Pernikahan'),
                       subtitle: Text(_formatDate(_weddingDate)),
-                      trailing: const Icon(Icons.chevron_right),
+                      trailing: const Icon(LucideIcons.chevronRight),
                       onTap: () => _pickDate(isWedding: true),
                     ),
                     const Divider(height: 1),
                     ListTile(
-                      leading: const Icon(Icons.favorite_border),
+                      leading: const Icon(LucideIcons.heart),
                       title: const Text('Tanggal Lamaran (Opsional)'),
                       subtitle: Text(_formatDate(_engagementDate)),
-                      trailing: const Icon(Icons.chevron_right),
+                      trailing: const Icon(LucideIcons.chevronRight),
                       onTap: () => _pickDate(isWedding: false),
                     ),
                   ],
@@ -158,7 +159,7 @@ class _SetupProfileScreenState extends ConsumerState<SetupProfileScreen> {
               TextFormField(
                 controller: _locationCtrl,
                 textCapitalization: TextCapitalization.words,
-                decoration: const InputDecoration(labelText: 'Lokasi Pernikahan (Opsional)', prefixIcon: Icon(Icons.location_on)),
+                decoration: const InputDecoration(labelText: 'Lokasi Pernikahan (Opsional)', prefixIcon: Icon(LucideIcons.mapPin)),
               ),
               const SizedBox(height: 24),
               Text('Anggaran', style: Theme.of(context).textTheme.titleLarge),
@@ -166,7 +167,7 @@ class _SetupProfileScreenState extends ConsumerState<SetupProfileScreen> {
               TextFormField(
                 controller: _budgetCtrl,
                 keyboardType: TextInputType.number,
-                decoration: const InputDecoration(labelText: 'Total Anggaran Awal', prefixText: 'Rp ', prefixIcon: Icon(Icons.account_balance_wallet)),
+                decoration: const InputDecoration(labelText: 'Total Anggaran Awal', prefixText: 'Rp ', prefixIcon: Icon(LucideIcons.wallet)),
                 validator: (v) {
                   if (v == null || v.trim().isEmpty) return 'Wajib diisi';
                   if (CurrencyFormatter.parse(v) <= 0) return 'Harus lebih dari Rp0';

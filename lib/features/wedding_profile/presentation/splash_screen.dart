@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:weddingmanagementf/core/services/notification_service.dart';
@@ -56,7 +57,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.favorite, size: 96, color: scheme.primary),
+              Icon(LucideIcons.heart, size: 96, color: scheme.primary),
               const SizedBox(height: 16),
               Text(
                 'Wedding Management',

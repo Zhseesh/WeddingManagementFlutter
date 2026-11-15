@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:weddingmanagementf/app/theme/app_theme.dart';
 import 'package:weddingmanagementf/core/utils/currency_formatter.dart';
@@ -193,7 +194,7 @@ class BudgetScreen extends ConsumerWidget {
                     final cats = spendingAsync.asData?.value ?? const [];
                     _addCategory(context, ref, b.id!, cats.length);
                   },
-                  icon: const Icon(Icons.add, size: 18),
+                  icon: const Icon(LucideIcons.plus, size: 18),
                   label: const Text('Kategori', style: TextStyle(fontSize: 12)),
                 ),
                 orElse: () => const SizedBox.shrink(),

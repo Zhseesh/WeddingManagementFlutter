@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -83,8 +84,8 @@ class TransactionDetailScreen extends ConsumerWidget {
                       ),
                       child: Icon(
                         isIncome
-                            ? Icons.arrow_downward
-                            : Icons.arrow_upward,
+                            ? LucideIcons.arrowDown
+                            : LucideIcons.arrowUp,
                         color: color,
                         size: 32,
                       ),

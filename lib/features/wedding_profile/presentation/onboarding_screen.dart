@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:go_router/go_router.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -14,17 +15,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   static const List<_OnboardingPage> _pages = [
     _OnboardingPage(
-      icon: Icons.favorite,
+      icon: LucideIcons.heart,
       title: 'Rencanakan Pernikahan Impian',
       description: 'Kelola anggaran, vendor, hingga persiapan administrasi KUA dalam satu aplikasi.',
     ),
     _OnboardingPage(
-      icon: Icons.account_balance_wallet,
+      icon: LucideIcons.wallet,
       title: 'Kelola Anggaran dengan Mudah',
       description: 'Catat pemasukan, pengeluaran, dan pantau sisa anggaran secara real-time.',
     ),
     _OnboardingPage(
-      icon: Icons.checklist,
+      icon: LucideIcons.listChecks,
       title: 'Pantau Semua Persiapan',
       description: 'Lacak vendor, cicilan, lamaran, seserahan, dan checklist dalam satu tempat.',
     ),
