@@ -145,7 +145,7 @@ class ProfileScreen extends ConsumerWidget {
     showAboutDialog(
       context: context,
       applicationName: 'Wedding Management',
-      applicationVersion: '1.0.0',
+      applicationVersion: '1.3.0',
       children: const [
         Text(
             'Aplikasi offline-first untuk mengelola persiapan pernikahan dan keuangan.'),
