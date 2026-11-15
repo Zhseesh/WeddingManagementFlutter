@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:weddingmanagementf/app/theme/app_theme.dart';
 
 class AnimatedBottomNav extends StatelessWidget {
@@ -12,14 +13,14 @@ class AnimatedBottomNav extends StatelessWidget {
   });
 
   static const _items = [
-    (icon: Icons.home_outlined, activeIcon: Icons.home, label: 'Beranda'),
-    (icon: Icons.checklist_outlined, activeIcon: Icons.checklist, label: 'Persiapan'),
-    (icon: Icons.wallet_outlined, activeIcon: Icons.wallet, label: 'Keuangan'),
-    (icon: Icons.bar_chart_outlined, activeIcon: Icons.bar_chart, label: 'Laporan'),
-    (icon: Icons.person_outline, activeIcon: Icons.person, label: 'Profil'),
+    (icon: LucideIcons.house, activeIcon: LucideIcons.house, label: 'Beranda'),
+    (icon: LucideIcons.clipboardList, activeIcon: LucideIcons.clipboardList, label: 'Persiapan'),
+    (icon: LucideIcons.wallet, activeIcon: LucideIcons.wallet, label: 'Keuangan'),
+    (icon: LucideIcons.barChart3, activeIcon: LucideIcons.barChart3, label: 'Laporan'),
+    (icon: LucideIcons.user, activeIcon: LucideIcons.user, label: 'Profil'),
   ];
 
-  @override
+   @override
   Widget build(BuildContext context) {
     final palette = AppTheme.of(context);
     final scheme = Theme.of(context).colorScheme;
