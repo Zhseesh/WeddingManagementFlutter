@@ -224,7 +224,6 @@ class _EngagementFormSheetState extends ConsumerState<_EngagementFormSheet> {
               initialValue: _status,
               borderRadius: BorderRadius.circular(16),
               dropdownColor: palette.surface,
-              focusColor: Colors.transparent,
               decoration: const InputDecoration(labelText: 'Status'),
               items: EngagementStatus.values
                   .map((s) =>

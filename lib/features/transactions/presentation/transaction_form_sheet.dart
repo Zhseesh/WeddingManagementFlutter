@@ -165,7 +165,6 @@ class _TransactionFormSheetState extends ConsumerState<_TransactionFormSheet> {
                 initialValue: _categoryId,
                 borderRadius: BorderRadius.circular(16),
                 dropdownColor: AppTheme.of(context).surface,
-                focusColor: Colors.transparent,
                 decoration: const InputDecoration(labelText: 'Kategori (opsional)'),
                 items: [
                   const DropdownMenuItem<int?>(
@@ -193,7 +192,6 @@ class _TransactionFormSheetState extends ConsumerState<_TransactionFormSheet> {
               initialValue: _paymentMethod,
               borderRadius: BorderRadius.circular(16),
               dropdownColor: AppTheme.of(context).surface,
-              focusColor: Colors.transparent,
               decoration: const InputDecoration(labelText: 'Metode'),
               items: _methods
                   .map((m) => DropdownMenuItem(value: m, child: Text(m)))

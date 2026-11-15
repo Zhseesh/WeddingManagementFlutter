@@ -171,7 +171,6 @@ class _FilterSection extends ConsumerWidget {
                   isDense: true,
                   borderRadius: BorderRadius.circular(16),
                   dropdownColor: palette.surface,
-                  focusColor: Colors.transparent,
                   decoration: const InputDecoration(labelText: 'Kategori', isDense: true, contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 12)),
                   items: [
                     const DropdownMenuItem(value: null, child: Text('Semua')),
@@ -191,7 +190,6 @@ class _FilterSection extends ConsumerWidget {
                   isDense: true,
                   borderRadius: BorderRadius.circular(16),
                   dropdownColor: palette.surface,
-                  focusColor: Colors.transparent,
                   decoration: const InputDecoration(labelText: 'Tipe', isDense: true, contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 12)),
                   items: const [
                     DropdownMenuItem(value: null, child: Text('Semua')),
