@@ -6,7 +6,7 @@ import 'package:weddingmanagementf/features/guests/presentation/providers/guest_
 import 'package:weddingmanagementf/features/wedding_profile/presentation/providers/wedding_profile_providers.dart';
 
 // ============================================================
-// TAMBAH TAMU — AlertDialog (gaya "Tambah Kategori")
+// TAMBAH TAMU — AlertDialog
 // ============================================================
 Future<void> showGuestAddDialog(BuildContext context, WidgetRef ref) async {
   final nameCtrl = TextEditingController();
@@ -81,13 +81,14 @@ Future<void> showGuestAddDialog(BuildContext context, WidgetRef ref) async {
 }
 
 // ============================================================
-// EDIT / HAPUS TAMU — BottomSheet (gaya "Edit Alokasi")
+// EDIT / HAPUS TAMU — BottomSheet
 // ============================================================
 Future<void> showGuestEditSheet(
   BuildContext context,
   WidgetRef ref,
   GuestModel initial,
 ) async {
+  final palette = AppTheme.of(context);
   final nameCtrl = TextEditingController(text: initial.name);
 
   final action = await showModalBottomSheet<String>(
@@ -101,18 +102,21 @@ Future<void> showGuestEditSheet(
       return Padding(
         padding: EdgeInsets.only(bottom: keyboardPadding),
         child: Container(
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          decoration: BoxDecoration(
+            color: palette.surface,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
           ),
           padding: EdgeInsets.fromLTRB(16, 16, 16, 16 + safeAreaPadding),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Text(
+              Text(
                 'Edit Tamu',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: palette.ink),
               ),
               const SizedBox(height: 16),
               TextField(

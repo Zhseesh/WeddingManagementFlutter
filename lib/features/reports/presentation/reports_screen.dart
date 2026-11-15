@@ -47,12 +47,10 @@ class ReportsScreen extends ConsumerWidget {
       final stamp = DateFormat('yyyyMMdd_HHmmss').format(DateTime.now());
       final file = File('${dir.path}/laporan_$stamp.pdf');
       await file.writeAsBytes(bytes);
-      await SharePlus.instance.share(
-        ShareParams(
-          files: [XFile(file.path)],
-          subject: 'Laporan Keuangan Pernikahan',
-        ),
-      );
+      await SharePlus.instance.share(ShareParams(
+        files: [XFile(file.path)],
+        subject: 'Laporan Keuangan Pernikahan',
+      ));
     } catch (e) {
       messenger.showSnackBar(SnackBar(content: Text('Gagal export PDF: $e')));
     }
@@ -67,12 +65,10 @@ class ReportsScreen extends ConsumerWidget {
       final stamp = DateFormat('yyyyMMdd_HHmmss').format(DateTime.now());
       final file = File('${dir.path}/laporan_$stamp.csv');
       await file.writeAsString(csv);
-      await SharePlus.instance.share(
-        ShareParams(
-          files: [XFile(file.path)],
-          subject: 'Laporan Keuangan Pernikahan (CSV)',
-        ),
-      );
+      await SharePlus.instance.share(ShareParams(
+        files: [XFile(file.path)],
+        subject: 'Laporan Keuangan Pernikahan (CSV)',
+      ));
     } catch (e) {
       messenger.showSnackBar(SnackBar(content: Text('Gagal export CSV: $e')));
     }
@@ -80,17 +76,23 @@ class ReportsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final palette = AppTheme.of(context);
     final async = ref.watch(reportDataProvider);
     final filter = ref.watch(reportFilterProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Column(
+        title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Laporan', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
-            Text('Ringkasan dan analisis keuangan', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w500, color: AppTheme.muted)),
+            const Text('Laporan',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+            Text('Ringkasan dan analisis keuangan',
+                style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                    color: palette.muted)),
           ],
         ),
       ),
@@ -237,25 +239,22 @@ class _ReportContent extends StatelessWidget {
   }
 }
 
-// ============================================================
-// Stat Cards
-// ============================================================
-
 class _StatsGrid extends StatelessWidget {
   final ReportData data;
   const _StatsGrid({required this.data});
 
   @override
   Widget build(BuildContext context) {
+    final palette = AppTheme.of(context);
     final items = [
       _StatItem(label: 'Pemasukan', value: CurrencyFormatter.format(data.totalIncome), icon: Icons.arrow_downward,
-          color: AppTheme.success, bg: Color.lerp(AppTheme.success, Colors.white, 0.88)!),
+          color: AppTheme.success, bg: Color.lerp(AppTheme.success, palette.surface, 0.88)!),
       _StatItem(label: 'Pengeluaran', value: CurrencyFormatter.format(data.totalExpense), icon: Icons.arrow_upward,
-          color: AppTheme.error, bg: Color.lerp(AppTheme.error, Colors.white, 0.88)!),
+          color: AppTheme.error, bg: Color.lerp(AppTheme.error, palette.surface, 0.88)!),
       _StatItem(label: 'Transaksi', value: '${data.transactions.length}', icon: Icons.receipt_long_outlined,
-          color: AppTheme.primary, bg: Color.lerp(AppTheme.primary, Colors.white, 0.88)!),
+          color: AppTheme.primary, bg: Color.lerp(AppTheme.primary, palette.surface, 0.88)!),
       _StatItem(label: 'Vendor Aktif', value: '${data.vendors.length}', icon: Icons.store_outlined,
-          color: AppTheme.tertiary, bg: Color.lerp(AppTheme.tertiary, Colors.white, 0.88)!),
+          color: AppTheme.tertiary, bg: Color.lerp(AppTheme.tertiary, palette.surface, 0.88)!),
     ];
 
     return LayoutBuilder(
@@ -287,13 +286,14 @@ class _StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = AppTheme.of(context);
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: palette.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppTheme.line),
-        boxShadow: [BoxShadow(color: const Color(0xFF30206B).withValues(alpha: 0.06), blurRadius: 20, offset: const Offset(0, 8))],
+        border: Border.all(color: palette.line),
+        boxShadow: [BoxShadow(color: palette.shadow, blurRadius: 20, offset: const Offset(0, 8))],
       ),
       child: Row(
         children: [
@@ -307,12 +307,12 @@ class _StatCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(item.label, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 11, color: AppTheme.muted, fontWeight: FontWeight.w500)),
+                Text(item.label, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 11, color: palette.muted, fontWeight: FontWeight.w500)),
                 const SizedBox(height: 3),
                 FittedBox(
                   fit: BoxFit.scaleDown,
                   alignment: Alignment.centerLeft,
-                  child: Text(item.value, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: AppTheme.ink)),
+                  child: Text(item.value, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: palette.ink)),
                 ),
               ],
             ),
@@ -323,21 +323,18 @@ class _StatCard extends StatelessWidget {
   }
 }
 
-// ============================================================
-// Donut Chart Card (disingkat agar tidak menabrak chart)
-// ============================================================
-
 class _DonutCard extends StatelessWidget {
   final ReportData data;
   const _DonutCard({required this.data});
 
   @override
   Widget build(BuildContext context) {
+    final palette = AppTheme.of(context);
     if (data.categories.isEmpty || data.totalExpense == 0) {
       return const SizedBox.shrink();
     }
 
-    final palette = [
+    final chartPalette = [
       AppTheme.primary,
       AppTheme.success,
       AppTheme.warning,
@@ -367,7 +364,7 @@ class _DonutCard extends StatelessWidget {
       final pct = (c.total / data.totalExpense) * 100;
       return PieChartSectionData(
         value: c.total.toDouble(),
-        color: palette[i % palette.length],
+        color: chartPalette[i % chartPalette.length],
         title: pct >= 8 ? '${pct.toStringAsFixed(0)}%' : '',
         radius: 38,
         titleStyle: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white),
@@ -377,14 +374,14 @@ class _DonutCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: palette.surface,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppTheme.line),
+        border: Border.all(color: palette.line),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Pengeluaran per Kategori', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
+          Text('Pengeluaran per Kategori', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: palette.ink)),
           const SizedBox(height: 16),
           Row(
             children: [
@@ -407,13 +404,12 @@ class _DonutCard extends StatelessWidget {
                       children: [
                         FittedBox(
                           fit: BoxFit.scaleDown,
-                          // FIX: gunakan shortFormat → "57Jt" bukan "Rp 57.000.000"
                           child: Text(
                             CurrencyFormatter.shortFormat(data.totalExpense),
-                            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: AppTheme.ink),
+                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: palette.ink),
                           ),
                         ),
-                        const Text('Total keluar', style: TextStyle(fontSize: 8, color: AppTheme.muted)),
+                        Text('Total keluar', style: TextStyle(fontSize: 8, color: palette.muted)),
                       ],
                     ),
                   ],
@@ -434,13 +430,13 @@ class _DonutCard extends StatelessWidget {
                           Container(
                             width: 8,
                             height: 8,
-                            decoration: BoxDecoration(color: palette[i % palette.length], shape: BoxShape.circle),
+                            decoration: BoxDecoration(color: chartPalette[i % chartPalette.length], shape: BoxShape.circle),
                           ),
                           const SizedBox(width: 6),
                           Expanded(
                             child: Text(
                               c.name,
-                              style: const TextStyle(fontSize: 10, color: AppTheme.ink, fontWeight: FontWeight.w500),
+                              style: TextStyle(fontSize: 10, color: palette.ink, fontWeight: FontWeight.w500),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -448,7 +444,7 @@ class _DonutCard extends StatelessWidget {
                           const SizedBox(width: 4),
                           Text(
                             '${pct.toStringAsFixed(1)}%',
-                            style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: AppTheme.ink),
+                            style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: palette.ink),
                           ),
                         ],
                       ),
@@ -464,10 +460,6 @@ class _DonutCard extends StatelessWidget {
   }
 }
 
-// ============================================================
-// Export Card
-// ============================================================
-
 class _ExportCard extends StatelessWidget {
   final VoidCallback onExportPdf;
   final VoidCallback onExportCsv;
@@ -475,32 +467,33 @@ class _ExportCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = AppTheme.of(context);
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: palette.surface,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppTheme.line),
+        border: Border.all(color: palette.line),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Ekspor Laporan', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
+          Text('Ekspor Laporan', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: palette.ink)),
           const SizedBox(height: 12),
-          _row(icon: Icons.picture_as_pdf, title: 'Laporan PDF', subtitle: 'Ringkasan untuk dicetak', onTap: onExportPdf),
-          const Divider(height: 20, color: AppTheme.line),
-          _row(icon: Icons.table_chart, title: 'Data Transaksi CSV', subtitle: 'Untuk spreadsheet', onTap: onExportCsv),
+          _row(icon: Icons.picture_as_pdf, title: 'Laporan PDF', subtitle: 'Ringkasan untuk dicetak', onTap: onExportPdf, palette: palette),
+          Divider(height: 20, color: palette.line),
+          _row(icon: Icons.table_chart, title: 'Data Transaksi CSV', subtitle: 'Untuk spreadsheet', onTap: onExportCsv, palette: palette),
         ],
       ),
     );
   }
 
-  Widget _row({required IconData icon, required String title, required String subtitle, required VoidCallback onTap}) {
+  Widget _row({required IconData icon, required String title, required String subtitle, required VoidCallback onTap, required AppPalette palette}) {
     return Row(
       children: [
         Container(
           padding: const EdgeInsets.all(9),
-          decoration: BoxDecoration(color: const Color(0xFFF0EDFF), borderRadius: BorderRadius.circular(10)),
+          decoration: BoxDecoration(color: palette.softPrimary, borderRadius: BorderRadius.circular(10)),
           child: Icon(icon, color: AppTheme.primary, size: 20),
         ),
         const SizedBox(width: 12),
@@ -508,8 +501,8 @@ class _ExportCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppTheme.ink)),
-              Text(subtitle, style: const TextStyle(fontSize: 11, color: AppTheme.muted)),
+              Text(title, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: palette.ink)),
+              Text(subtitle, style: TextStyle(fontSize: 11, color: palette.muted)),
             ],
           ),
         ),
@@ -517,7 +510,7 @@ class _ExportCard extends StatelessWidget {
           onPressed: onTap,
           style: TextButton.styleFrom(
             foregroundColor: AppTheme.primary,
-            backgroundColor: const Color(0xFFF0EDFF),
+            backgroundColor: palette.softPrimary,
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             minimumSize: Size.zero,
             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -530,33 +523,30 @@ class _ExportCard extends StatelessWidget {
   }
 }
 
-// ============================================================
-// Transaction Details
-// ============================================================
-
 class _TransactionDetails extends StatelessWidget {
   final ReportData data;
   const _TransactionDetails({required this.data});
 
   @override
   Widget build(BuildContext context) {
+    final palette = AppTheme.of(context);
     if (data.transactions.isEmpty) return const SizedBox.shrink();
 
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: palette.surface,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppTheme.line),
+        border: Border.all(color: palette.line),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Text('Rincian Transaksi', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
+              Text('Rincian Transaksi', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: palette.ink)),
               const Spacer(),
-              Text('${data.transactions.length} item', style: const TextStyle(fontSize: 11, color: AppTheme.muted)),
+              Text('${data.transactions.length} item', style: TextStyle(fontSize: 11, color: palette.muted)),
             ],
           ),
           const SizedBox(height: 12),
@@ -576,6 +566,7 @@ class _TransactionRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = AppTheme.of(context);
     final isIncome = tx.isIncome;
     final color = isIncome ? AppTheme.success : AppTheme.error;
     final sign = isIncome ? '+' : '-';
@@ -588,9 +579,9 @@ class _TransactionRow extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.ink)),
+              Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: palette.ink)),
               const SizedBox(height: 2),
-              Text('${df.format(tx.transactionDate)}${tx.isVoid ? ' · VOID' : ''}', style: const TextStyle(fontSize: 11, color: AppTheme.muted)),
+              Text('${df.format(tx.transactionDate)}${tx.isVoid ? ' · VOID' : ''}', style: TextStyle(fontSize: 11, color: palette.muted)),
             ],
           ),
         ),

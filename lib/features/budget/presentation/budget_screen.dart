@@ -13,7 +13,7 @@ class BudgetScreen extends ConsumerWidget {
     final nameCtrl = TextEditingController();
     final allocCtrl = TextEditingController();
     final formKey = GlobalKey<FormState>();
-    
+
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -65,6 +65,7 @@ class BudgetScreen extends ConsumerWidget {
   }
 
   Future<void> _editAllocation(BuildContext context, WidgetRef ref, BudgetCategoryModel cat) async {
+    final palette = AppTheme.of(context);
     final ctrl = TextEditingController(text: CurrencyFormatter.format(cat.allocatedAmount).replaceAll('Rp ', ''));
 
     final action = await showModalBottomSheet<String>(
@@ -74,21 +75,24 @@ class BudgetScreen extends ConsumerWidget {
       builder: (ctx) {
         final keyboardPadding = MediaQuery.viewInsetsOf(ctx).bottom;
         final safeAreaPadding = MediaQuery.paddingOf(ctx).bottom;
-        
+
         return Padding(
           padding: EdgeInsets.only(bottom: keyboardPadding),
           child: Container(
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            decoration: BoxDecoration(
+              color: palette.surface,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
             ),
-            // FIX: Tambahkan safeAreaPadding.bottom agar saat keyboard turun tidak tenggelam
             padding: EdgeInsets.fromLTRB(16, 16, 16, 16 + safeAreaPadding),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text('Kategori: ${cat.name}', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                Text('Kategori: ${cat.name}',
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: palette.ink)),
                 const SizedBox(height: 16),
                 TextField(
                   controller: ctrl,
@@ -161,6 +165,7 @@ class BudgetScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final palette = AppTheme.of(context);
     final budgetAsync = ref.watch(activeBudgetProvider);
     final spendingAsync = ref.watch(categorySpendingProvider);
 
@@ -176,7 +181,11 @@ class BudgetScreen extends ConsumerWidget {
         children: [
           Row(
             children: [
-              const Text('Kategori', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
+              Text('Kategori',
+                  style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                      color: palette.ink)),
               const Spacer(),
               budgetAsync.maybeWhen(
                 data: (b) => b == null ? const SizedBox.shrink() : TextButton.icon(
@@ -196,7 +205,17 @@ class BudgetScreen extends ConsumerWidget {
             loading: () => const Padding(padding: EdgeInsets.all(24), child: Center(child: CircularProgressIndicator())),
             error: (e, _) => Text('Error: $e'),
             data: (cats) {
-              if (cats.isEmpty) return const Padding(padding: EdgeInsets.all(24), child: Center(child: Text('Belum ada kategori.')));
+              if (cats.isEmpty) {
+                return Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Center(
+                    child: Text(
+                      'Belum ada kategori.',
+                      style: TextStyle(color: palette.muted),
+                    ),
+                  ),
+                );
+              }
               return Column(
                 children: cats.map((c) => Padding(
                   padding: const EdgeInsets.only(bottom: 8),
@@ -218,8 +237,11 @@ class _CategoryTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = AppTheme.of(context);
     final cat = item.category;
-    final color = cat.color != null ? Color(int.parse('FF${cat.color!.replaceFirst('#', '')}', radix: 16)) : AppTheme.primary;
+    final color = cat.color != null
+        ? Color(int.parse('FF${cat.color!.replaceFirst('#', '')}', radix: 16))
+        : AppTheme.primary;
 
     return Card(
       margin: EdgeInsets.zero,
@@ -233,23 +255,41 @@ class _CategoryTile extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Expanded(child: Text(cat.name, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700))),
-                  Text(CurrencyFormatter.format(cat.allocatedAmount), style: const TextStyle(fontSize: 12)),
+                  Expanded(
+                    child: Text(cat.name,
+                        style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            color: palette.ink)),
+                  ),
+                  Text(CurrencyFormatter.format(cat.allocatedAmount),
+                      style: TextStyle(fontSize: 12, color: palette.ink)),
                 ],
               ),
               const SizedBox(height: 8),
               ClipRRect(
                 borderRadius: BorderRadius.circular(6),
-                child: LinearProgressIndicator(value: item.progress, minHeight: 6, backgroundColor: AppTheme.line, valueColor: AlwaysStoppedAnimation(color)),
+                child: LinearProgressIndicator(
+                    value: item.progress,
+                    minHeight: 6,
+                    backgroundColor: palette.line,
+                    valueColor: AlwaysStoppedAnimation(color)),
               ),
               const SizedBox(height: 6),
               Row(
                 children: [
-                  Text('Terpakai ${CurrencyFormatter.format(item.spent)}', style: const TextStyle(fontSize: 11, color: AppTheme.muted)),
+                  Text('Terpakai ${CurrencyFormatter.format(item.spent)}',
+                      style: TextStyle(fontSize: 11, color: palette.muted)),
                   const Spacer(),
                   Text(
-                    item.remaining >= 0 ? 'Sisa ${CurrencyFormatter.format(item.remaining)}' : 'Lebih ${CurrencyFormatter.format(-item.remaining)}',
-                    style: TextStyle(fontSize: 11, color: item.remaining < 0 ? AppTheme.error : AppTheme.muted),
+                    item.remaining >= 0
+                        ? 'Sisa ${CurrencyFormatter.format(item.remaining)}'
+                        : 'Lebih ${CurrencyFormatter.format(-item.remaining)}',
+                    style: TextStyle(
+                        fontSize: 11,
+                        color: item.remaining < 0
+                            ? AppTheme.error
+                            : palette.muted),
                   ),
                 ],
               ),

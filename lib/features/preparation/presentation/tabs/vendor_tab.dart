@@ -23,6 +23,7 @@ class _VendorTabState extends ConsumerState<VendorTab> {
 
   @override
   Widget build(BuildContext context) {
+    final palette = AppTheme.of(context);
     final async = ref.watch(vendorListProvider);
     final query = ref.watch(vendorSearchQueryProvider).toLowerCase();
     final filter = ref.watch(vendorStatusFilterProvider);
@@ -89,13 +90,13 @@ class _VendorTabState extends ConsumerState<VendorTab> {
                     .toList();
               }
               if (filtered.isEmpty) {
-                return const Center(
+                return Center(
                   child: Padding(
-                    padding: EdgeInsets.all(32),
+                    padding: const EdgeInsets.all(32),
                     child: Text(
                       'Belum ada vendor.\nTekan + untuk menambah.',
                       textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 12, color: AppTheme.muted),
+                      style: TextStyle(fontSize: 12, color: palette.muted),
                     ),
                   ),
                 );
@@ -129,9 +130,10 @@ class _VendorTabState extends ConsumerState<VendorTab> {
                                       item.vendor.name,
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w700,
+                                        color: palette.ink,
                                       ),
                                     ),
                                   ),
@@ -146,15 +148,16 @@ class _VendorTabState extends ConsumerState<VendorTab> {
                               Row(
                                 children: [
                                   _amount('Harga', item.vendor.agreedPrice,
-                                      AppTheme.ink),
+                                      palette.ink, palette),
                                   _amount('Dibayar', item.totalPaid,
-                                      AppTheme.tertiary),
+                                      AppTheme.tertiary, palette),
                                   _amount(
                                       'Sisa',
                                       item.remaining,
                                       item.remaining > 0
                                           ? AppTheme.error
-                                          : AppTheme.muted),
+                                          : palette.muted,
+                                      palette),
                                 ],
                               ),
                               const SizedBox(height: 8),
@@ -163,7 +166,7 @@ class _VendorTabState extends ConsumerState<VendorTab> {
                                 child: LinearProgressIndicator(
                                   value: item.progress,
                                   minHeight: 6,
-                                  backgroundColor: AppTheme.line,
+                                  backgroundColor: palette.line,
                                 ),
                               ),
                             ],
@@ -181,13 +184,13 @@ class _VendorTabState extends ConsumerState<VendorTab> {
     );
   }
 
-  Widget _amount(String label, int value, Color color) {
+  Widget _amount(String label, int value, Color color, AppPalette palette) {
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(label,
-              style: const TextStyle(fontSize: 10, color: AppTheme.muted)),
+              style: TextStyle(fontSize: 10, color: palette.muted)),
           Text(
             CurrencyFormatter.format(value),
             style: TextStyle(

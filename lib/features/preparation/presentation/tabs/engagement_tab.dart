@@ -10,19 +10,20 @@ class EngagementTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final palette = AppTheme.of(context);
     final async = ref.watch(engagementListProvider);
     return async.when(
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (e, _) => Center(child: Text('Error: $e')),
       data: (items) {
         if (items.isEmpty) {
-          return const Center(
+          return Center(
             child: Padding(
-              padding: EdgeInsets.all(32),
+              padding: const EdgeInsets.all(32),
               child: Text(
                 'Belum ada item lamaran.\nTekan + untuk menambah.',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 12, color: AppTheme.muted),
+                style: TextStyle(fontSize: 12, color: palette.muted),
               ),
             ),
           );
@@ -55,9 +56,10 @@ class EngagementTab extends ConsumerWidget {
                               child: Text(item.name,
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                       fontSize: 13,
-                                      fontWeight: FontWeight.w700)),
+                                      fontWeight: FontWeight.w700,
+                                      color: palette.ink)),
                             ),
                             Chip(
                               label: Text(item.statusEnum.label),
@@ -69,8 +71,8 @@ class EngagementTab extends ConsumerWidget {
                         const SizedBox(height: 6),
                         Text(
                           '${item.quantity} × ${CurrencyFormatter.format(item.actualPrice > 0 ? item.actualPrice : item.estimatedPrice)}',
-                          style: const TextStyle(
-                              fontSize: 12, color: AppTheme.muted),
+                          style: TextStyle(
+                              fontSize: 12, color: palette.muted),
                         ),
                       ],
                     ),

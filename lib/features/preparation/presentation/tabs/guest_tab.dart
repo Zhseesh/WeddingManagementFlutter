@@ -17,19 +17,20 @@ class GuestTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final palette = AppTheme.of(context);
     final async = ref.watch(guestListProvider);
     return async.when(
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (e, _) => Center(child: Text('Error: $e')),
       data: (items) {
         if (items.isEmpty) {
-          return const Center(
+          return Center(
             child: Padding(
-              padding: EdgeInsets.all(32),
+              padding: const EdgeInsets.all(32),
               child: Text(
                 'Belum ada tamu undangan.\nTekan + untuk menambah.',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 12, color: AppTheme.muted),
+                style: TextStyle(fontSize: 12, color: palette.muted),
               ),
             ),
           );
@@ -44,31 +45,28 @@ class GuestTab extends ConsumerWidget {
             physics: const AlwaysScrollableScrollPhysics(),
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 100),
             children: [
-              // Progres undangan
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: palette.surface,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppTheme.line),
+                  border: Border.all(color: palette.line),
                 ),
                 child: Column(
                   children: [
                     Row(
                       children: [
-                        Text(
-                          '$invited / ${items.length} diundang',
-                          style: const TextStyle(
-                              fontSize: 12, fontWeight: FontWeight.w700),
-                        ),
+                        Text('$invited / ${items.length} diundang',
+                            style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                                color: palette.ink)),
                         const Spacer(),
-                        Text(
-                          '${(invited / items.length * 100).round()}%',
-                          style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                              color: AppTheme.primary),
-                        ),
+                        Text('${(invited / items.length * 100).round()}%',
+                            style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                                color: AppTheme.primary)),
                       ],
                     ),
                     const SizedBox(height: 8),
@@ -77,16 +75,15 @@ class GuestTab extends ConsumerWidget {
                       child: LinearProgressIndicator(
                         value: invited / items.length,
                         minHeight: 8,
-                        backgroundColor: AppTheme.line,
+                        backgroundColor: palette.line,
                       ),
                     ),
                   ],
                 ),
               ),
               const SizedBox(height: 12),
-              // Daftar tamu — checklist + nomor + nama
               ...items.asMap().entries.map((entry) {
-                final idx = entry.key; // renumber otomatis dari posisi
+                final idx = entry.key;
                 final guest = entry.value;
                 return Card(
                   margin: const EdgeInsets.only(bottom: 8),
@@ -108,7 +105,7 @@ class GuestTab extends ConsumerWidget {
                             alignment: Alignment.center,
                             decoration: BoxDecoration(
                               color: Color.lerp(
-                                  AppTheme.primary, Colors.white, 0.88),
+                                  AppTheme.primary, palette.surface, 0.88),
                               borderRadius: BorderRadius.circular(7),
                             ),
                             child: Text(
@@ -133,8 +130,8 @@ class GuestTab extends ConsumerWidget {
                                     ? TextDecoration.lineThrough
                                     : null,
                                 color: guest.isInvited
-                                    ? AppTheme.muted
-                                    : AppTheme.ink,
+                                    ? palette.muted
+                                    : palette.ink,
                               ),
                             ),
                           ),

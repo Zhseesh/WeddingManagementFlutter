@@ -20,19 +20,20 @@ class ChecklistTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final palette = AppTheme.of(context);
     final async = ref.watch(checklistListProvider);
     return async.when(
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (e, _) => Center(child: Text('Error: $e')),
       data: (items) {
         if (items.isEmpty) {
-          return const Center(
+          return Center(
             child: Padding(
-              padding: EdgeInsets.all(32),
+              padding: const EdgeInsets.all(32),
               child: Text(
                 'Belum ada checklist.\nTekan + untuk menambah.',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 12, color: AppTheme.muted),
+                style: TextStyle(fontSize: 12, color: palette.muted),
               ),
             ),
           );
@@ -50,17 +51,19 @@ class ChecklistTab extends ConsumerWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: palette.surface,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppTheme.line),
+                  border: Border.all(color: palette.line),
                 ),
                 child: Column(
                   children: [
                     Row(
                       children: [
                         Text('$done / ${items.length} selesai',
-                            style: const TextStyle(
-                                fontSize: 12, fontWeight: FontWeight.w700)),
+                            style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                                color: palette.ink)),
                         const Spacer(),
                         Text('${(done / items.length * 100).round()}%',
                             style: const TextStyle(
@@ -75,7 +78,7 @@ class ChecklistTab extends ConsumerWidget {
                       child: LinearProgressIndicator(
                         value: done / items.length,
                         minHeight: 8,
-                        backgroundColor: AppTheme.line,
+                        backgroundColor: palette.line,
                       ),
                     ),
                   ],
@@ -116,8 +119,8 @@ class ChecklistTab extends ConsumerWidget {
                                         ? TextDecoration.lineThrough
                                         : null,
                                     color: c.isCompleted
-                                        ? AppTheme.muted
-                                        : AppTheme.ink,
+                                        ? palette.muted
+                                        : palette.ink,
                                   ),
                                 ),
                                 if (dueText != null)
@@ -127,7 +130,7 @@ class ChecklistTab extends ConsumerWidget {
                                       fontSize: 10,
                                       color: overdue
                                           ? AppTheme.error
-                                          : AppTheme.muted,
+                                          : palette.muted,
                                       fontWeight: overdue
                                           ? FontWeight.w700
                                           : FontWeight.w500,

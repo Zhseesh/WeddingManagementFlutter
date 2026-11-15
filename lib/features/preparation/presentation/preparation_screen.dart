@@ -76,6 +76,7 @@ class _PreparationScreenState extends ConsumerState<PreparationScreen>
 
   @override
   Widget build(BuildContext context) {
+    final palette = AppTheme.of(context);
     ref.listen<int>(prepTabProvider, (previous, next) {
       if (mounted && _tab.index != next) {
         _tab.animateTo(next);
@@ -96,17 +97,17 @@ class _PreparationScreenState extends ConsumerState<PreparationScreen>
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: const Column(
+        title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Persiapan',
+            const Text('Persiapan',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
             Text('Vendor, kebutuhan, dan pengingat',
                 style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w500,
-                    color: AppTheme.muted)),
+                    color: palette.muted)),
           ],
         ),
         bottom: TabBar(
@@ -114,7 +115,7 @@ class _PreparationScreenState extends ConsumerState<PreparationScreen>
           isScrollable: true,
           tabAlignment: TabAlignment.start,
           labelColor: AppTheme.primary,
-          unselectedLabelColor: AppTheme.muted,
+          unselectedLabelColor: palette.muted,
           indicatorColor: AppTheme.primary,
           indicatorSize: TabBarIndicatorSize.label,
           labelStyle:

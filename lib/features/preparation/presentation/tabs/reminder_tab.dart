@@ -16,19 +16,20 @@ class ReminderTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final palette = AppTheme.of(context);
     final async = ref.watch(reminderListProvider);
     return async.when(
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (e, _) => Center(child: Text('Error: $e')),
       data: (items) {
         if (items.isEmpty) {
-          return const Center(
+          return Center(
             child: Padding(
-              padding: EdgeInsets.all(32),
+              padding: const EdgeInsets.all(32),
               child: Text(
                 'Belum ada pengingat.\nTekan + untuk menambah.',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 12, color: AppTheme.muted),
+                style: TextStyle(fontSize: 12, color: palette.muted),
               ),
             ),
           );
@@ -75,8 +76,8 @@ class ReminderTab extends ConsumerWidget {
                                       ? TextDecoration.lineThrough
                                       : null,
                                   color: item.isCompleted
-                                      ? AppTheme.muted
-                                      : AppTheme.ink,
+                                      ? palette.muted
+                                      : palette.ink,
                                 ),
                               ),
                               Text(
@@ -84,8 +85,9 @@ class ReminderTab extends ConsumerWidget {
                                     .format(item.reminderDate),
                                 style: TextStyle(
                                   fontSize: 10,
-                                  color:
-                                      isPast ? AppTheme.error : AppTheme.muted,
+                                  color: isPast
+                                      ? AppTheme.error
+                                      : palette.muted,
                                   fontWeight: isPast
                                       ? FontWeight.w700
                                       : FontWeight.w500,
