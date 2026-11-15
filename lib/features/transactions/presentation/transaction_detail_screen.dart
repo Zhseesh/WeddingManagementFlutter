@@ -2,6 +2,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:weddingmanagementf/app/theme/app_theme.dart';
 import 'package:weddingmanagementf/core/utils/currency_formatter.dart';
 import 'package:weddingmanagementf/features/budget/presentation/providers/budget_providers.dart';
 import 'package:weddingmanagementf/features/dashboard/presentation/providers/dashboard_providers.dart';
@@ -66,7 +67,7 @@ class TransactionDetailScreen extends ConsumerWidget {
           }
           final scheme = Theme.of(context).colorScheme;
           final isIncome = tx.isIncome;
-          final color = isIncome ? const Color(0xFF22C55E) : scheme.error;
+          final color = isIncome ? AppTheme.success : scheme.error;
 
           return ListView(
             padding: const EdgeInsets.all(16),

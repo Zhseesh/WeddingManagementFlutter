@@ -152,6 +152,7 @@ class _ScheduleTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = AppTheme.of(context);
     final s = sw.schedule;
     final display = s.displayStatus;
     Color statusColor;
@@ -159,7 +160,7 @@ class _ScheduleTile extends StatelessWidget {
       case 'paid': statusColor = AppTheme.success; break;
       case 'overdue': statusColor = AppTheme.error; break;
       case 'partial': statusColor = AppTheme.primary; break;
-      default: statusColor = AppTheme.muted;
+      default: statusColor = palette.muted;
     }
 
     return Card(
@@ -171,11 +172,14 @@ class _ScheduleTile extends StatelessWidget {
           children: [
             Row(
               children: [
-                Text('Termin ${s.sequenceNumber}', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
+                Text('Termin ${s.sequenceNumber}', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: palette.ink)),
                 const SizedBox(width: 8),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                  decoration: BoxDecoration(color: Color.lerp(statusColor, Colors.white, 0.85), borderRadius: BorderRadius.circular(6)),
+                  decoration: BoxDecoration(
+                    color: Color.lerp(statusColor, palette.surface, 0.85),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
                   child: Text(s.displayStatusLabel, style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: statusColor)),
                 ),
                 const Spacer(),
@@ -188,28 +192,37 @@ class _ScheduleTile extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 8),
-            Text('Jatuh tempo: ${DateFormat('d MMM yyyy', 'id_ID').format(s.dueDate)}', style: const TextStyle(fontSize: 11, color: AppTheme.muted)),
+            Text('Jatuh tempo: ${DateFormat('d MMM yyyy', 'id_ID').format(s.dueDate)}', style: TextStyle(fontSize: 11, color: palette.muted)),
             const SizedBox(height: 8),
             Row(
               children: [
-                Expanded(child: _amount(context, 'Total', s.amount, AppTheme.ink)),
-                Expanded(child: _amount(context, 'Dibayar', sw.totalPaid, AppTheme.success)),
-                Expanded(child: _amount(context, 'Sisa', sw.remaining, sw.remaining > 0 ? AppTheme.error : AppTheme.muted)),
+                Expanded(child: _amount('Total', s.amount, palette.ink, palette)),
+                Expanded(child: _amount('Dibayar', sw.totalPaid, AppTheme.success, palette)),
+                Expanded(child: _amount('Sisa', sw.remaining, sw.remaining > 0 ? AppTheme.error : palette.muted, palette)),
               ],
             ),
             const SizedBox(height: 8),
-            ClipRRect(borderRadius: BorderRadius.circular(6), child: LinearProgressIndicator(value: sw.progress, minHeight: 6, backgroundColor: AppTheme.line)),
+            ClipRRect(borderRadius: BorderRadius.circular(6), child: LinearProgressIndicator(value: sw.progress, minHeight: 6, backgroundColor: palette.line)),
             if (sw.payments.isNotEmpty) ...[
               const SizedBox(height: 10),
-              const Divider(height: 1, color: AppTheme.line),
+              Divider(height: 1, color: palette.line),
               const SizedBox(height: 6),
               ...sw.payments.map((p) => Padding(
                     padding: const EdgeInsets.symmetric(vertical: 4),
                     child: Row(
                       children: [
-                        Icon(Icons.payments_outlined, size: 16, color: p.isVoid ? AppTheme.muted : AppTheme.success),
+                        Icon(Icons.payments_outlined, size: 16, color: p.isVoid ? palette.muted : AppTheme.success),
                         const SizedBox(width: 8),
-                        Expanded(child: Text('${CurrencyFormatter.format(p.amount)} · ${DateFormat('d MMM yyyy', 'id_ID').format(p.date)}${p.isVoid ? ' · VOID' : ''}', style: TextStyle(fontSize: 12, decoration: p.isVoid ? TextDecoration.lineThrough : null))),
+                        Expanded(
+                          child: Text(
+                            '${CurrencyFormatter.format(p.amount)} · ${DateFormat('d MMM yyyy', 'id_ID').format(p.date)}${p.isVoid ? ' · VOID' : ''}',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: palette.ink,
+                              decoration: p.isVoid ? TextDecoration.lineThrough : null,
+                            ),
+                          ),
+                        ),
                         if (!p.isVoid) IconButton(icon: const Icon(Icons.undo, size: 16, color: AppTheme.error), visualDensity: VisualDensity.compact, onPressed: () => onVoid(p)),
                       ],
                     ),
@@ -221,11 +234,11 @@ class _ScheduleTile extends StatelessWidget {
     );
   }
 
-  Widget _amount(BuildContext context, String label, int value, Color color) {
+  Widget _amount(String label, int value, Color color, AppPalette palette) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontSize: 10, color: AppTheme.muted)),
+        Text(label, style: TextStyle(fontSize: 10, color: palette.muted)),
         Text(CurrencyFormatter.format(value), style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: color)),
       ],
     );

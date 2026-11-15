@@ -15,21 +15,15 @@ class VendorDetailScreen extends ConsumerWidget {
   final int vendorId;
   const VendorDetailScreen({super.key, required this.vendorId});
 
-  Future<void> _void(
-      BuildContext context, WidgetRef ref, PaymentRecord p) async {
+  Future<void> _void(BuildContext context, WidgetRef ref, PaymentRecord p) async {
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Void pembayaran?'),
-        content: const Text(
-            'Transaksi terkait tidak dihapus, tetapi tidak dihitung sebagai pembayaran.'),
+        content: const Text('Transaksi terkait tidak dihapus, tetapi tidak dihitung sebagai pembayaran.'),
         actions: [
-          TextButton(
-              onPressed: () => Navigator.of(ctx).pop(false),
-              child: const Text('Batal')),
-          FilledButton(
-              onPressed: () => Navigator.of(ctx).pop(true),
-              child: const Text('Void')),
+          TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: const Text('Batal')),
+          FilledButton(onPressed: () => Navigator.of(ctx).pop(true), child: const Text('Void')),
         ],
       ),
     );
@@ -45,6 +39,7 @@ class VendorDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final palette = AppTheme.of(context);
     final async = ref.watch(vendorDetailProvider(vendorId));
     return Scaffold(
       appBar: AppBar(
@@ -78,18 +73,17 @@ class VendorDetailScreen extends ConsumerWidget {
               const SizedBox(height: 20),
               Text(
                 'Riwayat Pembayaran (${detail.payments.length})',
-                style: const TextStyle(
-                    fontSize: 15, fontWeight: FontWeight.w700),
+                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: palette.ink),
               ),
               const SizedBox(height: 8),
               if (detail.payments.isEmpty)
                 Container(
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF7F6FC),
+                    color: palette.softBg,
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Center(child: Text('Belum ada pembayaran.')),
+                  child: Center(child: Text('Belum ada pembayaran.', style: TextStyle(color: palette.muted))),
                 )
               else
                 ...detail.payments.map((p) => _PaymentTile(
@@ -141,10 +135,7 @@ class _HeaderCard extends StatelessWidget {
                 child: Text(summary.vendor.name,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold)),
+                    style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
               ),
               Chip(
                 label: Text(summary.vendor.statusEnum.label),
@@ -155,14 +146,10 @@ class _HeaderCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          const Text('Sisa Tagihan',
-              style: TextStyle(color: Colors.white, fontSize: 12)),
+          const Text('Sisa Tagihan', style: TextStyle(color: Colors.white, fontSize: 12)),
           Text(
             CurrencyFormatter.format(summary.remaining),
-            style: const TextStyle(
-                color: Colors.white,
-                fontSize: 24,
-                fontWeight: FontWeight.bold),
+            style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 12),
           ClipRRect(
@@ -231,20 +218,20 @@ class _PaymentTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = AppTheme.of(context);
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor: record.isVoid
-              ? AppTheme.line
-              : const Color(0xFFE4F8EF),
+          backgroundColor: record.isVoid ? palette.line : palette.softSuccess,
           child: Icon(Icons.payments_outlined,
-              color: record.isVoid ? AppTheme.muted : AppTheme.success),
+              color: record.isVoid ? palette.muted : AppTheme.success),
         ),
         title: Text(
           CurrencyFormatter.format(record.amount),
           style: TextStyle(
             fontWeight: FontWeight.bold,
+            color: palette.ink,
             decoration: record.isVoid ? TextDecoration.lineThrough : null,
           ),
         ),
@@ -252,6 +239,7 @@ class _PaymentTile extends StatelessWidget {
           '${DateFormat('d MMM yyyy', 'id_ID').format(record.date)}'
           '${record.method != null ? ' · ${record.method}' : ''}'
           '${record.isVoid ? ' · VOID' : ''}',
+          style: TextStyle(color: palette.muted),
         ),
         trailing: record.isVoid
             ? null

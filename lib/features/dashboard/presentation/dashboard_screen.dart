@@ -154,10 +154,6 @@ class _HeroCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 6),
                 if (!isPast && !isToday) ...[
-                  const Text(
-                    '',
-                    style: TextStyle(fontSize: 36),
-                  ),
                   Text(
                     '$days',
                     style: const TextStyle(
@@ -696,7 +692,6 @@ class _QuickActionButton extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 4),
           child: Column(
             children: [
-              const Icon(Icons.circle, size: 0),
               Icon(action.icon, size: 22, color: AppTheme.primary),
               const SizedBox(height: 6),
               Text(action.label,
