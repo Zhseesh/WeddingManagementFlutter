@@ -26,6 +26,7 @@ dependencies:
   fl_chart: ^0.69.0       
   material_ui: ^0.0.1
   cupertino_icons: ^1.0.8
+  lucide_icons: ^0.257.0
 
 dev_dependencies:
   flutter_test:

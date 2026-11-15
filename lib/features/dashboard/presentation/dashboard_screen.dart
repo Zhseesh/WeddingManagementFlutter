@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:weddingmanagementf/app/theme/app_theme.dart';
@@ -634,19 +635,51 @@ class _QuickActionsGrid extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final palette = AppTheme.of(context);
+
     final actions = [
-      _QuickAction(label: 'Vendor', icon: Icons.store_outlined,
-          onTap: () => _goToTab(ref, mainTab: 1, prepSubTab: 0)),
-      _QuickAction(label: 'Lamaran', icon: Icons.favorite_border,
-          onTap: () => _goToTab(ref, mainTab: 1, prepSubTab: 2)),
-      _QuickAction(label: 'Seserahan', icon: Icons.card_giftcard,
-          onTap: () => _goToTab(ref, mainTab: 1, prepSubTab: 3)),
-      _QuickAction(label: 'Transaksi', icon: Icons.receipt_long_outlined,
-          onTap: () => _goToTab(ref, mainTab: 2, financeSubTab: 1)),
-      _QuickAction(label: 'Cicilan', icon: Icons.calendar_month_outlined,
-          onTap: () => _goToTab(ref, mainTab: 2, financeSubTab: 2)),
-      _QuickAction(label: 'Checklist', icon: Icons.check_circle_outline,
-          onTap: () => _goToTab(ref, mainTab: 1, prepSubTab: 1)),
+      _QuickAction(
+        label: 'Vendor', 
+        icon: LucideIcons.store, 
+        color: AppTheme.primary,
+        bgColor: Color.lerp(AppTheme.primary, palette.surface, 0.88)!,
+        onTap: () => _goToTab(ref, mainTab: 1, prepSubTab: 0),
+      ),
+      _QuickAction(
+        label: 'Lamaran', 
+        icon: LucideIcons.gem, // Ikon permata/berlian
+        color: const Color(0xFFE91E63),
+        bgColor: Color.lerp(const Color(0xFFE91E63), palette.surface, 0.88)!,
+        onTap: () => _goToTab(ref, mainTab: 1, prepSubTab: 2),
+      ),
+      _QuickAction(
+        label: 'Seserahan', 
+        icon: LucideIcons.gift, 
+        color: AppTheme.warning,
+        bgColor: Color.lerp(AppTheme.warning, palette.surface, 0.88)!,
+        onTap: () => _goToTab(ref, mainTab: 1, prepSubTab: 3),
+      ),
+      _QuickAction(
+        label: 'Transaksi', 
+        icon: LucideIcons.receipt, 
+        color: AppTheme.tertiary,
+        bgColor: Color.lerp(AppTheme.tertiary, palette.surface, 0.88)!,
+        onTap: () => _goToTab(ref, mainTab: 2, financeSubTab: 1),
+      ),
+      _QuickAction(
+        label: 'Cicilan', 
+        icon: LucideIcons.calendarCheck, 
+        color: AppTheme.success,
+        bgColor: Color.lerp(AppTheme.success, palette.surface, 0.88)!,
+        onTap: () => _goToTab(ref, mainTab: 2, financeSubTab: 2),
+      ),
+      _QuickAction(
+        label: 'Checklist', 
+        icon: LucideIcons.listChecks, 
+        color: const Color(0xFF00BCD4),
+        bgColor: Color.lerp(const Color(0xFF00BCD4), palette.surface, 0.88)!,
+        onTap: () => _goToTab(ref, mainTab: 1, prepSubTab: 1),
+      ),
     ];
 
     return LayoutBuilder(
@@ -668,9 +701,18 @@ class _QuickActionsGrid extends ConsumerWidget {
 
 class _QuickAction {
   final String label;
-  final IconData icon;
+  final IconData icon; 
+  final Color color;   
+  final Color bgColor; 
   final VoidCallback onTap;
-  const _QuickAction({required this.label, required this.icon, required this.onTap});
+  
+  const _QuickAction({
+    required this.label, 
+    required this.icon, 
+    required this.color,
+    required this.bgColor,
+    required this.onTap
+  });
 }
 
 class _QuickActionButton extends StatelessWidget {
@@ -692,15 +734,25 @@ class _QuickActionButton extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 4),
           child: Column(
             children: [
-              Icon(action.icon, size: 22, color: AppTheme.primary),
-              const SizedBox(height: 6),
-              Text(action.label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                      color: palette.ink)),
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: action.bgColor,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(action.icon, size: 20, color: action.color),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                action.label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  color: palette.ink,
+                ),
+              ),
             ],
           ),
         ),
