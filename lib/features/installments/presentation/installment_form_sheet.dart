@@ -120,6 +120,7 @@ class _InstallmentFormSheetState extends ConsumerState<_InstallmentFormSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final palette = AppTheme.of(context);
     return FormSheetScaffold(
       title: 'Tambah Cicilan',
       onSave: _submit,
@@ -174,12 +175,17 @@ class _InstallmentFormSheetState extends ConsumerState<_InstallmentFormSheet> {
             const SizedBox(height: 8),
             Container(
               padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(color: AppTheme.line, borderRadius: BorderRadius.circular(10)),
+              decoration: BoxDecoration(color: palette.softBg, borderRadius: BorderRadius.circular(10)),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('Total Termin', style: TextStyle(fontWeight: FontWeight.w600)),
-                  Text(CurrencyFormatter.format(_schedulesTotal), style: const TextStyle(fontWeight: FontWeight.w700, color: AppTheme.primary)),
+                  Text('Total Termin',
+                      style: TextStyle(fontWeight: FontWeight.w600, color: palette.ink)),
+                  Text(
+                    CurrencyFormatter.format(_schedulesTotal),
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w700, color: AppTheme.primary),
+                  ),
                 ],
               ),
             ),

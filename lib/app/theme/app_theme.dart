@@ -158,15 +158,15 @@ class AppTheme {
         fillColor: p.surface,
         contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(11),
+          borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(color: p.line),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(11),
+          borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(color: p.line),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(11),
+          borderRadius: BorderRadius.circular(16),
           borderSide: const BorderSide(color: primary, width: 2),
         ),
         labelStyle: TextStyle(color: p.muted),
@@ -251,15 +251,15 @@ class AppTheme {
         fillColor: p.surface,
         contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(11),
+          borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(color: p.line),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(11),
+          borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(color: p.line),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(11),
+          borderRadius: BorderRadius.circular(16),
           borderSide: const BorderSide(color: primary, width: 2),
         ),
         labelStyle: TextStyle(color: p.muted),

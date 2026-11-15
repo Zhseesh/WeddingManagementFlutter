@@ -1,6 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:weddingmanagementf/app/theme/app_theme.dart';
 import 'package:weddingmanagementf/core/utils/currency_formatter.dart';
 import 'package:weddingmanagementf/features/budget/presentation/providers/budget_providers.dart';
 import 'package:weddingmanagementf/features/dashboard/presentation/providers/dashboard_providers.dart';
@@ -144,6 +145,7 @@ class _InstallmentPaymentFormSheetState
     final scheduleAsync = ref.watch(scheduleByIdProvider(widget.scheduleId));
     final paidAsync = ref.watch(schedulePaidProvider(widget.scheduleId));
     final catsAsync = ref.watch(budgetCategoriesProvider);
+    final palette = AppTheme.of(context);
 
     if (scheduleAsync.hasValue && paidAsync.hasValue) {
       _autoFill();
@@ -168,22 +170,22 @@ class _InstallmentPaymentFormSheetState
               children: [
                 Container(
                   padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(color: const Color(0xFFF7F6FC), borderRadius: BorderRadius.circular(12)),
+                  decoration: BoxDecoration(color: palette.softBg, borderRadius: BorderRadius.circular(12)),
                   child: Column(
                     children: [
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text('Sisa Tagihan', style: TextStyle(fontSize: 12)),
-                          Text(CurrencyFormatter.format(remaining), style: const TextStyle(fontWeight: FontWeight.bold)),
+                          Text('Sisa Tagihan', style: TextStyle(fontSize: 12, color: palette.muted)),
+                          Text(CurrencyFormatter.format(remaining), style: TextStyle(fontWeight: FontWeight.bold, color: palette.ink)),
                         ],
                       ),
                       const SizedBox(height: 4),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text('Jatuh tempo', style: TextStyle(fontSize: 12)),
-                          Text(DateFormat('d MMM yyyy', 'id_ID').format(schedule.dueDate), style: const TextStyle(fontSize: 12)),
+                          Text('Jatuh tempo', style: TextStyle(fontSize: 12, color: palette.muted)),
+                          Text(DateFormat('d MMM yyyy', 'id_ID').format(schedule.dueDate), style: TextStyle(fontSize: 12, color: palette.ink)),
                         ],
                       ),
                     ],

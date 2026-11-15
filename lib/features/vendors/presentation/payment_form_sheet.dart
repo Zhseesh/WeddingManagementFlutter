@@ -1,6 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:weddingmanagementf/app/theme/app_theme.dart';
 import 'package:weddingmanagementf/core/utils/currency_formatter.dart';
 import 'package:weddingmanagementf/features/budget/presentation/providers/budget_providers.dart';
 import 'package:weddingmanagementf/features/dashboard/presentation/providers/dashboard_providers.dart';
@@ -100,7 +101,8 @@ class _PaymentFormSheetState extends ConsumerState<_PaymentFormSheet> {
   @override
   Widget build(BuildContext context) {
     final s = widget.summary;
-    final catsAsync = ref.watch(budgetCategoriesProvider); // <-- AMBIL KATEGORI
+    final catsAsync = ref.watch(budgetCategoriesProvider);
+    final palette = AppTheme.of(context); // <-- AMBIL KATEGORI
 
     return FormSheetScaffold(
       title: 'Catat Pembayaran',
@@ -114,7 +116,7 @@ class _PaymentFormSheetState extends ConsumerState<_PaymentFormSheet> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: const Color(0xFFF7F6FC),
+                color: palette.softBg,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Column(
@@ -122,13 +124,13 @@ class _PaymentFormSheetState extends ConsumerState<_PaymentFormSheet> {
                 children: [
                   Text(
                     s.vendor.name,
-                    style: const TextStyle(
-                        fontSize: 14, fontWeight: FontWeight.w700),
+                    style: TextStyle(
+                        fontSize: 14, fontWeight: FontWeight.w700, color: palette.ink),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     'Sisa: ${CurrencyFormatter.format(s.remaining)}',
-                    style: const TextStyle(fontSize: 12),
+                    style: TextStyle(fontSize: 12, color: palette.muted),
                   ),
                 ],
               ),

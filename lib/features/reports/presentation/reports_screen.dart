@@ -366,7 +366,7 @@ class _DonutCard extends StatelessWidget {
         value: c.total.toDouble(),
         color: chartPalette[i % chartPalette.length],
         title: pct >= 8 ? '${pct.toStringAsFixed(0)}%' : '',
-        radius: 38,
+        radius: 24,
         titleStyle: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white),
       );
     }).toList();
@@ -436,7 +436,7 @@ class _DonutCard extends StatelessWidget {
                           Expanded(
                             child: Text(
                               c.name,
-                              style: TextStyle(fontSize: 10, color: palette.ink, fontWeight: FontWeight.w500),
+                              style: TextStyle(fontSize: 12, color: palette.ink, fontWeight: FontWeight.w500),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
