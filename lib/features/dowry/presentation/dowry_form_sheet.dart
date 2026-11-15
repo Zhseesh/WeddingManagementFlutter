@@ -1,5 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:weddingmanagementf/app/theme/app_theme.dart';
 import 'package:weddingmanagementf/core/utils/currency_formatter.dart';
 import 'package:weddingmanagementf/features/dowry/data/dowry_model.dart';
 import 'package:weddingmanagementf/features/dowry/presentation/providers/dowry_providers.dart';
@@ -200,6 +201,8 @@ class _DowryFormSheetState extends ConsumerState<_DowryFormSheet> {
             const SizedBox(height: 12),
             DropdownButtonFormField<DowryStatus>(
               initialValue: _status,
+              borderRadius: BorderRadius.circular(16),
+              dropdownColor: AppTheme.of(context).surface,
               decoration: const InputDecoration(labelText: 'Status'),
               items: DowryStatus.values
                   .map((s) => DropdownMenuItem(value: s, child: Text(s.label)))

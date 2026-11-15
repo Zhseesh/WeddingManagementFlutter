@@ -1,5 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:weddingmanagementf/app/theme/app_theme.dart';
 import 'package:weddingmanagementf/core/utils/currency_formatter.dart';
 import 'package:weddingmanagementf/features/preparation/presentation/sheets/form_sheet_scaffold.dart';
 import 'package:weddingmanagementf/features/vendors/data/vendor_model.dart';
@@ -175,6 +176,8 @@ class _VendorFormSheetState extends ConsumerState<_VendorFormSheet> {
             const SizedBox(height: 12),
             DropdownButtonFormField<VendorStatus>(
               initialValue: _status,
+              borderRadius: BorderRadius.circular(16),
+              dropdownColor: AppTheme.of(context).surface,
               decoration: const InputDecoration(labelText: 'Status'),
               items: VendorStatus.values
                   .map((s) => DropdownMenuItem(value: s, child: Text(s.label)))

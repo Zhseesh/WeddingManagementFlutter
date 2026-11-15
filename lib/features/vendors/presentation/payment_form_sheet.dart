@@ -158,6 +158,8 @@ class _PaymentFormSheetState extends ConsumerState<_PaymentFormSheet> {
             const SizedBox(height: 4),
             DropdownButtonFormField<String>(
               initialValue: _method,
+              borderRadius: BorderRadius.circular(16),
+              dropdownColor: palette.surface,
               decoration: const InputDecoration(labelText: 'Metode'),
               items: _methods.map((m) => DropdownMenuItem(value: m, child: Text(m))).toList(),
               onChanged: (v) => setState(() => _method = v ?? 'Transfer'),
@@ -169,6 +171,8 @@ class _PaymentFormSheetState extends ConsumerState<_PaymentFormSheet> {
               error: (e, _) => Text('Error: $e'),
               data: (cats) => DropdownButtonFormField<int?>(
                 initialValue: _categoryId,
+                borderRadius: BorderRadius.circular(16),
+                dropdownColor: palette.surface,
                 decoration: const InputDecoration(labelText: 'Kategori Anggaran (opsional)'),
                 items: [
                   const DropdownMenuItem<int?>(value: null, child: Text('— Tanpa kategori —')),

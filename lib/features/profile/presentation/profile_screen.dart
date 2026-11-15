@@ -58,7 +58,7 @@ class ProfileScreen extends ConsumerWidget {
       await SharePlus.instance.share(
         ShareParams(
           files: [XFile(file.path)],
-          subject: 'Backup Wedding Planner',
+          subject: 'Backup Wedding Management',
         ),
       );
     } catch (e) {
@@ -143,7 +143,7 @@ class ProfileScreen extends ConsumerWidget {
   void _showAbout(BuildContext context) {
     showAboutDialog(
       context: context,
-      applicationName: 'Wedding Planner & Finance',
+      applicationName: 'Wedding Management',
       applicationVersion: '1.0.0',
       children: const [
         Text(
@@ -424,7 +424,7 @@ class _SettingsCard extends StatelessWidget {
           Divider(height: 1, color: palette.line),
           _row(
             title: 'Tentang aplikasi',
-            subtitle: 'Wedding Planner v1.0.0',
+            subtitle: 'Wedding Management v1.0.0',
             actionLabel: 'Info',
             onAction: onAbout,
             trailingPill: 'v1.0.0',

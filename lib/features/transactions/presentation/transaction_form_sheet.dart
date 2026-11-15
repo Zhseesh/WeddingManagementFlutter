@@ -1,6 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:weddingmanagementf/app/theme/app_theme.dart';
 import 'package:weddingmanagementf/core/utils/currency_formatter.dart';
 import 'package:weddingmanagementf/features/budget/presentation/providers/budget_providers.dart';
 import 'package:weddingmanagementf/features/dashboard/presentation/providers/dashboard_providers.dart';
@@ -162,6 +163,8 @@ class _TransactionFormSheetState extends ConsumerState<_TransactionFormSheet> {
               error: (e, _) => Text('Error: $e'),
               data: (cats) => DropdownButtonFormField<int?>(
                 initialValue: _categoryId,
+                borderRadius: BorderRadius.circular(16),
+                dropdownColor: AppTheme.of(context).surface,
                 decoration: const InputDecoration(labelText: 'Kategori (opsional)'),
                 items: [
                   const DropdownMenuItem<int?>(
@@ -187,6 +190,8 @@ class _TransactionFormSheetState extends ConsumerState<_TransactionFormSheet> {
             const SizedBox(height: 12),
             DropdownButtonFormField<String>(
               initialValue: _paymentMethod,
+              borderRadius: BorderRadius.circular(16),
+              dropdownColor: AppTheme.of(context).surface,
               decoration: const InputDecoration(labelText: 'Metode'),
               items: _methods
                   .map((m) => DropdownMenuItem(value: m, child: Text(m)))

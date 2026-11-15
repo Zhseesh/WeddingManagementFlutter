@@ -24,7 +24,7 @@ class DashboardScreen extends ConsumerWidget {
           children: [
             const Text('Beranda',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
-            Text('Wedding Planner & Finance',
+            Text('Wedding Management',
                 style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w500,

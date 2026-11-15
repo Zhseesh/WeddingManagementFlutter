@@ -59,7 +59,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
               Icon(Icons.favorite, size: 96, color: scheme.primary),
               const SizedBox(height: 16),
               Text(
-                'Wedding Planner',
+                'Wedding Management',
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),

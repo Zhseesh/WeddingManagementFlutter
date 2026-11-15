@@ -1,6 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:weddingmanagementf/app/theme/app_theme.dart';
 import 'package:weddingmanagementf/core/utils/currency_formatter.dart';
 import 'package:weddingmanagementf/features/engagement/data/engagement_model.dart';
 import 'package:weddingmanagementf/features/engagement/presentation/providers/engagement_providers.dart';
@@ -165,6 +166,7 @@ class _EngagementFormSheetState extends ConsumerState<_EngagementFormSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final palette = AppTheme.of(context);
     return FormSheetScaffold(
       title: _isEdit ? 'Edit Item Lamaran' : 'Tambah Item Lamaran',
       onSave: _submit,
@@ -220,6 +222,8 @@ class _EngagementFormSheetState extends ConsumerState<_EngagementFormSheet> {
             const SizedBox(height: 12),
             DropdownButtonFormField<EngagementStatus>(
               initialValue: _status,
+              borderRadius: BorderRadius.circular(16),
+              dropdownColor: palette.surface,
               decoration: const InputDecoration(labelText: 'Status'),
               items: EngagementStatus.values
                   .map((s) =>

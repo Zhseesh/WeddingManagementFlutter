@@ -137,6 +137,7 @@ class _FilterSection extends ConsumerWidget {
     final isCustom = !_sameAs(filter.period, ReportPeriod.thisMonth()) &&
         !_sameAs(filter.period, ReportPeriod.last3Months()) &&
         !_sameAs(filter.period, ReportPeriod.thisYear());
+    final palette = AppTheme.of(context);
 
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
@@ -168,6 +169,8 @@ class _FilterSection extends ConsumerWidget {
                 child: DropdownButtonFormField<int?>(
                   initialValue: filter.categoryId,
                   isDense: true,
+                  borderRadius: BorderRadius.circular(16),
+                  dropdownColor: palette.surface,
                   decoration: const InputDecoration(labelText: 'Kategori', isDense: true, contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 12)),
                   items: [
                     const DropdownMenuItem(value: null, child: Text('Semua')),
@@ -185,6 +188,8 @@ class _FilterSection extends ConsumerWidget {
                 child: DropdownButtonFormField<String?>(
                   initialValue: filter.type,
                   isDense: true,
+                  borderRadius: BorderRadius.circular(16),
+                  dropdownColor: palette.surface,
                   decoration: const InputDecoration(labelText: 'Tipe', isDense: true, contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 12)),
                   items: const [
                     DropdownMenuItem(value: null, child: Text('Semua')),
