@@ -1,3 +1,4 @@
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -184,19 +185,19 @@ class _ReminderFormSheetState extends ConsumerState<_ReminderFormSheet> {
             const SizedBox(height: 12),
             ListTile(
               contentPadding: EdgeInsets.zero,
-              leading: const Icon(Icons.event),
+              leading: const Icon(LucideIcons.calendar),
               title: const Text('Tanggal'),
               subtitle: Text(
                   DateFormat('d MMMM yyyy', 'id_ID').format(_date)),
-              trailing: const Icon(Icons.chevron_right),
+              trailing: const Icon(LucideIcons.chevronRight),
               onTap: _pickDate,
             ),
             ListTile(
               contentPadding: EdgeInsets.zero,
-              leading: const Icon(Icons.access_time),
+              leading: const Icon(LucideIcons.clock),
               title: const Text('Jam'),
               subtitle: Text(DateFormat('HH:mm').format(_date)),
-              trailing: const Icon(Icons.chevron_right),
+              trailing: const Icon(LucideIcons.chevronRight),
               onTap: _pickTime,
             ),
             SwitchListTile(

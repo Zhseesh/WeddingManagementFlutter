@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:weddingmanagementf/app/theme/app_theme.dart';
@@ -120,12 +121,12 @@ class _TransactionFormSheetState extends ConsumerState<_TransactionFormSheet> {
                 segments: const [
                   ButtonSegment(
                     value: 'expense',
-                    icon: Icon(Icons.arrow_upward, size: 16),
+                    icon: Icon(LucideIcons.arrowUp, size: 16),
                     label: Text('Pengeluaran', style: TextStyle(fontSize: 13)),
                   ),
                   ButtonSegment(
                     value: 'income',
-                    icon: Icon(Icons.arrow_downward, size: 16),
+                    icon: Icon(LucideIcons.arrowDown, size: 16),
                     label: Text('Pemasukan', style: TextStyle(fontSize: 13)),
                   ),
                 ],
@@ -151,10 +152,10 @@ class _TransactionFormSheetState extends ConsumerState<_TransactionFormSheet> {
             const SizedBox(height: 12),
             ListTile(
               contentPadding: EdgeInsets.zero,
-              leading: const Icon(Icons.event),
+              leading: const Icon(LucideIcons.calendar),
               title: const Text('Tanggal'),
               subtitle: Text(DateFormat('d MMMM yyyy', 'id_ID').format(_date)),
-              trailing: const Icon(Icons.chevron_right),
+              trailing: const Icon(LucideIcons.chevronRight),
               onTap: _pickDate,
             ),
             const SizedBox(height: 4),

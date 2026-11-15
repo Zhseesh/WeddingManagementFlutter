@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:weddingmanagementf/app/theme/app_theme.dart';
 import 'package:weddingmanagementf/features/guests/data/guest_model.dart';
@@ -27,7 +28,7 @@ Future<void> showGuestAddDialog(BuildContext context, WidgetRef ref) async {
               textCapitalization: TextCapitalization.words,
               decoration: const InputDecoration(
                 labelText: 'Nama Tamu',
-                prefixIcon: Icon(Icons.person_outline),
+                prefixIcon: Icon(LucideIcons.user),
               ),
               validator: (v) =>
                   (v == null || v.trim().isEmpty) ? 'Wajib diisi' : null,
@@ -125,7 +126,7 @@ Future<void> showGuestEditSheet(
                 textCapitalization: TextCapitalization.words,
                 decoration: const InputDecoration(
                   labelText: 'Nama Tamu',
-                  prefixIcon: Icon(Icons.person_outline),
+                  prefixIcon: Icon(LucideIcons.user),
                 ),
               ),
               const SizedBox(height: 24),

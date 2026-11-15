@@ -1,3 +1,4 @@
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:weddingmanagementf/app/theme/app_theme.dart';
 
@@ -57,12 +58,12 @@ class FormSheetScaffold extends StatelessWidget {
                   ),
                   if (onDelete != null)
                     IconButton(
-                      icon: const Icon(Icons.delete_outline, color: AppTheme.error),
+                      icon: const Icon(LucideIcons.trash2, color: AppTheme.error),
                       tooltip: 'Hapus',
                       onPressed: onDelete,
                     ),
                   IconButton(
-                    icon: const Icon(Icons.close),
+                    icon: const Icon(LucideIcons.x),
                     color: palette.ink,
                     onPressed: () => Navigator.pop(context),
                   ),

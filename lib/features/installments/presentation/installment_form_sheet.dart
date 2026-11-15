@@ -1,3 +1,4 @@
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -149,10 +150,10 @@ class _InstallmentFormSheetState extends ConsumerState<_InstallmentFormSheet> {
             const SizedBox(height: 8),
             ListTile(
               contentPadding: EdgeInsets.zero,
-              leading: const Icon(Icons.event),
+              leading: const Icon(LucideIcons.calendar),
               title: const Text('Tanggal Mulai'),
               subtitle: Text(DateFormat('d MMMM yyyy', 'id_ID').format(_startDate)),
-              trailing: const Icon(Icons.chevron_right),
+              trailing: const Icon(LucideIcons.chevronRight),
               onTap: _pickStartDate,
             ),
             const SizedBox(height: 12),
@@ -169,7 +170,7 @@ class _InstallmentFormSheetState extends ConsumerState<_InstallmentFormSheet> {
             )),
             TextButton.icon(
               onPressed: () => setState(() => _schedules.add(_ScheduleDraft(dueDate: DateTime.now().add(const Duration(days: 30))))),
-              icon: const Icon(Icons.add),
+              icon: const Icon(LucideIcons.plus),
               label: const Text('Tambah Termin'),
             ),
             const SizedBox(height: 8),
@@ -232,7 +233,7 @@ class _ScheduleCard extends StatelessWidget {
                 const Spacer(),
                 if (onRemove != null)
                   IconButton(
-                    icon: const Icon(Icons.close, size: 18, color: AppTheme.error),
+                    icon: const Icon(LucideIcons.x, size: 18, color: AppTheme.error),
                     onPressed: onRemove,
                     visualDensity: VisualDensity.compact,
                   ),
@@ -253,11 +254,11 @@ class _ScheduleCard extends StatelessWidget {
               },
               child: Row(
                 children: [
-                  const Icon(Icons.event, size: 16),
+                  const Icon(LucideIcons.calendar, size: 16),
                   const SizedBox(width: 8),
                   Text(DateFormat('d MMM yyyy', 'id_ID').format(draft.dueDate), style: const TextStyle(fontSize: 13)),
                   const Spacer(),
-                  const Icon(Icons.chevron_right, size: 16),
+                  const Icon(LucideIcons.chevronRight, size: 16),
                 ],
               ),
             ),

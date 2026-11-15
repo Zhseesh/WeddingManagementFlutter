@@ -1,6 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:weddingmanagementf/features/checklist/data/checklist_model.dart';
 import 'package:weddingmanagementf/features/checklist/presentation/providers/checklist_providers.dart';
 import 'package:weddingmanagementf/features/dashboard/presentation/providers/dashboard_providers.dart';
@@ -225,17 +226,17 @@ class _ChecklistFormSheetState extends ConsumerState<_ChecklistFormSheet> {
             const SizedBox(height: 12),
             ListTile(
               contentPadding: EdgeInsets.zero,
-              leading: const Icon(Icons.event),
+              leading: const Icon(LucideIcons.calendar),
               title: const Text('Tenggat (opsional)'),
               subtitle: Text(_dueDate != null
                   ? DateFormat('d MMM yyyy', 'id_ID').format(_dueDate!)
                   : 'Belum diatur'),
               trailing: _dueDate != null
                   ? IconButton(
-                      icon: const Icon(Icons.close),
+                      icon: const Icon(LucideIcons.x),
                       onPressed: () => setState(() => _dueDate = null),
                     )
-                  : const Icon(Icons.chevron_right),
+                  : const Icon(LucideIcons.chevronRight),
               onTap: _pickDate,
             ),
           ],
