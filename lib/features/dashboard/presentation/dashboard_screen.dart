@@ -190,7 +190,7 @@ class _HeroCard extends StatelessWidget {
             ),
           ),
           Icon(
-            Icons.favorite,
+            LucideIcons.heart,
             size: 56,
             color: Color.lerp(AppTheme.primary, palette.surface, 0.55),
           ),
@@ -216,28 +216,28 @@ class _StatsGrid extends StatelessWidget {
       _StatItem(
         label: 'Total Anggaran',
         value: CurrencyFormatter.format(data.totalBudget),
-        icon: Icons.account_balance_wallet_outlined,
+        icon: LucideIcons.wallet,
         color: AppTheme.primary,
         bg: Color.lerp(AppTheme.primary, palette.surface, 0.88)!,
       ),
       _StatItem(
         label: 'Total Terbayar',
         value: CurrencyFormatter.format(data.totalPaid),
-        icon: Icons.check_circle_outline,
+        icon: LucideIcons.circleCheck,
         color: AppTheme.success,
         bg: Color.lerp(AppTheme.success, palette.surface, 0.88)!,
       ),
       _StatItem(
         label: 'Sisa Anggaran',
         value: CurrencyFormatter.format(data.remainingBudget),
-        icon: Icons.savings_outlined,
+        icon: LucideIcons.piggyBank,
         color: AppTheme.tertiary,
         bg: Color.lerp(AppTheme.tertiary, palette.surface, 0.88)!,
       ),
       _StatItem(
         label: 'Progres Anggaran',
         value: '${percent.toStringAsFixed(1)}%',
-        icon: Icons.trending_up,
+        icon: LucideIcons.trendingUp,
         color: AppTheme.warning,
         bg: Color.lerp(AppTheme.warning, palette.surface, 0.88)!,
       ),
@@ -515,7 +515,7 @@ class _RecentTransactionsList extends StatelessWidget {
         ),
         child: Column(
           children: [
-            Icon(Icons.receipt_long, size: 40, color: palette.muted),
+            Icon(LucideIcons.receipt, size: 40, color: palette.muted),
             const SizedBox(height: 8),
             Text(
               'Belum ada transaksi',
@@ -584,7 +584,7 @@ class _RecentTile extends StatelessWidget {
             borderRadius: BorderRadius.circular(11),
           ),
           child: Icon(
-            isIncome ? Icons.arrow_downward : Icons.arrow_upward,
+            isIncome ? LucideIcons.arrowDown : LucideIcons.arrowUp,
             color: color,
             size: 18,
           ),
@@ -798,7 +798,7 @@ class _ErrorView extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.error_outline, size: 48, color: AppTheme.error),
+            const Icon(LucideIcons.circleAlert, size: 48, color: AppTheme.error),
             const SizedBox(height: 12),
             Text(
               'Gagal memuat data',

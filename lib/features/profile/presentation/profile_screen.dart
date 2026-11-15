@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:weddingmanagementf/app/theme/app_theme.dart';
 import 'package:weddingmanagementf/features/backup/presentation/providers/backup_providers.dart';
 import 'package:weddingmanagementf/features/budget/presentation/providers/budget_providers.dart';
@@ -248,7 +249,7 @@ class _ProfileCard extends StatelessWidget {
                     color: palette.softPrimary,
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.favorite,
+                  child: const Icon(LucideIcons.heart,
                       color: AppTheme.primary, size: 26),
                 ),
               ),
@@ -308,7 +309,7 @@ class _ProfileCard extends StatelessWidget {
                 child: const Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.edit, size: 14),
+                    Icon(LucideIcons.pencil, size: 14),
                     SizedBox(width: 4),
                     Text('Edit',
                         style: TextStyle(

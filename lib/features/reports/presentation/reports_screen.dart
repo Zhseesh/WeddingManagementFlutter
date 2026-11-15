@@ -4,6 +4,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:weddingmanagementf/app/theme/app_theme.dart';
@@ -252,13 +253,13 @@ class _StatsGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     final palette = AppTheme.of(context);
     final items = [
-      _StatItem(label: 'Pemasukan', value: CurrencyFormatter.format(data.totalIncome), icon: Icons.arrow_downward,
+      _StatItem(label: 'Pemasukan', value: CurrencyFormatter.format(data.totalIncome), icon: LucideIcons.arrowDown,
           color: AppTheme.success, bg: Color.lerp(AppTheme.success, palette.surface, 0.88)!),
-      _StatItem(label: 'Pengeluaran', value: CurrencyFormatter.format(data.totalExpense), icon: Icons.arrow_upward,
+      _StatItem(label: 'Pengeluaran', value: CurrencyFormatter.format(data.totalExpense), icon: LucideIcons.arrowUp,
           color: AppTheme.error, bg: Color.lerp(AppTheme.error, palette.surface, 0.88)!),
-      _StatItem(label: 'Transaksi', value: '${data.transactions.length}', icon: Icons.receipt_long_outlined,
+      _StatItem(label: 'Transaksi', value: '${data.transactions.length}', icon: LucideIcons.receipt,
           color: AppTheme.primary, bg: Color.lerp(AppTheme.primary, palette.surface, 0.88)!),
-      _StatItem(label: 'Vendor Aktif', value: '${data.vendors.length}', icon: Icons.store_outlined,
+      _StatItem(label: 'Vendor Aktif', value: '${data.vendors.length}', icon: LucideIcons.store,
           color: AppTheme.tertiary, bg: Color.lerp(AppTheme.tertiary, palette.surface, 0.88)!),
     ];
 
@@ -485,9 +486,9 @@ class _ExportCard extends StatelessWidget {
         children: [
           Text('Ekspor Laporan', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: palette.ink)),
           const SizedBox(height: 12),
-          _row(icon: Icons.picture_as_pdf, title: 'Laporan PDF', subtitle: 'Ringkasan untuk dicetak', onTap: onExportPdf, palette: palette),
+          _row(icon: LucideIcons.fileText, title: 'Laporan PDF', subtitle: 'Ringkasan untuk dicetak', onTap: onExportPdf, palette: palette),
           Divider(height: 20, color: palette.line),
-          _row(icon: Icons.table_chart, title: 'Data Transaksi CSV', subtitle: 'Untuk spreadsheet', onTap: onExportCsv, palette: palette),
+          _row(icon: LucideIcons.table, title: 'Data Transaksi CSV', subtitle: 'Untuk spreadsheet', onTap: onExportCsv, palette: palette),
         ],
       ),
     );

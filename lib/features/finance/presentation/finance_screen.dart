@@ -2,6 +2,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:weddingmanagementf/app/theme/app_theme.dart';
 import 'package:weddingmanagementf/core/providers/navigation_providers.dart';
 import 'package:weddingmanagementf/core/utils/currency_formatter.dart';
@@ -144,7 +145,7 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen>
                   duration: const Duration(milliseconds: 200),
                   child: FloatingActionButton.extended(
                     onPressed: _onAdd,
-                    icon: const Icon(Icons.add),
+                    icon: const Icon(LucideIcons.plus),
                     label: Text(_tab.index > 0 ? _fabLabels[_tab.index] : ''),
                   ),
                 ),
@@ -172,28 +173,28 @@ class _FinanceStats extends StatelessWidget {
       _FinanceStatItem(
         label: 'Anggaran',
         value: CurrencyFormatter.format(data.totalBudget),
-        icon: Icons.account_balance_wallet_outlined,
+        icon: LucideIcons.wallet,
         color: AppTheme.primary,
         bg: Color.lerp(AppTheme.primary, palette.surface, 0.88)!,
       ),
       _FinanceStatItem(
         label: 'Pemasukan',
         value: CurrencyFormatter.format(data.totalIncome),
-        icon: Icons.arrow_downward,
+        icon: LucideIcons.arrowDown,
         color: AppTheme.success,
         bg: Color.lerp(AppTheme.success, palette.surface, 0.88)!,
       ),
       _FinanceStatItem(
         label: 'Pengeluaran',
         value: CurrencyFormatter.format(data.totalPaid),
-        icon: Icons.arrow_upward,
+        icon: LucideIcons.arrowUp,
         color: AppTheme.error,
         bg: Color.lerp(AppTheme.error, palette.surface, 0.88)!,
       ),
       _FinanceStatItem(
         label: 'Sisa',
         value: CurrencyFormatter.format(data.remainingBudget),
-        icon: Icons.savings_outlined,
+        icon: LucideIcons.piggyBank,
         color: AppTheme.tertiary,
         bg: Color.lerp(AppTheme.tertiary, palette.surface, 0.88)!,
       ),
@@ -419,7 +420,7 @@ class _TransactionCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
-                  isIncome ? Icons.arrow_downward : Icons.arrow_upward,
+                  isIncome ? LucideIcons.arrowDown : LucideIcons.arrowUp,
                   color: tx.isVoid ? palette.muted : color,
                   size: 20,
                 ),
