@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:weddingmanagementf/app/theme/app_theme.dart';
@@ -38,7 +39,7 @@ class _VendorTabState extends ConsumerState<VendorTab> {
                 ref.read(vendorSearchQueryProvider.notifier).state = v,
             decoration: const InputDecoration(
               hintText: 'Cari vendor...',
-              prefixIcon: Icon(Icons.search),
+              prefixIcon: Icon(LucideIcons.search),
             ),
           ),
         ),

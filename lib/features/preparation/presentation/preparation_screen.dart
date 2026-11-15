@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:weddingmanagementf/app/theme/app_theme.dart';
 import 'package:weddingmanagementf/core/providers/navigation_providers.dart';
@@ -159,7 +160,7 @@ class _PreparationScreenState extends ConsumerState<PreparationScreen>
                   duration: const Duration(milliseconds: 200),
                   child: FloatingActionButton.extended(
                     onPressed: _onAdd,
-                    icon: const Icon(Icons.add),
+                    icon: const Icon(LucideIcons.plus),
                     label: Text(_fabLabels[_tab.index]),
                   ),
                 ),

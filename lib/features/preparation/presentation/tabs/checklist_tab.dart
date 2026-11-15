@@ -1,6 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:weddingmanagementf/app/theme/app_theme.dart';
 import 'package:weddingmanagementf/features/checklist/data/checklist_model.dart';
 import 'package:weddingmanagementf/features/checklist/presentation/providers/checklist_providers.dart';
@@ -140,7 +141,7 @@ class ChecklistTab extends ConsumerWidget {
                             ),
                           ),
                           if (c.priorityEnum == ChecklistPriority.high)
-                            const Icon(Icons.flag,
+                            const Icon(LucideIcons.flag,
                                 size: 16, color: AppTheme.error),
                         ],
                       ),
