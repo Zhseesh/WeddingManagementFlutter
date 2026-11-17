@@ -105,9 +105,9 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen>
               if (dashboardAsync.hasValue) const SizedBox(height: 16),
               TabBar(
                 controller: _tab,
-                labelColor: AppTheme.primary,
+                labelColor: Theme.of(context).colorScheme.primary,
                 unselectedLabelColor: palette.muted,
-                indicatorColor: AppTheme.primary,
+                indicatorColor: Theme.of(context).colorScheme.primary,
                 indicatorSize: TabBarIndicatorSize.label,
                 labelStyle:
                     const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
@@ -174,8 +174,8 @@ class _FinanceStats extends StatelessWidget {
         label: 'Anggaran',
         value: CurrencyFormatter.format(data.totalBudget),
         icon: LucideIcons.wallet,
-        color: AppTheme.primary,
-        bg: Color.lerp(AppTheme.primary, palette.surface, 0.88)!,
+        color: Theme.of(context).colorScheme.primary,
+        bg: Color.lerp(Theme.of(context).colorScheme.primary, palette.surface, 0.88)!,
       ),
       _FinanceStatItem(
         label: 'Pemasukan',

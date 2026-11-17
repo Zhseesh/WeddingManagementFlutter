@@ -8,6 +8,8 @@ final guestRepositoryProvider = Provider<GuestRepository>(
   (ref) => GuestRepository(ref.watch(databaseHelperProvider)),
 );
 
+final guestSearchQueryProvider = StateProvider<String>((ref) => '');
+
 final guestListProvider = FutureProvider<List<GuestModel>>((ref) async {
   final profile = await ref.watch(activeWeddingProfileProvider.future);
   if (profile == null || profile.id == null) return const [];

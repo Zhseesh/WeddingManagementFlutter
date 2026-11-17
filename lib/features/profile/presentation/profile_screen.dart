@@ -7,9 +7,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:package_info_plus/package_info_plus.dart'; 
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:weddingmanagementf/app/theme/app_theme.dart';
+import 'package:weddingmanagementf/app/theme/theme_provider.dart';
 import 'package:weddingmanagementf/features/backup/presentation/providers/backup_providers.dart';
 import 'package:weddingmanagementf/features/budget/presentation/providers/budget_providers.dart';
 import 'package:weddingmanagementf/features/checklist/presentation/providers/checklist_providers.dart';
@@ -26,8 +28,30 @@ import 'package:weddingmanagementf/features/vendors/presentation/providers/vendo
 import 'package:weddingmanagementf/features/wedding_profile/data/wedding_profile_model.dart';
 import 'package:weddingmanagementf/features/wedding_profile/presentation/providers/wedding_profile_providers.dart';
 
-class ProfileScreen extends ConsumerWidget {
+class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
+
+  @override
+  ConsumerState<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends ConsumerState<ProfileScreen> {
+  String _appVersion = '1.0.0';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadVersion();
+  }
+
+  Future<void> _loadVersion() async {
+    final info = await PackageInfo.fromPlatform();
+    if (mounted) {
+      setState(() {
+        _appVersion = '${info.version}+${info.buildNumber}';
+      });
+    }
+  }
 
   void _invalidateAll(WidgetRef ref) {
     ref.invalidate(activeWeddingProfileProvider);
@@ -145,16 +169,47 @@ class ProfileScreen extends ConsumerWidget {
     showAboutDialog(
       context: context,
       applicationName: 'Wedding Management',
-      applicationVersion: '1.3.0',
+      applicationVersion: _appVersion,
       children: const [
-        Text(
-            'Aplikasi offline-first untuk mengelola persiapan pernikahan dan keuangan.'),
+        Text('Aplikasi offline-first untuk mengelola persiapan pernikahan dan keuangan.'),
       ],
     );
   }
 
+  void _showColorPicker(BuildContext context, WidgetRef ref) {
+    Color selectedColor = ref.read(themeColorProvider);
+    
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Pilih Warna Aksen'),
+        content: SingleChildScrollView(
+          child: ColorPicker(
+            pickerColor: selectedColor,
+            onColorChanged: (color) => selectedColor = color,
+            pickerAreaHeightPercent: 0.7,
+            enableAlpha: false,
+            displayThumbColor: true,
+            paletteType: PaletteType.hsvWithHue,
+            labelTypes: const [],
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Batal')),
+          FilledButton(
+            onPressed: () {
+              ref.read(themeColorProvider.notifier).setColor(selectedColor);
+              Navigator.pop(ctx);
+            },
+            child: const Text('Simpan'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final palette = AppTheme.of(context);
     final profileAsync = ref.watch(activeWeddingProfileProvider);
     return Scaffold(
@@ -163,13 +218,8 @@ class ProfileScreen extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('Profil',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
-            Text('Data pernikahan & pengaturan',
-                style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w500,
-                    color: palette.muted)),
+            const Text('Profil', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+            Text('Data pernikahan & pengaturan', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w500, color: palette.muted)),
           ],
         ),
       ),
@@ -177,9 +227,7 @@ class ProfileScreen extends ConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Error: $e')),
         data: (profile) {
-          if (profile == null) {
-            return const Center(child: Text('Profil belum dibuat.'));
-          }
+          if (profile == null) return const Center(child: Text('Profil belum dibuat.'));
           return ListView(
             padding: const EdgeInsets.all(16),
             children: [
@@ -196,6 +244,8 @@ class ProfileScreen extends ConsumerWidget {
                   ref.read(prepTabProvider.notifier).state = 4;
                 },
                 onAbout: () => _showAbout(context),
+                appVersion: _appVersion,
+                onPickColor: () => _showColorPicker(context, ref),
               ),
             ],
           );
@@ -218,15 +268,9 @@ class _ProfileCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final palette = AppTheme.of(context);
     final df = DateFormat('d MMMM yyyy', 'id_ID');
-    final weddingText = profile.weddingDate != null
-        ? df.format(profile.weddingDate!)
-        : 'Belum diatur';
-    final engagementText = profile.engagementDate != null
-        ? df.format(profile.engagementDate!)
-        : 'Belum diatur';
-    final locationText = (profile.weddingLocation?.isNotEmpty ?? false)
-        ? profile.weddingLocation!
-        : 'Belum diatur';
+    final weddingText = profile.weddingDate != null ? df.format(profile.weddingDate!) : 'Belum diatur';
+    final engagementText = profile.engagementDate != null ? df.format(profile.engagementDate!) : 'Belum diatur';
+    final locationText = (profile.weddingLocation?.isNotEmpty ?? false) ? profile.weddingLocation! : 'Belum diatur';
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -249,8 +293,7 @@ class _ProfileCard extends StatelessWidget {
                     color: palette.softPrimary,
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(LucideIcons.heart,
-                      color: AppTheme.primary, size: 26),
+                  child: Icon(Icons.favorite, color: Theme.of(context).colorScheme.primary, size: 26),
                 ),
               ),
               const SizedBox(width: 12),
@@ -261,32 +304,23 @@ class _ProfileCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       '${profile.partnerOne} & ${profile.partnerTwo}',
-                      style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w800,
-                          color: palette.ink),
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: palette.ink),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 6),
                     Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 3),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
                       child: DecoratedBox(
                         decoration: BoxDecoration(
                           color: palette.softSuccess,
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(20)),
+                          borderRadius: const BorderRadius.all(Radius.circular(20)),
                         ),
                         child: const Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 3),
+                          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 3),
                           child: Text(
                             'Profil aktif',
-                            style: TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.w700,
-                                color: AppTheme.success),
+                            style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: AppTheme.success),
                           ),
                         ),
                       ),
@@ -297,23 +331,19 @@ class _ProfileCard extends StatelessWidget {
               TextButton(
                 onPressed: onEdit,
                 style: TextButton.styleFrom(
-                  foregroundColor: AppTheme.primary,
+                  foregroundColor: Theme.of(context).colorScheme.primary,
                   backgroundColor: palette.softPrimary,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   minimumSize: Size.zero,
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8)),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 ),
                 child: const Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(LucideIcons.pencil, size: 14),
+                    Icon(Icons.edit, size: 14),
                     SizedBox(width: 4),
-                    Text('Edit',
-                        style: TextStyle(
-                            fontSize: 12, fontWeight: FontWeight.w700)),
+                    Text('Edit', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
                   ],
                 ),
               ),
@@ -338,21 +368,14 @@ class _ProfileCard extends StatelessWidget {
       children: [
         Expanded(
           flex: 2,
-          child: Text(label,
-              style: TextStyle(
-                  fontSize: 12,
-                  color: palette.muted,
-                  fontWeight: FontWeight.w500)),
+          child: Text(label, style: TextStyle(fontSize: 12, color: palette.muted, fontWeight: FontWeight.w500)),
         ),
         Expanded(
           flex: 3,
           child: Text(
             value,
             textAlign: TextAlign.right,
-            style: TextStyle(
-                fontSize: 13,
-                color: palette.ink,
-                fontWeight: FontWeight.w700),
+            style: TextStyle(fontSize: 13, color: palette.ink, fontWeight: FontWeight.w700),
           ),
         ),
       ],
@@ -369,11 +392,16 @@ class _SettingsCard extends StatelessWidget {
   final VoidCallback onRestore;
   final VoidCallback onReminder;
   final VoidCallback onAbout;
+  final String appVersion;
+  final VoidCallback onPickColor;
+
   const _SettingsCard({
     required this.onBackup,
     required this.onRestore,
     required this.onReminder,
     required this.onAbout,
+    required this.appVersion,
+    required this.onPickColor,
   });
 
   @override
@@ -392,19 +420,25 @@ class _SettingsCard extends StatelessWidget {
             padding: const EdgeInsets.only(top: 12, bottom: 4),
             child: Align(
               alignment: Alignment.centerLeft,
-              child: Text('Pengaturan & Data',
-                  style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                      color: palette.ink)),
+              child: Text('Pengaturan & Data', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: palette.ink)),
             ),
           ),
+          _row(
+            title: 'Warna Aksen',
+            subtitle: 'Ubah tema warna aplikasi',
+            actionLabel: 'Pilih',
+            onAction: onPickColor,
+            palette: palette,
+            context: context,
+          ),
+          Divider(height: 1, color: palette.line),
           _row(
             title: 'Backup data',
             subtitle: 'Simpan semua data sebagai JSON',
             actionLabel: 'Backup',
             onAction: onBackup,
             palette: palette,
+            context: context,
           ),
           Divider(height: 1, color: palette.line),
           _row(
@@ -413,6 +447,7 @@ class _SettingsCard extends StatelessWidget {
             actionLabel: 'Pilih file',
             onAction: onRestore,
             palette: palette,
+            context: context,
           ),
           Divider(height: 1, color: palette.line),
           _row(
@@ -421,15 +456,17 @@ class _SettingsCard extends StatelessWidget {
             actionLabel: 'Kelola',
             onAction: onReminder,
             palette: palette,
+            context: context,
           ),
           Divider(height: 1, color: palette.line),
           _row(
             title: 'Tentang aplikasi',
-            subtitle: 'Wedding Management v1.0.0',
+            subtitle: 'Wedding Management v$appVersion',
             actionLabel: 'Info',
             onAction: onAbout,
-            trailingPill: 'v1.0.0',
+            trailingPill: 'v$appVersion',
             palette: palette,
+            context: context,
           ),
         ],
       ),
@@ -443,6 +480,7 @@ class _SettingsCard extends StatelessWidget {
     required VoidCallback onAction,
     String? trailingPill,
     required AppPalette palette,
+    required BuildContext context, 
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12),
@@ -452,14 +490,9 @@ class _SettingsCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title,
-                    style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
-                        color: palette.ink)),
+                Text(title, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: palette.ink)),
                 const SizedBox(height: 2),
-                Text(subtitle,
-                    style: TextStyle(fontSize: 11, color: palette.muted)),
+                Text(subtitle, style: TextStyle(fontSize: 11, color: palette.muted)),
               ],
             ),
           ),
@@ -473,28 +506,21 @@ class _SettingsCard extends StatelessWidget {
               ),
               child: Text(
                 trailingPill,
-                style: const TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w700,
-                    color: AppTheme.primary),
+                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Theme.of(context).colorScheme.primary),
               ),
             )
           else
             TextButton(
               onPressed: onAction,
               style: TextButton.styleFrom(
-                foregroundColor: AppTheme.primary,
+                foregroundColor: Theme.of(context).colorScheme.primary,
                 backgroundColor: palette.softPrimary,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 minimumSize: Size.zero,
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8)),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
               ),
-              child: Text(actionLabel,
-                  style: const TextStyle(
-                      fontSize: 12, fontWeight: FontWeight.w700)),
+              child: Text(actionLabel, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
             ),
         ],
       ),

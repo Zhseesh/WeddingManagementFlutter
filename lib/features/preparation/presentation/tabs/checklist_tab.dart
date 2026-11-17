@@ -67,10 +67,10 @@ class ChecklistTab extends ConsumerWidget {
                                 color: palette.ink)),
                         const Spacer(),
                         Text('${(done / items.length * 100).round()}%',
-                            style: const TextStyle(
+                            style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w700,
-                                color: AppTheme.primary)),
+                                color: Theme.of(context).colorScheme.primary)),
                       ],
                     ),
                     const SizedBox(height: 8),

@@ -126,13 +126,13 @@ class _HeroCard extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Color.lerp(AppTheme.primary, palette.surface, 0.88)!,
-            Color.lerp(AppTheme.primary, palette.surface, 0.94)!,
+            Color.lerp(Theme.of(context).colorScheme.primary, palette.surface, 0.88)!,
+            Color.lerp(Theme.of(context).colorScheme.primary, palette.surface, 0.94)!,
             palette.surface,
           ],
         ),
         border: Border.all(
-            color: Color.lerp(AppTheme.primary, palette.surface, 0.75)!),
+            color: Color.lerp(Theme.of(context).colorScheme.primary, palette.surface, 0.75)!),
       ),
       child: Row(
         children: [
@@ -157,10 +157,10 @@ class _HeroCard extends StatelessWidget {
                 if (!isPast && !isToday) ...[
                   Text(
                     '$days',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 36,
                       fontWeight: FontWeight.w800,
-                      color: AppTheme.primary,
+                      color: Theme.of(context).colorScheme.primary,
                       height: 1.1,
                     ),
                   ),
@@ -175,10 +175,10 @@ class _HeroCard extends StatelessWidget {
                 ] else
                   Text(
                     isPast ? 'Selamat!' : 'Hari ini!',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 26,
                       fontWeight: FontWeight.w800,
-                      color: AppTheme.primary,
+                      color: Theme.of(context).colorScheme.primary,
                     ),
                   ),
                 const SizedBox(height: 6),
@@ -192,7 +192,7 @@ class _HeroCard extends StatelessWidget {
           Icon(
             LucideIcons.heart,
             size: 56,
-            color: Color.lerp(AppTheme.primary, palette.surface, 0.55),
+            color: Color.lerp(Theme.of(context).colorScheme.primary, palette.surface, 0.55),
           ),
         ],
       ),
@@ -217,8 +217,8 @@ class _StatsGrid extends StatelessWidget {
         label: 'Total Anggaran',
         value: CurrencyFormatter.format(data.totalBudget),
         icon: LucideIcons.wallet,
-        color: AppTheme.primary,
-        bg: Color.lerp(AppTheme.primary, palette.surface, 0.88)!,
+        color: Theme.of(context).colorScheme.primary,
+        bg: Color.lerp(Theme.of(context).colorScheme.primary, palette.surface, 0.88)!,
       ),
       _StatItem(
         label: 'Total Terbayar',
@@ -381,9 +381,9 @@ class _SectionHead extends StatelessWidget {
           TextButton(
             onPressed: onAction,
             style: TextButton.styleFrom(
-              foregroundColor: AppTheme.primary,
+              foregroundColor: Theme.of(context).colorScheme.primary,
               backgroundColor:
-                  Color.lerp(AppTheme.primary, palette.surface, 0.9),
+                  Color.lerp(Theme.of(context).colorScheme.primary, palette.surface, 0.9),
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               minimumSize: Size.zero,
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -448,7 +448,7 @@ class _CategoryList extends StatelessWidget {
       ),
       child: Column(
         children: categories.map((c) {
-          final color = _parseHex(c.colorHex, AppTheme.primary);
+          final color = _parseHex(c.colorHex, Theme.of(context).colorScheme.primary);
           return Padding(
             padding: const EdgeInsets.symmetric(vertical: 8),
             child: Column(
@@ -641,8 +641,8 @@ class _QuickActionsGrid extends ConsumerWidget {
       _QuickAction(
         label: 'Vendor', 
         icon: LucideIcons.store, 
-        color: AppTheme.primary,
-        bgColor: Color.lerp(AppTheme.primary, palette.surface, 0.88)!,
+        color: Theme.of(context).colorScheme.primary,
+        bgColor: Color.lerp(Theme.of(context).colorScheme.primary, palette.surface, 0.88)!,
         onTap: () => _goToTab(ref, mainTab: 1, prepSubTab: 0),
       ),
       _QuickAction(

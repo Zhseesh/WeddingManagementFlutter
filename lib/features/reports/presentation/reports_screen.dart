@@ -258,7 +258,7 @@ class _StatsGrid extends StatelessWidget {
       _StatItem(label: 'Pengeluaran', value: CurrencyFormatter.format(data.totalExpense), icon: LucideIcons.arrowUp,
           color: AppTheme.error, bg: Color.lerp(AppTheme.error, palette.surface, 0.88)!),
       _StatItem(label: 'Transaksi', value: '${data.transactions.length}', icon: LucideIcons.receipt,
-          color: AppTheme.primary, bg: Color.lerp(AppTheme.primary, palette.surface, 0.88)!),
+          color: Theme.of(context).colorScheme.primary, bg: Color.lerp(Theme.of(context).colorScheme.primary, palette.surface, 0.88)!),
       _StatItem(label: 'Vendor Aktif', value: '${data.vendors.length}', icon: LucideIcons.store,
           color: AppTheme.tertiary, bg: Color.lerp(AppTheme.tertiary, palette.surface, 0.88)!),
     ];
@@ -341,7 +341,7 @@ class _DonutCard extends StatelessWidget {
     }
 
     final chartPalette = [
-      AppTheme.primary,
+      Theme.of(context).colorScheme.primary,
       AppTheme.success,
       AppTheme.warning,
       AppTheme.tertiary,
@@ -486,21 +486,28 @@ class _ExportCard extends StatelessWidget {
         children: [
           Text('Ekspor Laporan', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: palette.ink)),
           const SizedBox(height: 12),
-          _row(icon: LucideIcons.fileText, title: 'Laporan PDF', subtitle: 'Ringkasan untuk dicetak', onTap: onExportPdf, palette: palette),
+          _row(icon: LucideIcons.fileText, title: 'Laporan PDF', subtitle: 'Ringkasan untuk dicetak', onTap: onExportPdf, palette: palette, context: context,),
           Divider(height: 20, color: palette.line),
-          _row(icon: LucideIcons.table, title: 'Data Transaksi CSV', subtitle: 'Untuk spreadsheet', onTap: onExportCsv, palette: palette),
+          _row(icon: LucideIcons.table, title: 'Data Transaksi CSV', subtitle: 'Untuk spreadsheet', onTap: onExportCsv, palette: palette, context: context,),
         ],
       ),
     );
   }
 
-  Widget _row({required IconData icon, required String title, required String subtitle, required VoidCallback onTap, required AppPalette palette}) {
+  Widget _row({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+    required AppPalette palette,
+    required BuildContext context, // 👈 TAMBAHKAN INI
+  }) {
     return Row(
       children: [
         Container(
           padding: const EdgeInsets.all(9),
           decoration: BoxDecoration(color: palette.softPrimary, borderRadius: BorderRadius.circular(10)),
-          child: Icon(icon, color: AppTheme.primary, size: 20),
+          child: Icon(icon, color: Theme.of(context).colorScheme.primary, size: 20),
         ),
         const SizedBox(width: 12),
         Expanded(
@@ -515,7 +522,7 @@ class _ExportCard extends StatelessWidget {
         TextButton(
           onPressed: onTap,
           style: TextButton.styleFrom(
-            foregroundColor: AppTheme.primary,
+            foregroundColor: Theme.of(context).colorScheme.primary,
             backgroundColor: palette.softPrimary,
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             minimumSize: Size.zero,

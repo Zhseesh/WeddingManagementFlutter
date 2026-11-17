@@ -120,7 +120,7 @@ class _HeaderCard extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
-        gradient: const LinearGradient(colors: [AppTheme.primary, AppTheme.secondary], begin: Alignment.topLeft, end: Alignment.bottomRight),
+        gradient: LinearGradient(colors: [Theme.of(context).colorScheme.primary, AppTheme.secondary], begin: Alignment.topLeft, end: Alignment.bottomRight),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -128,7 +128,7 @@ class _HeaderCard extends StatelessWidget {
           Row(
             children: [
               Expanded(child: Text(summary.installment.name, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold))),
-              Chip(label: Text(summary.installment.statusLabel), backgroundColor: Colors.white, labelStyle: const TextStyle(color: AppTheme.primary), visualDensity: VisualDensity.compact),
+              Chip(label: Text(summary.installment.statusLabel), backgroundColor: Colors.white, labelStyle:  TextStyle(color: Theme.of(context).colorScheme.primary), visualDensity: VisualDensity.compact),
             ],
           ),
           const SizedBox(height: 12),
@@ -160,7 +160,7 @@ class _ScheduleTile extends StatelessWidget {
     switch (display) {
       case 'paid': statusColor = AppTheme.success; break;
       case 'overdue': statusColor = AppTheme.error; break;
-      case 'partial': statusColor = AppTheme.primary; break;
+      case 'partial': statusColor = Theme.of(context).colorScheme.primary; break;
       default: statusColor = palette.muted;
     }
 

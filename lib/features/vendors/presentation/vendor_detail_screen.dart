@@ -121,8 +121,8 @@ class _HeaderCard extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
-        gradient: const LinearGradient(
-          colors: [AppTheme.primary, AppTheme.secondary],
+        gradient: LinearGradient(
+          colors: [Theme.of(context).colorScheme.primary, AppTheme.secondary],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -141,7 +141,7 @@ class _HeaderCard extends StatelessWidget {
               Chip(
                 label: Text(summary.vendor.statusEnum.label),
                 backgroundColor: Colors.white,
-                labelStyle: const TextStyle(color: AppTheme.primary),
+                labelStyle: TextStyle(color: Theme.of(context).colorScheme.primary),
                 visualDensity: VisualDensity.compact,
               ),
             ],

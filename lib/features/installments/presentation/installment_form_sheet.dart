@@ -184,8 +184,8 @@ class _InstallmentFormSheetState extends ConsumerState<_InstallmentFormSheet> {
                       style: TextStyle(fontWeight: FontWeight.w600, color: palette.ink)),
                   Text(
                     CurrencyFormatter.format(_schedulesTotal),
-                    style: const TextStyle(
-                        fontWeight: FontWeight.w700, color: AppTheme.primary),
+                    style: TextStyle(
+                        fontWeight: FontWeight.w700, color: Theme.of(context).colorScheme.primary),
                   ),
                 ],
               ),

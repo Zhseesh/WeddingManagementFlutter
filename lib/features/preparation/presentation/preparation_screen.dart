@@ -115,9 +115,9 @@ class _PreparationScreenState extends ConsumerState<PreparationScreen>
           controller: _tab,
           isScrollable: true,
           tabAlignment: TabAlignment.start,
-          labelColor: AppTheme.primary,
+          labelColor: Theme.of(context).colorScheme.primary,
           unselectedLabelColor: palette.muted,
-          indicatorColor: AppTheme.primary,
+          indicatorColor: Theme.of(context).colorScheme.primary,
           indicatorSize: TabBarIndicatorSize.label,
           labelStyle:
               const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),

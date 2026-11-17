@@ -242,7 +242,7 @@ class _CategoryTile extends StatelessWidget {
     final cat = item.category;
     final color = cat.color != null
         ? Color(int.parse('FF${cat.color!.replaceFirst('#', '')}', radix: 16))
-        : AppTheme.primary;
+        : Theme.of(context).colorScheme.primary;
 
     return Card(
       margin: EdgeInsets.zero,
