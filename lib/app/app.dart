@@ -12,7 +12,7 @@ class WeddingApp extends ConsumerWidget { // 👈 Ubah jadi ConsumerWidget
     final accentColor = ref.watch(themeColorProvider); // 👈 Pantau warna
 
     return MaterialApp.router(
-      title: 'Wedding Planner & Finance',
+      title: 'Wedding Management',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme(accentColor),
       darkTheme: AppTheme.darkTheme(accentColor),
